@@ -23,5 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# dotenv environment variables file
+.env
+
 cypress/screenshots/
 cypress/videos/
+
