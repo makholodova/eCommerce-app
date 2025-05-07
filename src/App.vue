@@ -1,10 +1,12 @@
-<script setup lang="ts"></script>
+<script lang="ts" setup></script>
 
 <template>
   <nav>
-    <router-link to="/">Main</router-link> |
-    <router-link to="/login">Login</router-link> |
-    <router-link to="/register">Register</router-link>
+    <router-link :to="{ name: 'Main' }">Main</router-link>
+    |
+    <router-link :to="{ name: 'Login' }">Login</router-link>
+    |
+    <router-link :to="{ name: 'Register' }">Register</router-link>
   </nav>
   <router-view />
 </template>
