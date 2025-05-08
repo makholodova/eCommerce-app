@@ -1,0 +1,51 @@
+@font-face {
+  font-family: "Roboto";
+  src: url("@/assets/fonts/Roboto-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto";
+  src: url("@/assets/fonts/Roboto-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Disket-Mono";
+  src: url("@/assets/fonts/DisketMono.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --blue: #091d9e;
+  --blue-hover: rgba(9, 29, 158, 0.8);
+  --blue-light: #bcc5ff;
+  --purple: #750dc5;
+  --white: #f6f6f6;
+  --black: #0c0c0c;
+  --grey: #ababab;
+  --grey-light: #c1c1c1;
+  --grey-lighter: #dedede;
+  --grey-dark: #454545;
+  --grey-not-active: #505050;
+  --yellow: #ebba1a;
+  --green: #169b00;
+  --red: #ff0000;
+  --purple-blue-gradient: linear-gradient(90deg, #260dc1 0%, #59006f 100%);
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+#app {
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+}
