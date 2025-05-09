@@ -18,7 +18,7 @@ defineProps<{
     <input
       :id="id"
       v-model="model"
-      :class="{ valid: model && !error }"
+      :class="['base-input', { valid: model && !error, error: !!error }]"
       :placeholder="placeholder"
       :type="type"
       :value="model"
@@ -34,7 +34,7 @@ defineProps<{
   gap: 0.5rem;
 }
 
-input {
+.base-input {
   border: 1px solid var(--grey-not-active);
   border-radius: 8px;
   padding: 11px 8px 11px 16px;
@@ -50,25 +50,25 @@ input {
     background-color 0.2s ease;
 }
 
-input:not(:placeholder-shown):not(.error):not(:focus) {
+.base-input:not(:placeholder-shown):not(.error):not(:focus) {
   font-size: 1rem;
   color: var(--black);
 }
 
-input.valid {
+.base-input.valid {
   background-image: url("@/assets/icons/icon_valid.svg");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 20px 20px;
 }
 
-/*input.error {
+/*.base-input.error {
   font-size: 1rem;
   border: 1px solid var(--red);
   color: var(--red);
 }*/
 
-input:focus:not(.error) {
+.base-input:focus:not(.error) {
   border: 1px solid var(--black);
   color: var(--black);
 }
