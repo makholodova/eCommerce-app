@@ -2,45 +2,44 @@ import type { Validator } from "@/types/types.ts";
 import { normalizeDate } from "@/utils/date.ts";
 
 export const validateEmail: Validator = (email) => {
-  if (!email) return "Email  is required";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email format";
-  if (/\s/.test(email)) return "Email must not contain white spaces";
+  if (!email) return "Email обязателен";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Неверный формат email";
+  if (/\s/.test(email)) return "Email не должен содержать пробелы";
   return "";
 };
 
 export const validatePassword: Validator = (password) => {
-  if (!password) return "Password  is required";
-  if (password.length < 8) return "Password must be at least 8 characters long";
+  if (!password) return "Пароль обязателен";
+  if (password.length < 8) return "Пароль должен содержать не менее 8 символов";
   if (!/[A-ZА-Я]/.test(password))
-    return "The password must contain at least one capital letter";
+    return "Пароль должен содержать хотя бы одну заглавную букву";
   if (!/[a-zа-яё]/.test(password))
-    return "The password must contain at least one lowercase letter";
-  if (!/\d/.test(password))
-    return "The password must contain at least one digit";
+    return "Пароль должен содержать хотя бы одну строчную букву";
+  if (!/\d/.test(password)) return "Пароль должен содержать хотя бы одну цифру";
   if (!/[^\dA-Za-zА-Яа-яёЁ]/.test(password))
-    return "The password must contain at least one special character";
-  if (/\s/.test(password)) return "Password must not contain white spaces";
+    return "ароль должен содержать хотя бы один специальный символ";
+  if (/\s/.test(password)) return "Пароль не должен содержать пробелы";
   return "";
 };
 
 export const validateFirstName: Validator = (name) => {
-  if (!name) return "First name is required";
-  if (!/^[A-Za-zА-Яа-яЁё]+$/.test(name)) return "Only letters are allowed";
-  if (/\s/.test(name)) return "First name must not contain white spaces";
+  if (!name) return "Имя обязательно";
+  if (!/^[A-Za-zА-Яа-яЁё]+$/.test(name)) return "Допустимы только буквы";
+  if (/\s/.test(name)) return "Имя не должно содержать пробелы";
   return "";
 };
 
 export const validateLastName: Validator = (name) => {
-  if (!name) return "Last name is required";
-  if (!/^[A-Za-zА-Яа-яЁё]+$/.test(name)) return "Only letters are allowed";
-  if (/\s/.test(name)) return "Last name must not contain white spaces";
+  if (!name) return "Фамилия обязательна";
+  if (!/^[A-Za-zА-Яа-яЁё]+$/.test(name)) return "Допустимы только буквы";
+  if (/\s/.test(name)) return "Фамилия не должна содержать пробелы";
   return "";
 };
 
 export const validateBirthDate: Validator = (dateStr) => {
-  if (!dateStr) return "Date of birth is required";
+  if (!dateStr) return "Дата рождения обязательна";
   if (/\s/.test(dateStr)) {
-    return "Date of birth must not contain white spaces";
+    return "Дата рождения не должна содержать пробелы";
   }
 
   const birthDate = normalizeDate(new Date(dateStr));
@@ -51,33 +50,45 @@ export const validateBirthDate: Validator = (dateStr) => {
     today.getMonth(),
     today.getDate(),
   );
-  if (birthDate > minAllowedDate) return "You must be at least 14 years old";
+  if (birthDate > minAllowedDate) return "Вам должно быть не менее 14 лет";
   return "";
 };
 
 export const validateStreet: Validator = (name) => {
-  if (!name) return "Street is required";
+  if (!name) return "Улица обязательна";
   return "";
 };
 
 export const validateCity: Validator = (name) => {
-  if (!name) return "City is required";
-  if (!/^[A-Za-zА-Яа-яЁё]+$/.test(name)) return "Only letters are allowed";
+  if (!name) return "Город обязателен";
+  if (!/^[A-Za-zА-Яа-яЁё]+$/.test(name)) return "Допустимы только буквы";
   return "";
 };
 
 export const validateCountry: Validator = (country) => {
   const allowedCountries = ["RU"];
-  if (!country) return "Country is required";
+  if (!country) return "Страна обязательна";
   if (!allowedCountries.includes(country)) {
-    return "Selected country is not allowed";
+    return "Выбранная страна недопустима";
   }
   return "";
 };
 
 export const validatePostalCode: Validator = (code) => {
-  if (!code) return "Postal code  is required";
+  if (!code) return "Почтовый индекс обязателен";
   if (!/\d{6}$/.test(code) || code.length > 6)
-    return `Postal code in Russia must be exactly 6 digits`;
+    return `Почтовый индекс в России должен состоять ровно из 6 цифр`;
   return "";
+};
+
+export const fieldValidators: Record<string, Validator> = {
+  email: validateEmail,
+  password: validatePassword,
+  firstName: validateFirstName,
+  lastName: validateLastName,
+  birthDate: validateBirthDate,
+  street: validateStreet,
+  city: validateCity,
+  country: validateCountry,
+  postalCode: validatePostalCode,
 };
