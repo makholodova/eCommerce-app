@@ -1,29 +1,68 @@
 ﻿<script lang="ts" setup>
-import { defineProps } from "vue";
+import { computed, defineProps } from "vue";
+import {
+  useVuelidate,
+  type ValidationRuleWithoutParams,
+  type ValidationRuleWithParams,
+  type ValidatorFn,
+} from "@vuelidate/core";
 
-const model = defineModel<string>();
-
-defineProps<{
+const props = defineProps<{
   id: string;
   label: string;
   type: string;
+  vuelidateRules?: Record<
+    string,
+    ValidationRuleWithoutParams | ValidationRuleWithParams | ValidatorFn
+  >;
   placeholder?: string;
-  error?: string;
+  showError?: boolean;
 }>();
+
+const inputValue = defineModel<string>({ required: true });
+
+const rules = computed(() => {
+  const rules = props.vuelidateRules ?? {};
+  return {
+    inputValue: rules,
+  };
+});
+
+const v$ = useVuelidate(
+  rules,
+  { inputValue },
+  { $lazy: true, $autoDirty: true },
+);
+
+const errorMessage = computed(() => {
+  const errors = v$.value.inputValue.$errors;
+  return errors.length ? errors[0].$message : "";
+});
 </script>
 
 <template>
   <label class="field">
     <span>{{ label }}</span>
     <input
-      :id="id"
-      v-model="model"
-      :class="['base-input', { valid: model && !error, error: !!error }]"
-      :placeholder="placeholder"
-      :type="type"
-      :value="model"
+      :id
+      v-model="inputValue"
+      :class="[
+        'base-input',
+        {
+          invalid: v$.inputValue.$error,
+          valid: inputValue && !v$.inputValue.$error,
+        },
+      ]"
+      :placeholder
+      :type
+      :value="inputValue"
     />
-    <span v-if="error" class="error-text">{{ error }}</span>
+    <span
+      v-if="showError"
+      :class="{ visible: v$.inputValue.$error }"
+      class="error-text"
+      >{{ errorMessage }}</span
+    >
   </label>
 </template>
 
@@ -62,11 +101,10 @@ defineProps<{
   background-size: 20px 20px;
 }
 
-/*.base-input.error {
-  font-size: 1rem;
-  border: 1px solid var(--red);
+.base-input.invalid {
+  border-color: var(--red);
   color: var(--red);
-}*/
+}
 
 .base-input:focus:not(.error) {
   border: 1px solid var(--black);
@@ -76,5 +114,15 @@ defineProps<{
 .error-text {
   color: var(--red);
   font-size: 0.7rem;
+  min-height: 1rem;
+}
+
+.error-text {
+  transition: opacity 0.2s ease;
+  opacity: 0;
+}
+
+.error-text.visible {
+  opacity: 1;
 }
 </style>

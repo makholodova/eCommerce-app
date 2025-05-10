@@ -1,21 +1,10 @@
 ﻿<script lang="ts" setup>
 import { computed, reactive, ref } from "vue";
 import BaseInputField from "@/components/ui/BaseInputField.vue";
-import { fieldValidators } from "@/utils/validation.ts";
+import { useVuelidate } from "@vuelidate/core";
+import BaseSelectField from "@/components/ui/BaseSelectField.vue";
+import { registrationRules } from "@/utils/validation.ts";
 
-const fieldKeys = {
-  email: "email",
-  password: "password",
-  firstName: "firstName",
-  lastName: "lastName",
-  birthDate: "birthDate",
-  street: "street",
-  city: "city",
-  country: "country",
-  postalCode: "postalCode",
-} as const;
-
-type FieldKey = (typeof fieldKeys)[keyof typeof fieldKeys];
 const form = reactive({
   email: "",
   password: "",
@@ -30,23 +19,13 @@ const form = reactive({
 
 const countries = ref([{ title: "RU", value: "Россия" }]);
 
-const errors = reactive<Record<string, string>>({});
+const rules = computed(() => registrationRules);
 
-function validateField(field: FieldKey): void {
-  const validator = fieldValidators[field];
-  if (!validator) return;
+const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });
 
-  const value = form[field];
-  const error = validator(value);
-  errors[field] = error;
-}
-
-function handleSubmit(): void {
-  Object.values(fieldKeys).forEach(validateField);
-
-  const hasErrors = Object.values(errors).some(Boolean);
-  if (hasErrors) return;
-
+async function handleSubmit(): Promise<void> {
+  await v$.value.$validate();
+  if (v$.value.$invalid) return;
   const dateCustomerRequest = {
     email: form.email,
     password: form.password,
@@ -63,11 +42,8 @@ function handleSubmit(): void {
 
   console.log("Форма валидна, отправляем данные:", dateCustomerRequest);
 }
-const isFormValid = computed(() => {
-  const hasEmptyFields = Object.values(form).some((value) => !value);
-  const hasErrors = Object.values(errors).some(Boolean);
-  return !hasEmptyFields && !hasErrors;
-});
+
+const isFormValid = computed(() => !v$.value.$invalid);
 </script>
 
 <template>
@@ -76,52 +52,52 @@ const isFormValid = computed(() => {
       <BaseInputField
         id="email"
         v-model="form.email"
-        :error="errors.email"
+        :vuelidate-rules="rules.email"
         label="E-mail"
         placeholder="user@example.com"
+        show-error
         type="email"
-        @input="validateField(fieldKeys.email)"
       />
       <BaseInputField
         id="password"
         v-model="form.password"
-        :error="errors.password"
+        :vuelidate-rules="rules.password"
         label="Пароль"
         placeholder="**********"
+        show-error
         type="password"
-        @input="validateField(fieldKeys.password)"
       />
     </div>
     <div class="form-section personal-data-wrapper">
-      <h3 class="form-section-title">Personal Info</h3>
+      <h3 class="form-section-title">Личная информация</h3>
       <BaseInputField
         id="firstName"
         v-model="form.firstName"
-        :error="errors.firstName"
+        :vuelidate-rules="rules.firstName"
         label="Имя"
         placeholder="Иван"
+        show-error
         type="text"
-        @input="validateField(fieldKeys.firstName)"
       />
 
       <BaseInputField
         id="lastName"
         v-model="form.lastName"
-        :error="errors.lastName"
+        :vuelidate-rules="rules.lastName"
         label="Фамилия"
         placeholder="Иванов"
+        show-error
         type="text"
-        @input="validateField(fieldKeys.lastName)"
       />
 
       <BaseInputField
         id="birthDate"
         v-model="form.birthDate"
-        :error="errors.birthDate"
+        :vuelidate-rules="rules.birthDate"
         label="Дата рождения"
         placeholder="01.01.2000"
+        show-error
         type="date"
-        @input="validateField(fieldKeys.birthDate)"
       />
     </div>
 
@@ -130,56 +106,45 @@ const isFormValid = computed(() => {
       <BaseInputField
         id="street"
         v-model="form.street"
-        :error="errors.street"
+        :vuelidate-rules="rules.street"
         label="Улица"
         placeholder="ул. Ленина"
+        show-error
         type="text"
-        @input="validateField(fieldKeys.street)"
       />
 
       <BaseInputField
         id="city"
         v-model="form.city"
-        :error="errors.city"
+        :vuelidate-rules="rules.city"
         label="Город"
         placeholder="Москва"
+        show-error
         type="text"
-        @input="validateField(fieldKeys.city)"
       />
 
-      <label class="field">
-        <span>Country</span>
-        <select
-          id="country"
-          v-model="form.country"
-          @change="validateField(fieldKeys.country)"
-        >
-          <option disabled value="">Выберите страну</option>
-          <option
-            v-for="country in countries"
-            :key="country.title"
-            :value="country.title"
-          >
-            {{ country.value }}
-          </option>
-        </select>
-        <span v-if="errors.country" class="error-text">{{
-          errors.country
-        }}</span>
-      </label>
+      <BaseSelectField
+        id="country"
+        v-model="form.country"
+        :options="countries"
+        :vuelidate-rules="rules.country"
+        label="Страна"
+        placeholder="Выберите страну"
+        show-error
+      />
 
       <BaseInputField
         id="postalCode"
         v-model="form.postalCode"
-        :error="errors.postalCode"
-        label="Postal Code"
+        :vuelidate-rules="rules.postalCode"
+        label="Почтовый индекс"
         placeholder="123456"
+        show-error
         type="text"
-        @input="validateField(fieldKeys.postalCode)"
       />
     </div>
 
-    <button class="button" type="submit" :disabled="!isFormValid">
+    <button :disabled="!isFormValid" class="button" type="submit">
       Зарегистрироваться
     </button>
   </form>
@@ -198,55 +163,6 @@ const isFormValid = computed(() => {
 
 .form-section-title {
   grid-column: span 2;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-select {
-  border: 1px solid var(--grey-not-active);
-  border-radius: 8px;
-  padding: 11px 8px 11px 16px;
-
-  font-size: 1rem;
-  font-weight: 400;
-  color: var(--grey-not-active);
-
-  outline: none;
-  transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease;
-}
-
-select:not(:placeholder-shown):not(.error):not(:focus) {
-  font-size: 1rem;
-  color: var(--black);
-}
-
-/*select.valid {
-  background-image: url("@/assets/icons/icon_valid.svg");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 20px 20px;
-}*/
-
-/*select.error {
-  font-size: 1rem;
-  border: 1px solid var(--red);
-  color: var(--red);
-}*/
-
-select:focus:not(.error) {
-  border: 1px solid var(--black);
-  color: var(--black);
-}
-
-.error-text {
-  color: var(--red);
-  font-size: 0.7rem;
 }
 
 .button {

@@ -1,94 +1,121 @@
-import type { Validator } from "@/types/types.ts";
+import { email, helpers, minLength, required } from "@vuelidate/validators";
+import {
+  digitRegExp,
+  lowercaseRegExp,
+  onlyLettersRegExp,
+  postalCodeRegExp,
+  specialCharRegExp,
+  uppercaseRegExp,
+  whitespaceRegExp,
+} from "@/utils/baseRegEx.ts";
 import { normalizeDate } from "@/utils/date.ts";
 
-export const validateEmail: Validator = (email) => {
-  if (!email) return "Email обязателен";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Неверный формат email";
-  if (/\s/.test(email)) return "Email не должен содержать пробелы";
-  return "";
-};
+const allowedCountries = ["RU"];
 
-export const validatePassword: Validator = (password) => {
-  if (!password) return "Пароль обязателен";
-  if (password.length < 8) return "Пароль должен содержать не менее 8 символов";
-  if (!/[A-ZА-Я]/.test(password))
-    return "Пароль должен содержать хотя бы одну заглавную букву";
-  if (!/[a-zа-яё]/.test(password))
-    return "Пароль должен содержать хотя бы одну строчную букву";
-  if (!/\d/.test(password)) return "Пароль должен содержать хотя бы одну цифру";
-  if (!/[^\dA-Za-zА-Яа-яёЁ]/.test(password))
-    return "ароль должен содержать хотя бы один специальный символ";
-  if (/\s/.test(password)) return "Пароль не должен содержать пробелы";
-  return "";
-};
+const isAtLeastAge =
+  (minAge: number) =>
+  (value: string): boolean => {
+    const birthDate = normalizeDate(new Date(value));
+    const today = normalizeDate(new Date());
+    const minAllowedDate = new Date(
+      today.getFullYear() - minAge,
+      today.getMonth(),
+      today.getDate(),
+    );
+    return birthDate <= minAllowedDate;
+  };
 
-export const validateFirstName: Validator = (name) => {
-  if (!name) return "Имя обязательно";
-  if (!/^[A-Za-zА-Яа-яЁё]+$/.test(name)) return "Допустимы только буквы";
-  if (/\s/.test(name)) return "Имя не должно содержать пробелы";
-  return "";
-};
+export const registrationRules = {
+  email: {
+    required: helpers.withMessage("Email обязателен", required),
+    email: helpers.withMessage("Неверный формат e-mail", email),
+  },
+  password: {
+    required: helpers.withMessage("Пароль обязателен", required),
+    minLength: helpers.withMessage(
+      "Пароль должен содержать не менее 8 символов",
+      minLength(8),
+    ),
+    hasUppercase: helpers.withMessage(
+      "Пароль должен содержать хотя бы одну заглавную букву",
+      helpers.regex(uppercaseRegExp),
+    ),
+    hasLowercase: helpers.withMessage(
+      "Пароль должен содержать хотя бы одну строчную букву",
+      helpers.regex(lowercaseRegExp),
+    ),
+    hasDigit: helpers.withMessage(
+      "Пароль должен содержать хотя бы одну цифру",
+      helpers.regex(digitRegExp),
+    ),
+    hasSpecialChar: helpers.withMessage(
+      "Пароль должен содержать хотя бы один специальный символ",
+      helpers.regex(specialCharRegExp),
+    ),
 
-export const validateLastName: Validator = (name) => {
-  if (!name) return "Фамилия обязательна";
-  if (!/^[A-Za-zА-Яа-яЁё]+$/.test(name)) return "Допустимы только буквы";
-  if (/\s/.test(name)) return "Фамилия не должна содержать пробелы";
-  return "";
-};
+    noWhitespace: helpers.withMessage(
+      "Пароль не должен содержать пробелы",
+      helpers.regex(whitespaceRegExp),
+    ),
+  },
 
-export const validateBirthDate: Validator = (dateStr) => {
-  if (!dateStr) return "Дата рождения обязательна";
-  if (/\s/.test(dateStr)) {
-    return "Дата рождения не должна содержать пробелы";
-  }
+  firstName: {
+    required: helpers.withMessage("Имя обязательно", required),
+    /*noWhitespace: helpers.withMessage(
+			"Имя не должно содержать пробелы",
+			helpers.regex(whitespaceRegEx)
+		),*/
+    onlyLetters: helpers.withMessage(
+      "Имя может содержать только буквы, пробелы и дефисы",
+      helpers.regex(onlyLettersRegExp),
+    ),
+  },
 
-  const birthDate = normalizeDate(new Date(dateStr));
-  const today = normalizeDate(new Date());
+  lastName: {
+    required: helpers.withMessage("Фамилия обязательна", required),
+    /*noWhitespace: helpers.withMessage(
+			"Фамилия не должна содержать пробелы",
+			helpers.regex(whitespaceRegEx)
+		),*/
+    onlyLetters: helpers.withMessage(
+      "Допустимы может содержать только буквы, пробелы и дефисы",
+      helpers.regex(onlyLettersRegExp),
+    ),
+  },
+  birthDate: {
+    required: helpers.withMessage("Дата рождения обязательна", required),
+    noWhitespace: helpers.withMessage(
+      "Дата рождения не должна содержать пробелы",
+      helpers.regex(whitespaceRegExp),
+    ),
+    isAtLeast14: helpers.withMessage(
+      "Вам должно быть не менее 14 лет",
+      isAtLeastAge(14),
+    ),
+  },
 
-  const minAllowedDate = new Date(
-    today.getFullYear() - 14,
-    today.getMonth(),
-    today.getDate(),
-  );
-  if (birthDate > minAllowedDate) return "Вам должно быть не менее 14 лет";
-  return "";
-};
-
-export const validateStreet: Validator = (name) => {
-  if (!name) return "Улица обязательна";
-  return "";
-};
-
-export const validateCity: Validator = (name) => {
-  if (!name) return "Город обязателен";
-  if (!/^[A-Za-zА-Яа-яЁё]+$/.test(name)) return "Допустимы только буквы";
-  return "";
-};
-
-export const validateCountry: Validator = (country) => {
-  const allowedCountries = ["RU"];
-  if (!country) return "Страна обязательна";
-  if (!allowedCountries.includes(country)) {
-    return "Выбранная страна недопустима";
-  }
-  return "";
-};
-
-export const validatePostalCode: Validator = (code) => {
-  if (!code) return "Почтовый индекс обязателен";
-  if (!/\d{6}$/.test(code) || code.length > 6)
-    return `Почтовый индекс в России должен состоять ровно из 6 цифр`;
-  return "";
-};
-
-export const fieldValidators: Record<string, Validator> = {
-  email: validateEmail,
-  password: validatePassword,
-  firstName: validateFirstName,
-  lastName: validateLastName,
-  birthDate: validateBirthDate,
-  street: validateStreet,
-  city: validateCity,
-  country: validateCountry,
-  postalCode: validatePostalCode,
+  street: {
+    required: helpers.withMessage("Улица обязательна", required),
+  },
+  city: {
+    required: helpers.withMessage("Город обязателен", required),
+    onlyLetters: helpers.withMessage(
+      "Город  может содержать только буквы, пробелы и дефисы",
+      helpers.regex(onlyLettersRegExp),
+    ),
+  },
+  country: {
+    required: helpers.withMessage("Страна обязательна", required),
+    allowed: helpers.withMessage(
+      "Выбранная страна недопустима",
+      (value: string) => allowedCountries.includes(value),
+    ),
+  },
+  postalCode: {
+    required: helpers.withMessage("Почтовый индекс обязателен", required),
+    hasDigit: helpers.withMessage(
+      "Почтовый индекс в России должен состоять ровно из 6 цифр",
+      helpers.regex(postalCodeRegExp),
+    ),
+  },
 };
