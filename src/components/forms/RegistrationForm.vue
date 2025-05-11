@@ -149,7 +149,9 @@ const isFormValid = computed(() => !v$.value.$invalid);
     </button>
     <p class="login-link">
       Уже есть учетная запись?
-      <RouterLink to="/login" class="login-button">Войти</RouterLink>
+      <RouterLink :to="{ name: 'Login' }" class="login-button"
+        >Войти</RouterLink
+      >
     </p>
   </form>
 </template>
@@ -202,8 +204,8 @@ const isFormValid = computed(() => !v$.value.$invalid);
   text-decoration: none;
   margin-left: 0.3rem;
   transition:
-    text-decoration 0.02s ease,
-    color 0.02s ease;
+    text-decoration 0.2s ease,
+    color 0.2s ease;
 }
 
 .login-button:hover {
