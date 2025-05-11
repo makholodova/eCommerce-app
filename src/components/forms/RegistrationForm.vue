@@ -147,6 +147,10 @@ const isFormValid = computed(() => !v$.value.$invalid);
     <button :disabled="!isFormValid" class="button" type="submit">
       Зарегистрироваться
     </button>
+    <p class="login-link">
+      Уже есть учетная запись?
+      <RouterLink to="/login" class="login-button">Войти</RouterLink>
+    </p>
   </form>
 </template>
 
@@ -174,8 +178,8 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
   background-color: var(--blue);
   transition:
-    background 0.3s ease,
-    color 0.3s ease;
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .button:hover {
@@ -186,5 +190,24 @@ const isFormValid = computed(() => !v$.value.$invalid);
   pointer-events: none;
   opacity: 0.8;
   background-color: var(--blue-light);
+}
+
+.login-link {
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+.login-button {
+  color: var(--blue);
+  text-decoration: none;
+  margin-left: 0.3rem;
+  transition:
+    text-decoration 0.02s ease,
+    color 0.02s ease;
+}
+
+.login-button:hover {
+  text-decoration: underline;
+  color: var(--blue-hover);
 }
 </style>
