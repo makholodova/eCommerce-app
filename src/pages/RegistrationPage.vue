@@ -4,7 +4,7 @@ import RegistrationForm from "@/components/forms/RegistrationForm.vue";
 
 <template>
   <div class="registration-page">
-    <h1 class="registration-page-title">Регистриция</h1>
+    <h1 class="registration-page-title">Регистрация</h1>
     <RegistrationForm />
   </div>
 </template>
