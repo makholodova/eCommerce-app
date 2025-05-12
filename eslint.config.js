@@ -40,6 +40,12 @@ export default typescriptEslint.config(
       "@typescript-eslint/member-ordering": "error",
 
       "prettier/prettier": "error",
+      "vue/block-order": [
+        "error",
+        {
+          order: ["script", "template", "style"],
+        },
+      ],
     },
   },
   eslintConfigPrettier,
