@@ -1,35 +1,66 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
-import TheButton from "@/components/ui/TheButton.vue";
+import { reactive, computed } from "vue";
+import BaseInputField from "../ui/BaseInputField.vue";
+import useVuelidate from "@vuelidate/core";
+import { registrationRules } from "@/utils/validation";
+import BaseButton from "@/components/ui/BaseButton.vue";
 
-const email = ref("");
-const password = ref("");
-
-const isFromValid = computed(() => {
-  return email.value.trim().length > 0 && password.value.trim().length > 0;
+const form = reactive({
+  email: "",
+  password: "",
 });
 
-const handleForm = (): void => console.log("форма отправлена");
+const rules = computed(() => ({
+  email: registrationRules.email,
+  password: registrationRules.password,
+}));
+
+const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });
+
+async function handleSubmit(): Promise<void> {
+  await v$.value.$validate();
+  if (v$.value.$invalid) return;
+  const dateCustomerRequest = {
+    username: form.email,
+    password: form.password,
+  };
+
+  console.log("Вход выполнен успешно ", dateCustomerRequest);
+}
+
+const isFromValid = computed(() => !v$.value.$invalid);
 </script>
 
 <template>
-  <form @submit.prevent="handleForm">
+  <form @submit.prevent="handleSubmit">
     <div class="login-form">
-      <div class="login-form__email">
-        <label for="email">Почта</label>
-        <input id="email" v-model="email" type="email" />
-      </div>
-      <div class="login-form__password">
-        <label for="password">Пароль</label>
-        <input id="password" v-model="password" type="password" />
-      </div>
+      <BaseInputField
+        id="email"
+        v-model="form.email"
+        :vuelidate-rules="rules.email"
+        label="E-mail"
+        placeholder="user@example.com"
+        show-error
+        type="email"
+      />
+      <BaseInputField
+        id="password"
+        v-model="form.password"
+        :vuelidate-rules="rules.password"
+        label="Пароль"
+        placeholder="**********"
+        show-error
+        type="password"
+      />
     </div>
-    <TheButton
-      text="Войти"
-      type="submit"
-      size="xl"
-      :variant="isFromValid ? 'primary' : 'disabled'"
-    />
+    <div class="button-wrapper">
+      <BaseButton
+        text="Войти"
+        type="submit"
+        size="xl"
+        :disabled="!isFromValid"
+      />
+    </div>
   </form>
 </template>
 
@@ -37,7 +68,12 @@ const handleForm = (): void => console.log("форма отправлена");
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: clamp(12px, 3vw, 32px);
   margin: 40px 0;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
 }
 </style>
