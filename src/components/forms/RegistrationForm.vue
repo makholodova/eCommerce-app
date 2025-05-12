@@ -32,15 +32,31 @@ async function handleSubmit(): Promise<void> {
     firstName: form.firstName,
     lastName: form.lastName,
     dateOfBirth: form.birthDate,
-    address: {
-      streetName: form.street,
-      city: form.city,
-      postalCode: form.postalCode,
-      country: form.country,
-    },
+    addresses: [
+      {
+        streetName: form.street,
+        city: form.city,
+        postalCode: form.postalCode,
+        country: form.country,
+      },
+    ],
   };
 
   console.log("Форма валидна, отправляем данные:", dateCustomerRequest);
+
+  try {
+    const createdCustomer = await signUp(dateCustomerRequest);
+    console.log(
+      "🎉 Аккаунт успешно создан! Добро пожаловать, " + createdCustomer + "!",
+    );
+  } catch (error) {
+    console.log(
+      "Произошла ошибка при регистрации. Пожалуйста, попробуйте ещё раз. " +
+        error,
+    );
+  } finally {
+    isLoading.value = false;
+  }
 }
 
 const isFormValid = computed(() => !v$.value.$invalid);
