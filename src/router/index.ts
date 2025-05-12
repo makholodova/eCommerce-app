@@ -1,9 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import MainPage from "@/pages/MainPage.vue";
-
 const routes = [
-  { path: "/", name: "Main", component: MainPage },
+  {
+    path: "/",
+    name: "Main",
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    component: () => import("@/pages/MainPage.vue"),
+  },
   {
     path: "/login",
     name: "Login",

@@ -7,6 +7,7 @@ import { registrationRules } from "@/utils/validation.ts";
 import { signUp } from "@/api/commercetools/singUp.ts";
 import type { UserRegistrationData } from "@/types/user-registration.types.ts";
 import { showError, showSuccess } from "@/utils/toast.ts";
+import router from "@/router";
 
 const form = reactive({
   email: "",
@@ -51,6 +52,7 @@ async function handleSubmit(): Promise<void> {
     const createdCustomer = await signUp(dateCustomerRequest);
     showSuccess(
       `Аккаунт успешно создан! Добро пожаловать, ${createdCustomer.customer.firstName}!`,
+      () => router.push({ name: "Main" }),
     );
   } catch (error) {
     showError(

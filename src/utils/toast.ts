@@ -6,10 +6,10 @@ const defaultOptions = {
   theme: toast.THEME.LIGHT,
   transition: toast.TRANSITIONS.SLIDE,
 };
-export const showSuccess = (message: string): void => {
-  toast.success(message, defaultOptions);
+export const showSuccess = (message: string, onClose?: () => void): void => {
+  toast.success(message, { ...defaultOptions, onClose });
 };
 
-export const showError = (message: string): void => {
-  toast.error(message, defaultOptions);
+export const showError = (message: string, onClose?: () => void): void => {
+  toast.error(message, { ...defaultOptions, onClose });
 };
