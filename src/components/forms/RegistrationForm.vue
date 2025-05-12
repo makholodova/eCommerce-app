@@ -166,6 +166,12 @@ const isFormValid = computed(() => !v$.value.$invalid);
       <span v-if="isLoading" class="spinner" />
       <span v-else>Зарегистрироваться</span>
     </button>
+    <p class="login-link">
+      Уже есть учетная запись?
+      <RouterLink :to="{ name: 'Login' }" class="login-button"
+        >Войти</RouterLink
+      >
+    </p>
   </form>
 </template>
 
@@ -193,8 +199,8 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
   background-color: var(--blue);
   transition:
-    background 0.3s ease,
-    color 0.3s ease;
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .button:hover {
@@ -206,6 +212,26 @@ const isFormValid = computed(() => !v$.value.$invalid);
   opacity: 0.8;
   background-color: var(--blue-light);
 }
+
+.login-link {
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+.login-button {
+  color: var(--blue);
+  text-decoration: none;
+  margin-left: 0.3rem;
+  transition:
+    text-decoration 0.2s ease,
+    color 0.2s ease;
+}
+
+.login-button:hover {
+  text-decoration: underline;
+  color: var(--blue-hover);
+}
+
 .spinner {
   width: 18px;
   height: 18px;
