@@ -4,6 +4,8 @@ import BaseInputField from "@/components/ui/BaseInputField.vue";
 import { useVuelidate } from "@vuelidate/core";
 import BaseSelectField from "@/components/ui/BaseSelectField.vue";
 import { registrationRules } from "@/utils/validation.ts";
+import { signUp } from "@/api/commercetools/singUp.ts";
+import type { UserRegistrationData } from "@/types/user-registration.types.ts";
 
 const form = reactive({
   email: "",
@@ -16,7 +18,7 @@ const form = reactive({
   country: "",
   postalCode: "",
 });
-
+const isLoading = ref(false);
 const countries = ref([{ title: "RU", value: "Россия" }]);
 
 const rules = computed(() => registrationRules);
@@ -26,7 +28,10 @@ const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });
 async function handleSubmit(): Promise<void> {
   await v$.value.$validate();
   if (v$.value.$invalid) return;
-  const dateCustomerRequest = {
+
+  isLoading.value = true;
+
+  const dateCustomerRequest: UserRegistrationData = {
     email: form.email,
     password: form.password,
     firstName: form.firstName,
@@ -160,8 +165,9 @@ const isFormValid = computed(() => !v$.value.$invalid);
       />
     </div>
 
-    <button :disabled="!isFormValid" class="button" type="submit">
-      Зарегистрироваться
+    <button :disabled="!isFormValid || isLoading" class="button" type="submit">
+      <span v-if="isLoading" class="spinner" />
+      <span v-else>Зарегистрироваться</span>
     </button>
   </form>
 </template>
@@ -202,5 +208,22 @@ const isFormValid = computed(() => !v$.value.$invalid);
   pointer-events: none;
   opacity: 0.8;
   background-color: var(--blue-light);
+}
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--white);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
