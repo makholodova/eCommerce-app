@@ -6,6 +6,7 @@ import BaseSelectField from "@/components/ui/BaseSelectField.vue";
 import { registrationRules } from "@/utils/validation.ts";
 import { signUp } from "@/api/commercetools/singUp.ts";
 import type { UserRegistrationData } from "@/types/user-registration.types.ts";
+import { showError, showSuccess } from "@/utils/toast.ts";
 
 const form = reactive({
   email: "",
@@ -46,18 +47,14 @@ async function handleSubmit(): Promise<void> {
       },
     ],
   };
-
-  console.log("Форма валидна, отправляем данные:", dateCustomerRequest);
-
   try {
     const createdCustomer = await signUp(dateCustomerRequest);
-    console.log(
-      "🎉 Аккаунт успешно создан! Добро пожаловать, " + createdCustomer + "!",
+    showSuccess(
+      `Аккаунт успешно создан! Добро пожаловать, ${createdCustomer.customer.firstName}!`,
     );
   } catch (error) {
-    console.log(
-      "Произошла ошибка при регистрации. Пожалуйста, попробуйте ещё раз. " +
-        error,
+    showError(
+      `Произошла ошибка при регистрации. Пожалуйста, попробуйте ещё раз. ${error}`,
     );
   } finally {
     isLoading.value = false;
