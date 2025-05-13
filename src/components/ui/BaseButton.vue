@@ -39,8 +39,8 @@ const emit = defineEmits<{
   background-color: var(--blue);
   color: var(--white);
   transition:
-    background 0.3s ease,
-    color 0.3s ease;
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .button:hover {

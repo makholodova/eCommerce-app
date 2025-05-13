@@ -6,7 +6,7 @@ import LoginForm from "@/components/forms/LoginForm.vue";
   <div class="container">
     <h1>Войти</h1>
     <div class="register-prompt">
-      <span>Ещё нет аккаунта?</span>
+      <span>Ещё нет учетной записи?</span>
       <router-link to="/register">Зарегистрироваться</router-link>
     </div>
     <LoginForm />
@@ -35,20 +35,26 @@ h1 {
 
 .register-prompt {
   display: flex;
-  gap: 14px;
+  gap: clamp(8px, 2vw, 14px);
   align-items: baseline;
   justify-content: center;
-  font-size: clamp(14px, 4vw, 16px);
+  font-size: clamp(14px, 3.2vw, 16px);
 }
 
 .register-prompt a {
-  color: var(--black);
+  color: var(--blue);
   text-decoration: none;
-  border-bottom: 1px solid var(--black);
-  line-height: 1.5;
+  transition:
+    text-decoration 0.2s ease,
+    color 0.2s ease;
 }
 
-@media (max-width: 460px) {
+.register-prompt a:hover {
+  text-decoration: underline;
+  color: var(--blue-hover);
+}
+
+@media (max-width: 470px) {
   .container {
     padding: 40px clamp(12px, 5vw, 40px);
   }
