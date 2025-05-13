@@ -2,26 +2,27 @@
 import { computed, reactive, ref } from "vue";
 import BaseInputField from "@/components/ui/BaseInputField.vue";
 import { useVuelidate } from "@vuelidate/core";
-import BaseSelectField from "@/components/ui/BaseSelectField.vue";
 import { registrationRules } from "@/utils/validation.ts";
 import { signUp } from "@/api/commercetools/singUp.ts";
 import type { UserRegistrationData } from "@/types/user-registration.types.ts";
 import { showError, showSuccess } from "@/utils/toast.ts";
 import router from "@/router";
+import AddressForm from "@/components/forms/AddressForm.vue";
+import type { CountryOption } from "@/types/interfaces.ts";
 
 const form = reactive({
   email: "",
   password: "",
   firstName: "",
   lastName: "",
-  birthDate: "",
+  dateOfBirth: "",
   street: "",
   city: "",
   country: "",
   postalCode: "",
 });
 const isLoading = ref(false);
-const countries = ref([{ title: "RU", value: "Россия" }]);
+const countries = ref<CountryOption[]>([{ title: "RU", value: "Россия" }]);
 
 const rules = computed(() => registrationRules);
 
@@ -38,7 +39,7 @@ async function handleSubmit(): Promise<void> {
     password: form.password,
     firstName: form.firstName,
     lastName: form.lastName,
-    dateOfBirth: form.birthDate,
+    dateOfBirth: form.dateOfBirth,
     addresses: [
       {
         streetName: form.street,
@@ -112,8 +113,8 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
       <BaseInputField
         id="birthDate"
-        v-model="form.birthDate"
-        :vuelidate-rules="rules.birthDate"
+        v-model="form.dateOfBirth"
+        :vuelidate-rules="rules.dateOfBirth"
         label="Дата рождения"
         placeholder="01.01.2000"
         show-error
@@ -121,48 +122,12 @@ const isFormValid = computed(() => !v$.value.$invalid);
       />
     </div>
 
-    <div class="form-section address-wrapper">
-      <h3 class="form-section-title">Адрес доставки</h3>
-      <BaseInputField
-        id="street"
-        v-model="form.street"
-        :vuelidate-rules="rules.street"
-        label="Улица"
-        placeholder="ул. Ленина"
-        show-error
-        type="text"
-      />
-
-      <BaseInputField
-        id="city"
-        v-model="form.city"
-        :vuelidate-rules="rules.city"
-        label="Город"
-        placeholder="Москва"
-        show-error
-        type="text"
-      />
-
-      <BaseSelectField
-        id="country"
-        v-model="form.country"
-        :options="countries"
-        :vuelidate-rules="rules.country"
-        label="Страна"
-        placeholder="Выберите страну"
-        show-error
-      />
-
-      <BaseInputField
-        id="postalCode"
-        v-model="form.postalCode"
-        :vuelidate-rules="rules.postalCode"
-        label="Почтовый индекс"
-        placeholder="123456"
-        show-error
-        type="text"
-      />
-    </div>
+    <AddressForm
+      v-model="form"
+      title="Адрес доставки"
+      :countries="countries"
+      :rules="rules"
+    />
 
     <button :disabled="!isFormValid || isLoading" class="button" type="submit">
       <span v-if="isLoading" class="spinner" />
@@ -171,8 +136,8 @@ const isFormValid = computed(() => !v$.value.$invalid);
     <p class="login-link">
       Уже есть учетная запись?
       <RouterLink :to="{ name: 'Login' }" class="login-button"
-        >Войти</RouterLink
-      >
+        >Войти
+      </RouterLink>
     </p>
   </form>
 </template>

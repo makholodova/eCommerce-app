@@ -1,0 +1,76 @@
+﻿<script lang="ts" setup>
+import BaseInputField from "@/components/ui/BaseInputField.vue";
+import BaseSelectField from "@/components/ui/BaseSelectField.vue";
+import { defineProps } from "vue";
+import type { AddressFormFields, CountryOption } from "@/types/interfaces.ts";
+import type { AddressFormRules } from "@/types/types.ts";
+
+const modelValue = defineModel<AddressFormFields>({ required: true });
+
+const props = defineProps<{
+  title: string;
+  rules?: AddressFormRules;
+  countries: CountryOption[];
+}>();
+</script>
+
+<template>
+  <div class="form-section address-wrapper">
+    <h3 class="form-section-title">{{ title }}</h3>
+    <BaseInputField
+      id="street"
+      v-model="modelValue.street"
+      :vuelidate-rules="props.rules?.street"
+      label="Улица"
+      placeholder="ул. Ленина"
+      show-error
+      type="text"
+    />
+
+    <BaseInputField
+      id="city"
+      v-model="modelValue.city"
+      :vuelidate-rules="props.rules?.city"
+      label="Город"
+      placeholder="Москва"
+      show-error
+      type="text"
+    />
+
+    <BaseSelectField
+      id="country"
+      v-model="modelValue.country"
+      :options="countries"
+      :vuelidate-rules="props.rules?.country"
+      label="Страна"
+      placeholder="Выберите страну"
+      show-error
+    />
+
+    <BaseInputField
+      id="postalCode"
+      v-model="modelValue.postalCode"
+      :vuelidate-rules="props.rules?.postalCode"
+      label="Почтовый индекс"
+      placeholder="123456"
+      show-error
+      type="text"
+    />
+  </div>
+</template>
+
+<style scoped>
+.form-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-column: span 2;
+  grid-row: 1;
+  gap: 1rem;
+
+  margin-bottom: 2rem;
+}
+
+.form-section-title {
+  grid-column: span 2;
+}
+</style>

@@ -78,11 +78,11 @@ export const registrationRules = {
 			helpers.regex(whitespaceRegEx)
 		),*/
     onlyLetters: helpers.withMessage(
-      "Допустимы может содержать только буквы, пробелы и дефисы",
+      "Фамилия может содержать только буквы, пробелы и дефисы",
       helpers.regex(onlyLettersRegExp),
     ),
   },
-  birthDate: {
+  dateOfBirth: {
     required: helpers.withMessage("Дата рождения обязательна", required),
     noWhitespace: helpers.withMessage(
       "Дата рождения не должна содержать пробелы",
