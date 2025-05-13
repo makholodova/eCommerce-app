@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineProps, defineEmits, withDefaults } from "vue";
+import { defineProps, defineEmits } from "vue";
 
 type ButtonProps = {
   text: string;
@@ -8,10 +8,12 @@ type ButtonProps = {
   disabled?: boolean;
 };
 
-const props = withDefaults(defineProps<ButtonProps>(), {
-  size: "md",
-  type: "button",
-});
+const {
+  size = "md",
+  type = "button",
+  text,
+  disabled,
+} = defineProps<ButtonProps>();
 
 const emit = defineEmits<{
   (e: "click"): void;
@@ -20,12 +22,12 @@ const emit = defineEmits<{
 
 <template>
   <button
-    :type="type"
-    :disabled="disabled"
+    :type
+    :disabled
     :class="['button', `size-${size}`]"
     @click="emit('click')"
   >
-    {{ props.text }}
+    {{ text }}
   </button>
 </template>
 

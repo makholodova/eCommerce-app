@@ -28,7 +28,7 @@ async function handleSubmit(): Promise<void> {
   console.log("Вход выполнен успешно ", dateCustomerRequest);
 }
 
-const isFromValid = computed(() => !v$.value.$invalid);
+const isFormValid = computed(() => !v$.value.$invalid);
 </script>
 
 <template>
@@ -58,7 +58,7 @@ const isFromValid = computed(() => !v$.value.$invalid);
         text="Войти"
         type="submit"
         size="xl"
-        :disabled="!isFromValid"
+        :disabled="!isFormValid"
       />
     </div>
   </form>

@@ -5,13 +5,17 @@ import EyeIconOff from "@/assets/icons/icon-eye-off.svg";
 const isPasswordVisible = defineModel<boolean>("passwordVisible", {
   default: false,
 });
+
+const togglePasswordVisibility = (): void => {
+  isPasswordVisible.value = !isPasswordVisible.value;
+};
 </script>
 
 <template>
   <button
     type="button"
     class="toggle-password"
-    @click="isPasswordVisible = !isPasswordVisible"
+    @click="togglePasswordVisibility"
   >
     <img
       :src="isPasswordVisible ? EyeIcon : EyeIconOff"

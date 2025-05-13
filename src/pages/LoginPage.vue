@@ -7,7 +7,7 @@ import LoginForm from "@/components/forms/LoginForm.vue";
     <h1>Войти</h1>
     <div class="register-prompt">
       <span>Ещё нет учетной записи?</span>
-      <router-link to="/register">Зарегистрироваться</router-link>
+      <router-link :to="{ name: 'Register' }">Зарегистрироваться</router-link>
     </div>
     <LoginForm />
   </div>
