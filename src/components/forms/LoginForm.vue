@@ -69,7 +69,7 @@ const isFromValid = computed(() => !v$.value.$invalid);
   display: flex;
   flex-direction: column;
   gap: clamp(12px, 3vw, 32px);
-  margin: 40px 0;
+  margin: clamp(20px, 4vw, 40px) 0;
 }
 
 .button-wrapper {
