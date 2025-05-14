@@ -21,7 +21,7 @@ defineProps<{
   padding: 0.5rem;
 }
 
-.checkbox-input {
+/*.checkbox-input {
   width: 18px;
   height: 18px;
   appearance: none;
@@ -53,7 +53,7 @@ defineProps<{
 
 .checkbox-input:checked {
   border-color: var(--blue);
-}
+}*/
 
 .checkbox-label {
   transition: color 0.2s ease;

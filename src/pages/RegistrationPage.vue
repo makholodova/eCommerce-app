@@ -3,22 +3,38 @@ import RegistrationForm from "@/components/forms/RegistrationForm.vue";
 </script>
 
 <template>
-  <div class="registration-page">
-    <h1 class="registration-page-title">Регистрация</h1>
-    <RegistrationForm />
-    <div class="login-link">
-      <span>Уже есть учетная запись?</span>
-      <router-link :to="{ name: 'Login' }">Войти </router-link>
+  <div class="container">
+    <div class="registration-page">
+      <h1 class="registration-page-title">Регистрация</h1>
+      <RegistrationForm />
+      <div class="login-link">
+        <span>Уже есть учетная запись?</span>
+        <router-link :to="{ name: 'Login' }">Войти</router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.registration-page-title {
-  text-align: center;
+.container {
+  padding: 20px;
 }
+
 .registration-page {
-  padding: 1rem 2rem;
+  width: 100%;
+  margin: 20px auto;
+  padding: 40px;
+  border-radius: 40px;
+  background-color: var(--blue-lighter);
+
+  /* background: var(--blue-lighter);;*/
+  box-shadow: 0 2px 20px rgb(0 0 0 / 10%);
+}
+
+.registration-page-title {
+  font-weight: 500;
+  font-size: 28px;
+  text-align: center;
 }
 
 .login-link {
@@ -45,5 +61,15 @@ import RegistrationForm from "@/components/forms/RegistrationForm.vue";
 .login-link {
   margin-top: 1rem;
   font-size: 1rem;
+}
+
+@media (max-width: 470px) {
+  .registration-page {
+    padding: 10px;
+  }
+
+  .registration-page {
+    padding: 20px;
+  }
 }
 </style>

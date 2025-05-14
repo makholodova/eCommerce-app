@@ -1,13 +1,13 @@
 ﻿<script lang="ts" setup>
-import BaseInputField from "@/components/ui/BaseInputField.vue";
-import BaseSelectField from "@/components/ui/BaseSelectField.vue";
 import { defineProps } from "vue";
 import type { AddressFormFields, CountryOption } from "@/types/interfaces.ts";
 import type { AddressFormRules } from "@/types/types.ts";
+import BaseInputField from "@/components/ui/BaseInputField.vue";
+import BaseSelectField from "@/components/ui/BaseSelectField.vue";
 
 const modelValue = defineModel<AddressFormFields>({ required: true });
 
-const props = defineProps<{
+defineProps<{
   title: string;
   rules?: AddressFormRules;
   countries: CountryOption[];
@@ -21,7 +21,7 @@ const props = defineProps<{
     <BaseInputField
       :id="`${prefix}-streetName`"
       v-model="modelValue.streetName"
-      :vuelidate-rules="props.rules?.streetName"
+      :vuelidate-rules="rules?.streetName"
       label="Улица"
       placeholder="ул. Ленина"
       show-error
@@ -31,7 +31,7 @@ const props = defineProps<{
     <BaseInputField
       :id="`${prefix}-city`"
       v-model="modelValue.city"
-      :vuelidate-rules="props.rules?.city"
+      :vuelidate-rules="rules?.city"
       label="Город"
       placeholder="Москва"
       show-error
@@ -42,7 +42,7 @@ const props = defineProps<{
       :id="`${prefix}-country`"
       v-model="modelValue.country"
       :options="countries"
-      :vuelidate-rules="props.rules?.country"
+      :vuelidate-rules="rules?.country"
       label="Страна"
       placeholder="Выберите страну"
       show-error
@@ -51,7 +51,7 @@ const props = defineProps<{
     <BaseInputField
       :id="`${prefix}-postalCode`"
       v-model="modelValue.postalCode"
-      :vuelidate-rules="props.rules?.postalCode"
+      :vuelidate-rules="rules?.postalCode"
       label="Почтовый индекс"
       placeholder="123456"
       show-error
@@ -66,12 +66,25 @@ const props = defineProps<{
   grid-template-columns: repeat(2, 1fr);
   grid-column: span 2;
   grid-row: 1;
-  gap: 1rem;
-
-  margin-bottom: 1rem;
+  gap: 0.5rem;
 }
 
 .form-section-title {
   grid-column: span 2;
+
+  font-weight: 500;
+  font-size: 18px;
+  text-align: center;
+
+  border-top: 2px solid var(--blue-light);
+  padding-top: 1rem;
+}
+@media (max-width: 650px) {
+  .form-section {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  .form-section > * {
+    grid-column: span 1;
+  }
 }
 </style>

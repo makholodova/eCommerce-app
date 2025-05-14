@@ -1,23 +1,32 @@
 ﻿<script lang="ts" setup>
 import { computed, reactive, ref, watch } from "vue";
-import BaseInputField from "@/components/ui/BaseInputField.vue";
 import { useVuelidate } from "@vuelidate/core";
-import { addressRules, registrationRules } from "@/utils/validation.ts";
-import { signUp } from "@/api/commercetools/singUp.ts";
-import type { UserRegistrationData } from "@/types/user-registration.types.ts";
-import { showError, showSuccess } from "@/utils/toast.ts";
-import AddressForm from "@/components/forms/AddressForm.vue";
-import type { CountryOption } from "@/types/interfaces.ts";
-import BaseCheckbox from "@/components/ui/BaseCheckbox.vue";
 import router from "@/router";
+import { signUp } from "@/api/commercetools/singUp.ts";
+import { showError, showSuccess } from "@/utils/toast.ts";
+import {
+  addressRules,
+  authRules,
+  personalInfoRules,
+} from "@/utils/validation.ts";
+import type { UserRegistrationData } from "@/types/user-registration.types.ts";
+import type { CountryOption } from "@/types/interfaces.ts";
+import AuthForm from "@/components/forms/AuthForm.vue";
+import PersonalInfoForm from "@/components/forms/PersonalInfoForm.vue";
+import AddressForm from "@/components/forms/AddressForm.vue";
+import BaseCheckbox from "@/components/ui/BaseCheckbox.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 
 const form = reactive({
-  email: "",
-  password: "",
-  firstName: "",
-  lastName: "",
-  dateOfBirth: "",
+  auth: {
+    email: "",
+    password: "",
+  },
+  personal: {
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
+  },
   shippingAddress: {
     streetName: "",
     city: "",
@@ -36,7 +45,16 @@ const form = reactive({
   useSameAddress: false,
 });
 const isLoading = ref(false);
+
 const countries = ref<CountryOption[]>([{ title: "RU", value: "Россия" }]);
+
+const rules = computed(() => ({
+  auth: authRules,
+  personal: personalInfoRules,
+  shippingAddress: addressRules,
+  billingAddress: form.useSameAddress ? {} : addressRules,
+}));
+const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });
 
 watch(
   () => form.shippingAddress,
@@ -49,16 +67,6 @@ watch(
   },
 );
 
-/*const rules = computed(() => registrationRules);*/
-const addressValidationRules = computed(() => addressRules);
-const rules = computed(() => ({
-  ...registrationRules,
-  shippingAddress: addressValidationRules.value,
-  billingAddress: form.useSameAddress ? {} : addressValidationRules.value,
-}));
-
-const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });
-
 async function handleSubmit(): Promise<void> {
   await v$.value.$validate();
   if (v$.value.$invalid) return;
@@ -66,11 +74,11 @@ async function handleSubmit(): Promise<void> {
   isLoading.value = true;
 
   const dateCustomerRequest: UserRegistrationData = {
-    email: form.email,
-    password: form.password,
-    firstName: form.firstName,
-    lastName: form.lastName,
-    dateOfBirth: form.dateOfBirth,
+    email: form.auth.email,
+    password: form.auth.password,
+    firstName: form.personal.firstName,
+    lastName: form.personal.lastName,
+    dateOfBirth: form.personal.dateOfBirth,
     addresses: form.useSameAddress
       ? [form.shippingAddress]
       : [form.shippingAddress, form.billingAddress],
@@ -107,65 +115,20 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
 <template>
   <form class="registration-form" @submit.prevent="handleSubmit">
-    <div class="form-section credentials-wrapper">
-      <BaseInputField
-        id="email"
-        v-model="form.email"
-        :vuelidate-rules="rules.email"
-        label="E-mail"
-        placeholder="user@example.com"
-        show-error
-        type="email"
-      />
-      <BaseInputField
-        id="password"
-        v-model="form.password"
-        :vuelidate-rules="rules.password"
-        label="Пароль"
-        placeholder="**********"
-        show-error
-        type="password"
-      />
-    </div>
-    <div class="form-section personal-data-wrapper">
-      <h3 class="form-section-title">Личная информация</h3>
-      <BaseInputField
-        id="firstName"
-        v-model="form.firstName"
-        :vuelidate-rules="rules.firstName"
-        label="Имя"
-        placeholder="Иван"
-        show-error
-        type="text"
-      />
+    <AuthForm v-model="form.auth" :rules="rules.auth" />
 
-      <BaseInputField
-        id="lastName"
-        v-model="form.lastName"
-        :vuelidate-rules="rules.lastName"
-        label="Фамилия"
-        placeholder="Иванов"
-        show-error
-        type="text"
-      />
-
-      <BaseInputField
-        id="birthDate"
-        v-model="form.dateOfBirth"
-        :vuelidate-rules="rules.dateOfBirth"
-        label="Дата рождения"
-        placeholder="01.01.2000"
-        show-error
-        type="date"
-      />
-    </div>
+    <PersonalInfoForm
+      v-model="form.personal"
+      :rules="rules.personal"
+      title="Личная информация"
+    />
 
     <AddressForm
       v-model="form.shippingAddress"
       :countries="countries"
       :rules="rules.shippingAddress"
-      title="Адрес доставки"
       prefix="shipping"
+      title="Адрес доставки"
     />
     <BaseCheckbox
       id="shippingAddress"
@@ -184,8 +147,8 @@ const isFormValid = computed(() => !v$.value.$invalid);
       v-model="form.billingAddress"
       :countries="countries"
       :rules="rules.billingAddress"
-      title="Адрес для выставления счета"
       prefix="billing"
+      title="Адрес для выставления счета"
     />
 
     <BaseCheckbox
@@ -197,32 +160,26 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
     <div class="button-wrapper">
       <BaseButton
-        text="Зарегистрироваться"
-        type="submit"
-        size="xl"
         :disabled="!isFormValid || isLoading"
         :is-loading="isLoading"
+        size="xl"
+        text="Зарегистрироваться"
+        type="submit"
       />
     </div>
   </form>
 </template>
 
 <style scoped>
-.form-section {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-column: span 2;
-  grid-row: 1;
-  gap: 1rem;
-
-  margin-bottom: 1rem;
-}
-
-.form-section-title {
-  grid-column: span 2;
-}
 .button-wrapper {
   display: flex;
   justify-content: center;
+  margin: 2rem 0;
+}
+
+.registration-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 </style>

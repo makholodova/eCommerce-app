@@ -25,7 +25,7 @@ const isAtLeastAge =
     return birthDate <= minAllowedDate;
   };
 
-export const registrationRules = {
+export const authRules = {
   email: {
     required: helpers.withMessage("Email обязателен", required),
     email: helpers.withMessage("Неверный формат e-mail", email),
@@ -58,7 +58,9 @@ export const registrationRules = {
       helpers.regex(whitespaceRegExp),
     ),
   },
+};
 
+export const personalInfoRules = {
   firstName: {
     required: helpers.withMessage("Имя обязательно", required),
     onlyLetters: helpers.withMessage(
@@ -86,7 +88,6 @@ export const registrationRules = {
     ),
   },
 };
-
 export const addressRules = {
   streetName: {
     required: helpers.withMessage("Улица обязательна", required),

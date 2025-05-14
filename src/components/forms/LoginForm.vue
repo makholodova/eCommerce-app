@@ -2,7 +2,7 @@
 import { reactive, computed } from "vue";
 import BaseInputField from "../ui/BaseInputField.vue";
 import useVuelidate from "@vuelidate/core";
-import { registrationRules } from "@/utils/validation";
+import { authRules } from "@/utils/validation";
 import BaseButton from "@/components/ui/BaseButton.vue";
 
 const form = reactive({
@@ -11,8 +11,8 @@ const form = reactive({
 });
 
 const rules = computed(() => ({
-  email: registrationRules.email,
-  password: registrationRules.password,
+  email: authRules.email,
+  password: authRules.password,
 }));
 
 const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });
