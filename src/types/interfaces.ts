@@ -1,5 +1,5 @@
 export interface AddressFormFields {
-  street: string;
+  streetName: string;
   city: string;
   country: string;
   postalCode: string;

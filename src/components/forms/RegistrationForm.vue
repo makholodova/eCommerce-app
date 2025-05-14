@@ -2,13 +2,14 @@
 import { computed, reactive, ref } from "vue";
 import BaseInputField from "@/components/ui/BaseInputField.vue";
 import { useVuelidate } from "@vuelidate/core";
-import { registrationRules } from "@/utils/validation.ts";
+import { registrationRules, addressRules } from "@/utils/validation.ts";
 import { signUp } from "@/api/commercetools/singUp.ts";
 import type { UserRegistrationData } from "@/types/user-registration.types.ts";
 import { showError, showSuccess } from "@/utils/toast.ts";
 import router from "@/router";
 import AddressForm from "@/components/forms/AddressForm.vue";
 import type { CountryOption } from "@/types/interfaces.ts";
+import BaseCheckbox from "@/components/ui/BaseCheckbox.vue";
 
 const form = reactive({
   email: "",
@@ -16,15 +17,27 @@ const form = reactive({
   firstName: "",
   lastName: "",
   dateOfBirth: "",
-  street: "",
-  city: "",
-  country: "",
-  postalCode: "",
+  shippingAddress: {
+    streetName: "",
+    city: "",
+    country: "",
+    postalCode: "",
+  },
+  billingAddress: {
+    streetName: "",
+    city: "",
+    country: "",
+    postalCode: "",
+  },
+
+  isDefaultShipping: false,
+  isDefaultBilling: false,
 });
 const isLoading = ref(false);
 const countries = ref<CountryOption[]>([{ title: "RU", value: "Россия" }]);
 
 const rules = computed(() => registrationRules);
+const addressValidationRules = computed(() => addressRules);
 
 const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });
 
@@ -40,14 +53,9 @@ async function handleSubmit(): Promise<void> {
     firstName: form.firstName,
     lastName: form.lastName,
     dateOfBirth: form.dateOfBirth,
-    addresses: [
-      {
-        streetName: form.street,
-        city: form.city,
-        postalCode: form.postalCode,
-        country: form.country,
-      },
-    ],
+    defaultShippingAddress: form.isDefaultShipping ? 0 : undefined,
+    defaultBillingAddress: form.isDefaultBilling ? 1 : undefined,
+    addresses: [form.shippingAddress, form.billingAddress],
   };
   try {
     const createdCustomer = await signUp(dateCustomerRequest);
@@ -123,10 +131,27 @@ const isFormValid = computed(() => !v$.value.$invalid);
     </div>
 
     <AddressForm
-      v-model="form"
-      title="Адрес доставки"
+      v-model="form.shippingAddress"
       :countries="countries"
-      :rules="rules"
+      :rules="addressValidationRules"
+      title="Адрес доставки"
+    />
+    <BaseCheckbox
+      id="shippingAddress"
+      v-model="form.isDefaultShipping"
+      label="Использовать по умолчанию для доставки"
+    />
+
+    <AddressForm
+      v-model="form.billingAddress"
+      :countries="countries"
+      :rules="addressValidationRules"
+      title="Адрес для выставления счета"
+    />
+    <BaseCheckbox
+      id="billingAddress"
+      v-model="form.isDefaultBilling"
+      label="Использовать по умолчанию для выставления счета"
     />
 
     <button :disabled="!isFormValid || isLoading" class="button" type="submit">
@@ -150,7 +175,7 @@ const isFormValid = computed(() => !v$.value.$invalid);
   grid-row: 1;
   gap: 1rem;
 
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .form-section-title {

@@ -94,7 +94,34 @@ export const registrationRules = {
     ),
   },
 
-  street: {
+  /*  streetName: {
+    required: helpers.withMessage("Улица обязательна", required),
+  },
+  city: {
+    required: helpers.withMessage("Город обязателен", required),
+    onlyLetters: helpers.withMessage(
+      "Город  может содержать только буквы, пробелы и дефисы",
+      helpers.regex(onlyLettersRegExp),
+    ),
+  },
+  country: {
+    required: helpers.withMessage("Страна обязательна", required),
+    allowed: helpers.withMessage(
+      "Выбранная страна недопустима",
+      (value: string) => allowedCountries.includes(value),
+    ),
+  },
+  postalCode: {
+    required: helpers.withMessage("Почтовый индекс обязателен", required),
+    hasDigit: helpers.withMessage(
+      "Почтовый индекс в России должен состоять ровно из 6 цифр",
+      helpers.regex(postalCodeRegExp),
+    ),
+  },*/
+};
+
+export const addressRules = {
+  streetName: {
     required: helpers.withMessage("Улица обязательна", required),
   },
   city: {

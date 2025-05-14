@@ -18,9 +18,9 @@ const props = defineProps<{
   <div class="form-section address-wrapper">
     <h3 class="form-section-title">{{ title }}</h3>
     <BaseInputField
-      id="street"
-      v-model="modelValue.street"
-      :vuelidate-rules="props.rules?.street"
+      id="streetName"
+      v-model="modelValue.streetName"
+      :vuelidate-rules="props.rules?.streetName"
       label="Улица"
       placeholder="ул. Ленина"
       show-error
@@ -67,7 +67,7 @@ const props = defineProps<{
   grid-row: 1;
   gap: 1rem;
 
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .form-section-title {
