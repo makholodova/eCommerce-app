@@ -1,19 +1,20 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 import { createRouter, createWebHistory } from "vue-router";
-
-import MainPage from "@/pages/MainPage.vue";
-
 const routes = [
-  { path: "/", name: "Main", component: MainPage },
+  {
+    path: "/",
+    name: "Main",
+    component: () => import("@/pages/MainPage.vue"),
+  },
   {
     path: "/login",
     name: "Login",
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     component: () => import("@/pages/LoginPage.vue"),
   },
   {
     path: "/register",
     name: "Register",
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     component: () => import("@/pages/RegistrationPage.vue"),
   },
 ];
