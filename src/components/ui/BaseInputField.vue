@@ -1,11 +1,12 @@
 ﻿<script lang="ts" setup>
-import { computed, defineProps } from "vue";
+import { ref, computed, defineProps } from "vue";
 import {
   useVuelidate,
   type ValidationRuleWithoutParams,
   type ValidationRuleWithParams,
   type ValidatorFn,
 } from "@vuelidate/core";
+import TogglePassword from "@/components/ui/TogglePassword.vue";
 
 const props = defineProps<{
   id: string;
@@ -18,6 +19,8 @@ const props = defineProps<{
   placeholder?: string;
   showError?: boolean;
 }>();
+
+const isPasswordVisible = ref(false);
 
 const inputValue = defineModel<string>({ required: true });
 
@@ -43,20 +46,26 @@ const errorMessage = computed(() => {
 <template>
   <label class="field">
     <span>{{ label }}</span>
-    <input
-      :id
-      v-model="inputValue"
-      :class="[
-        'base-input',
-        {
-          invalid: v$.inputValue.$error,
-          valid: inputValue && !v$.inputValue.$error,
-        },
-      ]"
-      :placeholder
-      :type
-      :value="inputValue"
-    />
+    <div class="input-wrapper">
+      <input
+        :id
+        v-model="inputValue"
+        :class="[
+          'base-input',
+          {
+            invalid: v$.inputValue.$error,
+            valid: inputValue && !v$.inputValue.$error,
+          },
+        ]"
+        :placeholder
+        :type="isPasswordVisible && type === 'password' ? 'text' : type"
+        :value="inputValue"
+      />
+      <TogglePassword
+        v-if="type === 'password'"
+        v-model:password-visible="isPasswordVisible"
+      />
+    </div>
     <span
       v-if="showError"
       :class="{ visible: v$.inputValue.$error }"
@@ -77,6 +86,7 @@ const errorMessage = computed(() => {
   border: 1px solid var(--grey-not-active);
   border-radius: 8px;
   padding: 11px 8px 11px 16px;
+  width: 100%;
 
   font-size: 1rem;
   font-weight: 400;
@@ -124,5 +134,9 @@ const errorMessage = computed(() => {
 
 .error-text.visible {
   opacity: 1;
+}
+
+.input-wrapper {
+  position: relative;
 }
 </style>
