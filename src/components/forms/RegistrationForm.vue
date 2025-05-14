@@ -10,6 +10,7 @@ import AddressForm from "@/components/forms/AddressForm.vue";
 import type { CountryOption } from "@/types/interfaces.ts";
 import BaseCheckbox from "@/components/ui/BaseCheckbox.vue";
 import router from "@/router";
+import BaseButton from "@/components/ui/BaseButton.vue";
 
 const form = reactive({
   email: "",
@@ -194,10 +195,15 @@ const isFormValid = computed(() => !v$.value.$invalid);
       label="Использовать по умолчанию для выставления счета"
     />
 
-    <button :disabled="!isFormValid || isLoading" class="button" type="submit">
-      <span v-if="isLoading" class="spinner" />
-      <span v-else>Зарегистрироваться</span>
-    </button>
+    <div class="button-wrapper">
+      <BaseButton
+        text="Зарегистрироваться"
+        type="submit"
+        size="xl"
+        :disabled="!isFormValid || isLoading"
+        :is-loading="isLoading"
+      />
+    </div>
   </form>
 </template>
 
@@ -215,45 +221,8 @@ const isFormValid = computed(() => !v$.value.$invalid);
 .form-section-title {
   grid-column: span 2;
 }
-
-.button {
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 10px 17px;
-  border: none;
-  color: var(--white);
-
-  background-color: var(--blue);
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-.button:hover {
-  background-color: var(--blue-hover);
-}
-
-.button:disabled {
-  pointer-events: none;
-  opacity: 0.8;
-  background-color: var(--blue-light);
-}
-
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--white);
-  border-top: 2px solid transparent;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  display: inline-block;
-  vertical-align: middle;
-  margin: 0 auto;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.button-wrapper {
+  display: flex;
+  justify-content: center;
 }
 </style>
