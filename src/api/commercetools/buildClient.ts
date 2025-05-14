@@ -1,30 +1,27 @@
-import fetch from "node-fetch";
-import {
-  ClientBuilder,
-  type AuthMiddlewareOptions,
-  type HttpMiddlewareOptions,
-} from "@commercetools/ts-client";
+import { ClientBuilder } from "@commercetools/sdk-client-v2";
+import { createApiBuilderFromCtpClient } from "@commercetools/platform-sdk";
 
 const projectKey = import.meta.env.VITE_PROJECT_KEY;
 const clientId = import.meta.env.VITE_CLIENT_ID;
 const clientSecret = import.meta.env.VITE_CLIENT_SECRET;
-const region = import.meta.env.VITE_REGION;
+const authUrl = import.meta.env.VITE_AUTH_URL;
+const apiUrl = import.meta.env.VITE_API_URL;
 const scopes = import.meta.env.VITE_SCOPES.split(" ");
 
-const authMiddlewareOptions: AuthMiddlewareOptions = {
-  host: `https://auth.${region}.commercetools.com`,
+const authMiddlewareOptions = {
+  host: authUrl,
   projectKey: projectKey,
   credentials: {
     clientId: clientId,
     clientSecret: clientSecret,
   },
   scopes,
-  httpClient: fetch,
+  httpClient: globalThis.fetch,
 };
 
-const httpMiddlewareOptions: HttpMiddlewareOptions = {
-  host: `https://api.${region}.commercetools.com`,
-  httpClient: fetch,
+const httpMiddlewareOptions = {
+  host: apiUrl,
+  httpClient: globalThis.fetch,
 };
 
 export const ctpClient = new ClientBuilder()
@@ -33,3 +30,7 @@ export const ctpClient = new ClientBuilder()
   .withHttpMiddleware(httpMiddlewareOptions)
   .withLoggerMiddleware()
   .build();
+
+export const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({
+  projectKey,
+});
