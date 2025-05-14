@@ -61,10 +61,6 @@ export const registrationRules = {
 
   firstName: {
     required: helpers.withMessage("Имя обязательно", required),
-    /*noWhitespace: helpers.withMessage(
-			"Имя не должно содержать пробелы",
-			helpers.regex(whitespaceRegEx)
-		),*/
     onlyLetters: helpers.withMessage(
       "Имя может содержать только буквы, пробелы и дефисы",
       helpers.regex(onlyLettersRegExp),
@@ -73,10 +69,6 @@ export const registrationRules = {
 
   lastName: {
     required: helpers.withMessage("Фамилия обязательна", required),
-    /*noWhitespace: helpers.withMessage(
-			"Фамилия не должна содержать пробелы",
-			helpers.regex(whitespaceRegEx)
-		),*/
     onlyLetters: helpers.withMessage(
       "Фамилия может содержать только буквы, пробелы и дефисы",
       helpers.regex(onlyLettersRegExp),
@@ -93,31 +85,6 @@ export const registrationRules = {
       isAtLeastAge(14),
     ),
   },
-
-  /*  streetName: {
-    required: helpers.withMessage("Улица обязательна", required),
-  },
-  city: {
-    required: helpers.withMessage("Город обязателен", required),
-    onlyLetters: helpers.withMessage(
-      "Город  может содержать только буквы, пробелы и дефисы",
-      helpers.regex(onlyLettersRegExp),
-    ),
-  },
-  country: {
-    required: helpers.withMessage("Страна обязательна", required),
-    allowed: helpers.withMessage(
-      "Выбранная страна недопустима",
-      (value: string) => allowedCountries.includes(value),
-    ),
-  },
-  postalCode: {
-    required: helpers.withMessage("Почтовый индекс обязателен", required),
-    hasDigit: helpers.withMessage(
-      "Почтовый индекс в России должен состоять ровно из 6 цифр",
-      helpers.regex(postalCodeRegExp),
-    ),
-  },*/
 };
 
 export const addressRules = {
