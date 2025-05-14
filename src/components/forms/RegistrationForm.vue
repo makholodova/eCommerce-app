@@ -1,15 +1,15 @@
 ﻿<script lang="ts" setup>
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import BaseInputField from "@/components/ui/BaseInputField.vue";
 import { useVuelidate } from "@vuelidate/core";
-import { registrationRules, addressRules } from "@/utils/validation.ts";
+import { addressRules, registrationRules } from "@/utils/validation.ts";
 import { signUp } from "@/api/commercetools/singUp.ts";
 import type { UserRegistrationData } from "@/types/user-registration.types.ts";
 import { showError, showSuccess } from "@/utils/toast.ts";
-import router from "@/router";
 import AddressForm from "@/components/forms/AddressForm.vue";
 import type { CountryOption } from "@/types/interfaces.ts";
 import BaseCheckbox from "@/components/ui/BaseCheckbox.vue";
+import router from "@/router";
 
 const form = reactive({
   email: "",
@@ -32,12 +32,29 @@ const form = reactive({
 
   isDefaultShipping: false,
   isDefaultBilling: false,
+  useSameAddress: false,
 });
 const isLoading = ref(false);
 const countries = ref<CountryOption[]>([{ title: "RU", value: "Россия" }]);
 
-const rules = computed(() => registrationRules);
+watch(
+  () => form.shippingAddress,
+  (value) => {
+    console.log(value);
+    if (form.useSameAddress) {
+      console.log(form.useSameAddress);
+      form.billingAddress = { ...value };
+    }
+  },
+);
+
+/*const rules = computed(() => registrationRules);*/
 const addressValidationRules = computed(() => addressRules);
+const rules = computed(() => ({
+  ...registrationRules,
+  shippingAddress: addressValidationRules.value,
+  billingAddress: form.useSameAddress ? {} : addressValidationRules.value,
+}));
 
 const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });
 
@@ -53,15 +70,27 @@ async function handleSubmit(): Promise<void> {
     firstName: form.firstName,
     lastName: form.lastName,
     dateOfBirth: form.dateOfBirth,
+    addresses: form.useSameAddress
+      ? [form.shippingAddress]
+      : [form.shippingAddress, form.billingAddress],
     defaultShippingAddress: form.isDefaultShipping ? 0 : undefined,
-    defaultBillingAddress: form.isDefaultBilling ? 1 : undefined,
-    addresses: [form.shippingAddress, form.billingAddress],
+    defaultBillingAddress: form.useSameAddress
+      ? form.isDefaultShipping
+        ? 0
+        : undefined
+      : form.isDefaultBilling
+        ? 1
+        : undefined,
+    shippingAddresses: [0],
+    billingAddresses: form.useSameAddress ? [0] : [1],
   };
   try {
     const createdCustomer = await signUp(dateCustomerRequest);
     showSuccess(
       `Аккаунт успешно создан! Добро пожаловать, ${createdCustomer.customer.firstName}!`,
-      () => router.push({ name: "Main" }),
+      () => {
+        router.push({ name: "Main" });
+      },
     );
   } catch (error) {
     showError(
@@ -133,8 +162,9 @@ const isFormValid = computed(() => !v$.value.$invalid);
     <AddressForm
       v-model="form.shippingAddress"
       :countries="countries"
-      :rules="addressValidationRules"
+      :rules="rules.shippingAddress"
       title="Адрес доставки"
+      prefix="shipping"
     />
     <BaseCheckbox
       id="shippingAddress"
@@ -142,13 +172,23 @@ const isFormValid = computed(() => !v$.value.$invalid);
       label="Использовать по умолчанию для доставки"
     />
 
+    <BaseCheckbox
+      id="useSameAddress"
+      v-model="form.useSameAddress"
+      label="Использовать адрес доставки для выставления счета"
+    />
+
     <AddressForm
+      v-show="!form.useSameAddress"
       v-model="form.billingAddress"
       :countries="countries"
-      :rules="addressValidationRules"
+      :rules="rules.billingAddress"
       title="Адрес для выставления счета"
+      prefix="billing"
     />
+
     <BaseCheckbox
+      v-show="!form.useSameAddress"
       id="billingAddress"
       v-model="form.isDefaultBilling"
       label="Использовать по умолчанию для выставления счета"

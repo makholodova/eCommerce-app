@@ -11,6 +11,7 @@ const props = defineProps<{
   title: string;
   rules?: AddressFormRules;
   countries: CountryOption[];
+  prefix: string;
 }>();
 </script>
 
@@ -18,7 +19,7 @@ const props = defineProps<{
   <div class="form-section address-wrapper">
     <h3 class="form-section-title">{{ title }}</h3>
     <BaseInputField
-      id="streetName"
+      :id="`${prefix}-streetName`"
       v-model="modelValue.streetName"
       :vuelidate-rules="props.rules?.streetName"
       label="Улица"
@@ -28,7 +29,7 @@ const props = defineProps<{
     />
 
     <BaseInputField
-      id="city"
+      :id="`${prefix}-city`"
       v-model="modelValue.city"
       :vuelidate-rules="props.rules?.city"
       label="Город"
@@ -38,7 +39,7 @@ const props = defineProps<{
     />
 
     <BaseSelectField
-      id="country"
+      :id="`${prefix}-country`"
       v-model="modelValue.country"
       :options="countries"
       :vuelidate-rules="props.rules?.country"
@@ -48,7 +49,7 @@ const props = defineProps<{
     />
 
     <BaseInputField
-      id="postalCode"
+      :id="`${prefix}-postalCode`"
       v-model="modelValue.postalCode"
       :vuelidate-rules="props.rules?.postalCode"
       label="Почтовый индекс"
