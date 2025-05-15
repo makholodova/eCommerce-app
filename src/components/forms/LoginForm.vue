@@ -4,7 +4,8 @@ import BaseInputField from "../ui/BaseInputField.vue";
 import useVuelidate from "@vuelidate/core";
 import { registrationRules } from "@/utils/validation";
 import BaseButton from "@/components/ui/BaseButton.vue";
-import { login, userProfile } from "@/api/commercetools/login";
+import { login } from "@/api/commercetools/login";
+import { userProfile } from "@/api/commercetools/customer/profile";
 
 const form = reactive({
   email: "",
