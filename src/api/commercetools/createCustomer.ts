@@ -5,6 +5,7 @@ import {
 } from "@commercetools/sdk-client-v2";
 import { createApiBuilderFromCtpClient } from "@commercetools/platform-sdk";
 import type { ByProjectKeyRequestBuilder } from "@commercetools/platform-sdk";
+import { tokenStore } from "@/store/tokenStore";
 
 const projectKey = import.meta.env.VITE_PROJECT_KEY;
 const clientId = import.meta.env.VITE_CLIENT_ID;
@@ -17,6 +18,7 @@ export function createCustomerApiRoot(
   email: string,
   password: string,
 ): ByProjectKeyRequestBuilder {
+  const useTokenStore = tokenStore();
   const authOptions: PasswordAuthMiddlewareOptions = {
     host: authUrl,
     projectKey,
@@ -30,6 +32,12 @@ export function createCustomerApiRoot(
     },
     scopes: scopesCustomer,
     fetch: globalThis.fetch,
+    tokenCache: {
+      get: () => useTokenStore.getTokenStore(),
+      set: (newToken) => {
+        useTokenStore.setToken(newToken);
+      },
+    },
   };
 
   const httpOptions: HttpMiddlewareOptions = {
