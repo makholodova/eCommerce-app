@@ -62,8 +62,6 @@ defineProps<{
   font-weight: 500;
   font-size: 18px;
   text-align: center;
-  border-top: 2px solid var(--blue-light);
-  padding-top: 1rem;
 }
 
 @media (max-width: 650px) {

@@ -21,40 +21,6 @@ defineProps<{
   padding: 0.5rem;
 }
 
-/*.checkbox-input {
-  width: 18px;
-  height: 18px;
-  appearance: none;
-  border: 2px solid var(--blue);
-  border-radius: 4px;
-  background-color: white;
-  cursor: pointer;
-  display: inline-block;
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.checkbox-input:checked {
-  background-color: var(--blue);
-  border-color: var(--blue);
-}
-
-.checkbox-input:checked::after {
-  content: "";
-  position: absolute;
-  left: 4px;
-  top: 1px;
-  width: 5px;
-  height: 10px;
-  border: solid var(--white);
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.checkbox-input:checked {
-  border-color: var(--blue);
-}*/
-
 .checkbox-label {
   transition: color 0.2s ease;
 }
