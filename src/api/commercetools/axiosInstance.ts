@@ -1,19 +1,20 @@
 import axios from "axios";
-import { tokenStore } from "@/store/tokenStore";
+import { storeToRefs } from "pinia";
+import { useTokenStore } from "@/store/useTokenStore";
+import { API_BASE_URL } from "@/utils/constants";
 
 const api = axios.create({
-  baseURL: "https://api.europe-west1.gcp.commercetools.com/ecommerce-app-team",
+  baseURL: API_BASE_URL,
 });
 
 api.interceptors.request.use(
   (config) => {
-    const useTokenStore = tokenStore();
-    const { token } = useTokenStore.getTokenStore();
+    const tokenStore = useTokenStore();
+    const { token } = storeToRefs(tokenStore);
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (token.value) {
+      config.headers.Authorization = `Bearer ${token.value}`;
     }
-
     return config;
   },
   (error) => {

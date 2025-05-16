@@ -30,6 +30,7 @@ async function handleSubmit(): Promise<void> {
   try {
     const createdCustomer = await login(loginData);
     console.log("Вход выполнен успешно:", createdCustomer.customer.firstName);
+
     //временная проверка, выводит профиль созданного пользователя
     const response = await api.get("/me");
     console.log("Профиль пользователя:", response.data);

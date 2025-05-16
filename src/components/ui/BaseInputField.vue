@@ -1,5 +1,5 @@
 ﻿<script lang="ts" setup>
-import { ref, computed, defineProps } from "vue";
+import { ref, computed } from "vue";
 import {
   useVuelidate,
   type ValidationRuleWithoutParams,

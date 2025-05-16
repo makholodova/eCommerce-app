@@ -5,7 +5,8 @@ import {
 } from "@commercetools/sdk-client-v2";
 import { createApiBuilderFromCtpClient } from "@commercetools/platform-sdk";
 import type { ByProjectKeyRequestBuilder } from "@commercetools/platform-sdk";
-import { tokenStore } from "@/store/tokenStore";
+import { useTokenStore } from "@/store/useTokenStore";
+import { storeToRefs } from "pinia";
 
 const projectKey = import.meta.env.VITE_PROJECT_KEY;
 const clientId = import.meta.env.VITE_CLIENT_ID;
@@ -18,7 +19,9 @@ export function createCustomerApiRoot(
   email: string,
   password: string,
 ): ByProjectKeyRequestBuilder {
-  const useTokenStore = tokenStore();
+  const tokenStore = useTokenStore();
+  const { token, refreshToken, expirationTime } = storeToRefs(tokenStore);
+
   const authOptions: PasswordAuthMiddlewareOptions = {
     host: authUrl,
     projectKey,
@@ -33,9 +36,13 @@ export function createCustomerApiRoot(
     scopes: scopesCustomer,
     fetch: globalThis.fetch,
     tokenCache: {
-      get: () => useTokenStore.getTokenStore(),
+      get: () => ({
+        token: token.value,
+        refreshToken: refreshToken.value,
+        expirationTime: expirationTime.value,
+      }),
       set: (newToken) => {
-        useTokenStore.setToken(newToken);
+        tokenStore.setTokenStore(newToken);
       },
     },
   };
