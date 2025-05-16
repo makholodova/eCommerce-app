@@ -6,6 +6,7 @@ import { registrationRules } from "@/utils/validation";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { login } from "@/api/commercetools/login";
 import { getUserProfile } from "@/api/commercetools/customer/profile";
+import router from "@/router";
 
 const form = reactive({
   email: "",
@@ -34,6 +35,8 @@ async function handleSubmit(): Promise<void> {
     //временная проверка, выводит профиль созданного пользователя
     const userData = await getUserProfile();
     console.log("Профиль пользователя:", userData);
+
+    router.replace({ name: "Main" });
   } catch (error) {
     console.error("Ошибка входа:", error);
   }
