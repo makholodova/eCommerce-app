@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { defineProps, defineEmits } from "vue";
-
 type ButtonProps = {
   text: string;
   size?: "sm" | "md" | "lg" | "xl";

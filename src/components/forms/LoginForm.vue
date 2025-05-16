@@ -4,6 +4,8 @@ import BaseInputField from "../ui/BaseInputField.vue";
 import useVuelidate from "@vuelidate/core";
 import { registrationRules } from "@/utils/validation";
 import BaseButton from "@/components/ui/BaseButton.vue";
+import { login } from "@/api/commercetools/login";
+import { getUserProfile } from "@/api/commercetools/customer/profile";
 
 const form = reactive({
   email: "",
@@ -20,12 +22,21 @@ const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });
 async function handleSubmit(): Promise<void> {
   await v$.value.$validate();
   if (v$.value.$invalid) return;
-  const dateCustomerRequest = {
-    username: form.email,
+  const loginData = {
+    email: form.email,
     password: form.password,
   };
 
-  console.log("Вход выполнен успешно ", dateCustomerRequest);
+  try {
+    const createdCustomer = await login(loginData);
+    console.log("Вход выполнен успешно:", createdCustomer.customer.firstName);
+
+    //временная проверка, выводит профиль созданного пользователя
+    const userData = await getUserProfile();
+    console.log("Профиль пользователя:", userData);
+  } catch (error) {
+    console.error("Ошибка входа:", error);
+  }
 }
 
 const isFormValid = computed(() => !v$.value.$invalid);
