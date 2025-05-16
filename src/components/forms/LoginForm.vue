@@ -5,7 +5,7 @@ import useVuelidate from "@vuelidate/core";
 import { registrationRules } from "@/utils/validation";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { login } from "@/api/commercetools/login";
-import api from "@/api/commercetools/axiosInstance";
+import { getUserProfile } from "@/api/commercetools/customer/profile";
 
 const form = reactive({
   email: "",
@@ -32,8 +32,8 @@ async function handleSubmit(): Promise<void> {
     console.log("Вход выполнен успешно:", createdCustomer.customer.firstName);
 
     //временная проверка, выводит профиль созданного пользователя
-    const response = await api.get("/me");
-    console.log("Профиль пользователя:", response.data);
+    const userData = await getUserProfile();
+    console.log("Профиль пользователя:", userData);
   } catch (error) {
     console.error("Ошибка входа:", error);
   }
