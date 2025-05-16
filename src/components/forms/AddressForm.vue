@@ -9,9 +9,9 @@ const modelValue = defineModel<AddressFormFields>({ required: true });
 
 defineProps<{
   title: string;
-  rules?: AddressFormRules;
   countries: CountryOption[];
   prefix: string;
+  rules?: AddressFormRules;
 }>();
 </script>
 
