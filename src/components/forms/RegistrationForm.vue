@@ -16,6 +16,7 @@ import PersonalInfoForm from "@/components/forms/PersonalInfoForm.vue";
 import AddressForm from "@/components/forms/AddressForm.vue";
 import BaseCheckbox from "@/components/ui/BaseCheckbox.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
+import { registrationErrorMessages } from "@/utils/errors/errorMessages.ts";
 
 const auth = reactive({
   email: "",
@@ -104,9 +105,14 @@ async function handleSubmit(): Promise<void> {
       },
     );
   } catch (error) {
-    showError(
-      `Произошла ошибка при регистрации. Пожалуйста, попробуйте ещё раз. ${error}`,
-    );
+    if (error instanceof Error) {
+      const message =
+        registrationErrorMessages[error.message] ||
+        "Произошла ошибка при регистрации. Пожалуйста, попробуйте ещё раз.";
+      showError(message);
+    } else {
+      showError("Произошла неизвестная ошибка. Попробуйте позже.");
+    }
   } finally {
     isLoading.value = false;
   }
