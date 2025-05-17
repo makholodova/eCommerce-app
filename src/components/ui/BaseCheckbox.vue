@@ -1,14 +1,13 @@
 ﻿<script lang="ts" setup>
 const inputValue = defineModel<boolean>({ required: true });
 defineProps<{
-  id: string;
   label: string;
 }>();
 </script>
 
 <template>
   <label class="checkbox">
-    <input :id v-model="inputValue" class="checkbox-input" type="checkbox" />
+    <input v-model="inputValue" class="checkbox-input" type="checkbox" />
     <span class="checkbox-label">{{ label }}</span>
   </label>
 </template>

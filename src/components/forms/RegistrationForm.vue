@@ -135,13 +135,11 @@ const isFormValid = computed(() => !v$.value.$invalid);
       class="form-container"
     />
     <BaseCheckbox
-      id="shippingAddress"
       v-model="isDefaultShipping"
       label="Использовать по умолчанию для доставки"
     />
 
     <BaseCheckbox
-      id="useSameAddress"
       v-model="useSameAddress"
       label="Использовать адрес доставки для выставления счета"
     />
@@ -158,7 +156,6 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
     <BaseCheckbox
       v-show="!useSameAddress"
-      id="billingAddress"
       v-model="isDefaultBilling"
       label="Использовать по умолчанию для выставления счета"
     />
