@@ -12,10 +12,11 @@ app.use(router);
 
 app.mount("#app");
 
-router.beforeEach((to, _, next): void => {
+router.beforeEach(async (to, _, next): Promise<void> => {
   const store = useTokenStore();
+  store.checkIfUserIsAuthorized();
 
-  if (to.meta.requires === "unAuth" && store.isAddedToLocalStorage()) {
+  if (to.meta.requires === "unAuth" && store.isAuthenticated) {
     return next({ name: "Main" });
   }
 

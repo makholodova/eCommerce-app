@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 import { useTokenStore } from "@/store/useTokenStore";
 import { computed } from "vue";
 
 const route = useRoute();
 const token = useTokenStore();
+const router = useRouter();
 
-const isAuthenticated = computed(() => token.isAuthorized);
+const isAuthenticated = computed(() => token.isAuthenticated);
 
-function logout(): void {
-  token.logout();
+async function logout(): Promise<void> {
+  await token.logout();
+  router.push({ name: "Main" });
 }
 </script>
 
