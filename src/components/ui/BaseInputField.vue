@@ -46,7 +46,7 @@ const errorMessage = computed(() => {
 <template>
   <label class="field">
     <span>{{ label }}</span>
-    <div class="input-wrapper">
+    <span class="input-wrapper">
       <input
         :id
         v-model="inputValue"
@@ -59,13 +59,12 @@ const errorMessage = computed(() => {
         ]"
         :placeholder
         :type="isPasswordVisible && type === 'password' ? 'text' : type"
-        :value="inputValue"
       />
       <TogglePassword
         v-if="type === 'password'"
         v-model:password-visible="isPasswordVisible"
       />
-    </div>
+    </span>
     <span
       v-if="showError"
       :class="{ visible: v$.inputValue.$error }"
@@ -80,6 +79,10 @@ const errorMessage = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.input-wrapper {
+  position: relative;
 }
 
 .base-input {
@@ -99,11 +102,6 @@ const errorMessage = computed(() => {
     background-color 0.2s ease;
 }
 
-.base-input:not(:placeholder-shown):not(.error):not(:focus) {
-  font-size: 1rem;
-  color: var(--black);
-}
-
 .base-input.valid {
   background-image: url("@/assets/icons/icon_valid.svg");
   background-repeat: no-repeat;
@@ -121,22 +119,24 @@ const errorMessage = computed(() => {
   color: var(--black);
 }
 
+.base-input:not(:placeholder-shown):not(.error):not(:focus):not([type="date"]) {
+  font-size: 1rem;
+  color: var(--black);
+}
+
+input[type="date"].base-input {
+  padding-right: 34px;
+}
+
 .error-text {
   color: var(--red);
   font-size: 0.7rem;
   min-height: 1rem;
-}
-
-.error-text {
   transition: opacity 0.2s ease;
   opacity: 0;
 }
 
 .error-text.visible {
   opacity: 1;
-}
-
-.input-wrapper {
-  position: relative;
 }
 </style>
