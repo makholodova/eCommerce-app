@@ -1,13 +1,9 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import TheHeader from "./components/header/TheHeader.vue";
+</script>
 
 <template>
-  <nav>
-    <router-link :to="{ name: 'Main' }">Main</router-link>
-    |
-    <router-link :to="{ name: 'Login' }">Login</router-link>
-    |
-    <router-link :to="{ name: 'Register' }">Register</router-link>
-  </nav>
+  <TheHeader />
   <router-view />
 </template>
 
