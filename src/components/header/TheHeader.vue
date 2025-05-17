@@ -11,9 +11,6 @@ const isAuthenticated = computed(() => token.isAuthorized);
 function logout(): void {
   token.logout();
 }
-
-// написать условие в токене для логаута(удалить из локал сториджа и очистить токен), - завести переменную isAuthorized - getter,
-//
 </script>
 
 <template>
@@ -101,6 +98,8 @@ nav .navigation {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 5px;
+  border-radius: 10px;
 }
 .link-wrapper p {
   font-family: Roboto;
@@ -113,14 +112,24 @@ nav .navigation {
   width: 20px;
   height: 20px;
 }
-.router-link-active,
-a:active {
-}
+/* .router-link-active .link-wrapper,
+a:active .link-wrapper {
+  border: 1px solid #BCC5FF;
+} */
 
 a {
   text-decoration: none;
+  border-radius: 10px;
+  display: block;
 }
 
-a:hover {
+a:not(.logo):hover {
+  background-color: #bcc5ff;
+}
+
+@media (max-width: 600px) {
+  header {
+    padding: 5px 8px;
+  }
 }
 </style>
