@@ -1,14 +1,26 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
+import type { ComputedRef } from "vue";
 
 export const useTokenStore = defineStore("token", () => {
   const token = ref<string>("");
   const refreshToken = ref<string>("");
   const expirationTime = ref<number>(0);
 
-  const isAuthorized = computed(() => {
+  const isAuthorized: ComputedRef<boolean> = computed(() => {
     return !!token.value;
   });
+
+  function isAddedToLocalStorage(): boolean {
+    const data = localStorage.getItem("user");
+    if (data) {
+      const user = JSON.parse(data);
+      if (user.isAuthenticated) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   function setTokenStore(newToken: {
     token: string;
@@ -34,5 +46,6 @@ export const useTokenStore = defineStore("token", () => {
     setTokenStore,
     logout,
     isAuthorized,
+    isAddedToLocalStorage,
   };
 });
