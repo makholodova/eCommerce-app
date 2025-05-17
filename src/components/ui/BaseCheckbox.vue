@@ -18,6 +18,9 @@ defineProps<{
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem;
+  max-width: 700px;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .checkbox-label {
