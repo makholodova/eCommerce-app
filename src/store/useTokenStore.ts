@@ -14,7 +14,7 @@ export const useTokenStore = defineStore("token", () => {
         isAuthenticated.value = false;
       } else {
         const user = JSON.parse(data);
-        isAuthenticated.value = user.isAuthenticated;
+        isAuthenticated.value = user.isAuthenticated ?? false;
       }
     } catch {
       isAuthenticated.value = false;
