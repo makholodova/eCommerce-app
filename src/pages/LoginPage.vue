@@ -4,24 +4,27 @@ import LoginForm from "@/components/forms/LoginForm.vue";
 
 <template>
   <div class="container">
-    <h1>Войти</h1>
-    <div class="register-prompt">
-      <span>Ещё нет учетной записи?</span>
-      <router-link :to="{ name: 'Register' }">Зарегистрироваться</router-link>
+    <div class="login-page">
+      <h1>Войти</h1>
+      <div class="register-prompt">
+        <span>Ещё нет учетной записи?</span>
+        <router-link :to="{ name: 'Register' }">Зарегистрироваться</router-link>
+      </div>
+      <LoginForm />
     </div>
-    <LoginForm />
   </div>
 </template>
 
 <style scoped>
 .container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  padding: 8px;
+  margin: 0 auto;
+  max-width: 1440px;
+}
+.login-page {
   max-width: 542px;
   width: 100%;
-  margin: 0 auto;
+  margin: 30px auto;
   padding: clamp(12px, 8vw, 40px) clamp(12px, 9vw, 60px);
   border-radius: 40px;
   background-color: var(--blue-lighter);
