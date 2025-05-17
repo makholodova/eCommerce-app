@@ -1,5 +1,4 @@
 ﻿<script setup lang="ts">
-import { defineProps } from "vue";
 import type { PersonalInfoFields } from "@/types/interfaces.ts";
 import type { FormRules } from "@/types/types.ts";
 import BaseInputField from "@/components/ui/BaseInputField.vue";
