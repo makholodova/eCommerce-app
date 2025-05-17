@@ -1,13 +1,13 @@
 ﻿<script setup lang="ts">
 import { defineProps } from "vue";
 import type { PersonalInfoFields } from "@/types/interfaces.ts";
-import type { PersonalFormRules } from "@/types/types.ts";
+import type { FormRules } from "@/types/types.ts";
 import BaseInputField from "@/components/ui/BaseInputField.vue";
 
 const modelValue = defineModel<PersonalInfoFields>({ required: true });
 
 defineProps<{
-  rules?: PersonalFormRules;
+  rules?: FormRules<PersonalInfoFields>;
   title?: string;
 }>();
 </script>

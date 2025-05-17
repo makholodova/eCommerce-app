@@ -1,13 +1,13 @@
 ﻿<script lang="ts" setup>
 import { defineProps } from "vue";
 import type { AuthFields } from "@/types/interfaces.ts";
-import type { AuthFormRules } from "@/types/types.ts";
+import type { FormRules } from "@/types/types.ts";
 import BaseInputField from "@/components/ui/BaseInputField.vue";
 
 const modelValue = defineModel<AuthFields>({ required: true });
 
 defineProps<{
-  rules?: AuthFormRules;
+  rules?: FormRules<AuthFields>;
 }>();
 </script>
 
