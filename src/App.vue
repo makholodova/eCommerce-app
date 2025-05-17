@@ -4,9 +4,11 @@ import TheHeader from "./components/header/TheHeader.vue";
 
 <template>
   <TheHeader />
-  <transition name="fade" mode="out-in">
-    <router-view />
-  </transition>
+  <router-view v-slot="{ Component, route }">
+    <transition name="fade" mode="out-in">
+      <component :is="Component" :key="route.fullPath" />
+    </transition>
+  </router-view>
 </template>
 
 <style scoped>
