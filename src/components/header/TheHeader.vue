@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
-import { useRouter } from "vue-router";
 import { useTokenStore } from "@/store/useTokenStore";
+import { computed } from "vue";
 
 const route = useRoute();
-const router = useRouter();
 const token = useTokenStore();
 
-console.log(route, router, token);
+const isAuthenticated = computed(() => token.isAuthorized);
+
+function logout(): void {
+  token.logout();
+}
 
 // написать условие в токене для логаута(удалить из локал сториджа и очистить токен), - завести переменную isAuthorized - getter,
 //
@@ -20,7 +23,11 @@ console.log(route, router, token);
     </router-link>
     <nav>
       <ul class="navigation">
-        <router-link :to="{ name: 'Main' }">
+        <router-link
+          v-if="isAuthenticated"
+          :to="{ name: 'Main' }"
+          @click="logout"
+        >
           <div class="link-wrapper">
             <img
               src="@/assets/icons/header-icons/logout.png"
@@ -30,7 +37,10 @@ console.log(route, router, token);
             <p class="icon-description">Выход</p>
           </div>
         </router-link>
-        <router-link :to="{ name: 'Login' }">
+        <router-link
+          v-if="!isAuthenticated && route.name !== 'Login'"
+          :to="{ name: 'Login' }"
+        >
           <div class="link-wrapper">
             <img
               src="@/assets/icons/header-icons/login.png"
@@ -40,7 +50,10 @@ console.log(route, router, token);
             <p class="icon-description">Вход</p>
           </div>
         </router-link>
-        <router-link :to="{ name: 'Register' }">
+        <router-link
+          v-if="!isAuthenticated && route.name !== 'Register'"
+          :to="{ name: 'Register' }"
+        >
           <div class="link-wrapper">
             <img
               src="@/assets/icons/header-icons/signup.png"
