@@ -6,6 +6,8 @@ import { authRules } from "@/utils/validation";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { login } from "@/api/commercetools/login";
 import { getUserProfile } from "@/api/commercetools/customer/profile";
+import { loginErrorMessages } from "@/utils/errors/errorMessages";
+import { showError } from "@/utils/toast.ts";
 import router from "@/router";
 
 const form = reactive({
@@ -38,7 +40,14 @@ async function handleSubmit(): Promise<void> {
 
     router.push({ name: "Main" });
   } catch (error) {
-    console.error("Ошибка входа:", error);
+    if (error instanceof Error) {
+      const message =
+        loginErrorMessages[error.message] ||
+        "Произошла ошибка при входе. Пожалуйста, попробуйте ещё раз.";
+      showError(message);
+    } else {
+      showError("Произошла неизвестная ошибка. Попробуйте позже.");
+    }
   }
 }
 
