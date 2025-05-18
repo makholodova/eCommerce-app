@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import { createRouter, createWebHistory } from "vue-router";
+
 const routes = [
   {
     path: "/",
@@ -11,11 +12,13 @@ const routes = [
     path: "/login",
     name: "Login",
     component: () => import("@/pages/LoginPage.vue"),
+    meta: { requires: "unAuth" },
   },
   {
     path: "/register",
     name: "Register",
     component: () => import("@/pages/RegistrationPage.vue"),
+    meta: { requires: "unAuth" },
   },
 ];
 

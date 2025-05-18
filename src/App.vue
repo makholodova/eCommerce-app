@@ -1,14 +1,28 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import TheHeader from "./components/header/TheHeader.vue";
+</script>
 
 <template>
-  <nav>
-    <router-link :to="{ name: 'Main' }">Main</router-link>
-    |
-    <router-link :to="{ name: 'Login' }">Login</router-link>
-    |
-    <router-link :to="{ name: 'Register' }">Register</router-link>
-  </nav>
-  <router-view />
+  <TheHeader />
+  <router-view v-slot="{ Component, route }">
+    <transition name="fade" mode="out-in">
+      <component :is="Component" :key="route.fullPath" />
+    </transition>
+  </router-view>
 </template>
 
-<style scoped></style>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.4s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  transform: translateY(-10px);
+  opacity: 0;
+}
+.fade-enter-to {
+  transform: translateY(0);
+  opacity: 1;
+}
+</style>

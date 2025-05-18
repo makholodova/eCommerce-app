@@ -1,0 +1,32 @@
+<svg width="360" height="80" viewBox="0 0 360 80" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <rect width="360" height="80" rx="12" fill="white"/>
+  
+  <!-- Иконка микросхемы -->
+  <g transform="translate(15, 20)">
+    <rect x="0" y="0" width="40" height="40" rx="6" fill="#091D9E"/>
+    <rect x="10" y="10" width="20" height="20" fill="white"/>
+    <!-- Контакты -->
+    <line x1="20" y1="-10" x2="20" y2="0" stroke="#750DC5" stroke-width="2"/>
+    <line x1="20" y1="40" x2="20" y2="50" stroke="#750DC5" stroke-width="2"/>
+    <line x1="-10" y1="20" x2="0" y2="20" stroke="#750DC5" stroke-width="2"/>
+    <line x1="40" y1="20" x2="50" y2="20" stroke="#750DC5" stroke-width="2"/>
+  </g>
+
+  <!-- Название ZHMT -->
+  <text x="70" y="52" font-family="Segoe UI, Roboto, sans-serif" font-size="38" font-weight="700" fill="url(#grad1)">
+    ZHMT
+  </text>
+
+  <!-- shop -->
+  <text x="230" y="52" font-family="Segoe UI, Roboto, sans-serif" font-size="28" font-weight="500" fill="#0C0C0C">
+    shop
+  </text>
+
+  <defs>
+    <linearGradient id="grad1" x1="0" y1="0" x2="200" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#091D9E"/>
+      <stop offset="50%" stop-color="#750DC5"/>
+      <stop offset="100%" stop-color="#EBBA1A"/>
+    </linearGradient>
+  </defs>
+</svg>
