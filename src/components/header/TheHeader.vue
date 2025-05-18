@@ -10,8 +10,8 @@ const router = useRouter();
 
 const isAuthenticated = computed(() => token.isAuthenticated);
 
-async function logout(): Promise<void> {
-  await token.logout();
+function logout(): void {
+  token.logout();
   router.push({ name: "Main" });
 }
 </script>
@@ -75,6 +75,7 @@ async function logout(): Promise<void> {
   padding: 0;
 }
 header {
+  width: 100%;
   padding: 10px 80px;
   display: flex;
   justify-content: space-between;
