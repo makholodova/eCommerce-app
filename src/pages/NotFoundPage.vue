@@ -11,7 +11,8 @@ import BaseButton from "@/components/ui/BaseButton.vue";
       class="not-found-img"
     />
     <h2 class="not-found-text">
-      Перезагрузите страницу или проверьете подключение к интернету
+      404 — здесь только пустые коробки. Похоже, вы свернули не туда. Давайте
+      вернёмся на главную.
     </h2>
     <router-link :to="{ name: 'Main' }">
       <BaseButton
