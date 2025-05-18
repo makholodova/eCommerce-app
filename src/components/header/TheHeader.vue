@@ -21,7 +21,7 @@ function logout(): void {
   <header>
     <BaseContainer class="header">
       <router-link :to="{ name: 'Main' }" class="logo">
-        <img src="@/assets/icons/header-icons/logo.svg" alt="logo" />
+        <img src="@/assets/icons/header-icons/logo.png" alt="logo" />
       </router-link>
       <nav>
         <ul class="navigation">
@@ -90,8 +90,8 @@ header {
 }
 .logo {
   display: block;
-  max-width: 150px;
-  max-height: 50px;
+  min-width: 150px;
+  height: 50px;
 }
 
 .logo img {
@@ -137,8 +137,13 @@ a:not(.logo):hover {
 }
 
 @media (max-width: 600px) {
-  header {
+  .header {
     padding: 5px 8px;
+    justify-content: center;
+    gap: 5px;
+  }
+  nav .navigation {
+    gap: 5px;
   }
 }
 </style>

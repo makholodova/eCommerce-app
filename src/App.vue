@@ -4,14 +4,16 @@ import BaseContainer from "@/components/ui/BaseContainer.vue";
 </script>
 
 <template>
-  <TheHeader />
-  <BaseContainer>
-    <router-view v-slot="{ Component, route }">
-      <transition name="fade" mode="out-in">
-        <component :is="Component" :key="route.fullPath" />
-      </transition>
-    </router-view>
-  </BaseContainer>
+  <div>
+    <TheHeader />
+    <BaseContainer>
+      <router-view v-slot="{ Component, route }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" :key="route.fullPath" />
+        </transition>
+      </router-view>
+    </BaseContainer>
+  </div>
 </template>
 
 <style scoped>

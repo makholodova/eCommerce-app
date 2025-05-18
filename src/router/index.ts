@@ -20,6 +20,11 @@ const routes = [
     component: () => import("@/pages/RegistrationPage.vue"),
     meta: { requires: "unAuth" },
   },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "notFoundPage",
+    component: () => import("@/pages/NotFoundPage.vue"),
+  },
 ];
 
 const router = createRouter({
