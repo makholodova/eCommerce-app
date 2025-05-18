@@ -45,13 +45,24 @@ const selectedLabel = computed(() => {
     ""
   );
 });
+const errorMessage = computed(() => {
+  const errors = v$.value.model.$errors;
+  return errors.length ? errors[0].$message : "";
+});
 </script>
 
 <template>
   <div ref="root" class="field">
     <span>{{ label }}</span>
-    <div class="dropdown" @click="toggleOpen">
-      <div :class="['selected', { invalid: v$.model.$error }]">
+    <div class="input-wrapper">
+      <div
+        class="base-input"
+        :class="{
+          invalid: v$.model.$error,
+          valid: model && !v$.model.$error,
+        }"
+        @click="toggleOpen"
+      >
         {{ selectedLabel }}
       </div>
       <ul v-if="isOpen" class="options">
@@ -65,11 +76,11 @@ const selectedLabel = computed(() => {
       </ul>
     </div>
     <span
-      v-if="showError && v$.model.$error"
+      v-if="showError"
       :class="{ visible: v$.model.$error }"
       class="error-text"
     >
-      {{ v$.model.$errors[0]?.$message }}
+      {{ errorMessage }}
     </span>
   </div>
 </template>
@@ -81,19 +92,35 @@ const selectedLabel = computed(() => {
   gap: 0.5rem;
 }
 
-.dropdown {
+.input-wrapper {
   position: relative;
-  user-select: none;
 }
 
-.selected {
+.base-input {
+  background: white;
   border: 1px solid var(--grey-not-active);
   border-radius: 8px;
-  padding: 11px 8px;
+  padding: 11px 8px 11px 16px;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #726f6f;
   cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
-.selected.invalid {
+.base-input.valid {
+  background-image: url("@/assets/icons/icon_valid.svg");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px 20px;
+  color: var(--black);
+}
+
+.base-input.invalid {
   border-color: var(--red);
   color: var(--red);
 }
@@ -119,15 +146,13 @@ const selectedLabel = computed(() => {
 }
 
 .options li:hover {
-  background: var(--grey-light);
+  background: var(--grey-lighter);
 }
 
 .error-text {
   color: var(--red);
   font-size: 0.7rem;
   min-height: 1rem;
-}
-.error-text {
   transition: opacity 0.2s ease;
   opacity: 0;
 }

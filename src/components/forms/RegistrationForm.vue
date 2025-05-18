@@ -1,32 +1,75 @@
 ﻿<script lang="ts" setup>
-import { computed, reactive, ref } from "vue";
-import BaseInputField from "@/components/ui/BaseInputField.vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useVuelidate } from "@vuelidate/core";
-import BaseSelectField from "@/components/ui/BaseSelectField.vue";
-import { registrationRules } from "@/utils/validation.ts";
-import { signUp } from "@/api/commercetools/singUp.ts";
-import type { UserRegistrationData } from "@/types/user-registration.types.ts";
-import { showError, showSuccess } from "@/utils/toast.ts";
 import router from "@/router";
+import { signUp } from "@/api/commercetools/singUp.ts";
+import { showError, showSuccess } from "@/utils/toast.ts";
+import {
+  addressRules,
+  authRules,
+  personalInfoRules,
+} from "@/utils/validation.ts";
+import type { UserRegistrationData } from "@/types/user-registration.types.ts";
+import type { CountryOption } from "@/types/interfaces.ts";
+import AuthForm from "@/components/forms/AuthForm.vue";
+import PersonalInfoForm from "@/components/forms/PersonalInfoForm.vue";
+import AddressForm from "@/components/forms/AddressForm.vue";
+import BaseCheckbox from "@/components/ui/BaseCheckbox.vue";
+import BaseButton from "@/components/ui/BaseButton.vue";
+import { registrationErrorMessages } from "@/utils/errors/errorMessages.ts";
 
-const form = reactive({
+const auth = reactive({
   email: "",
   password: "",
+});
+const personal = reactive({
   firstName: "",
   lastName: "",
-  birthDate: "",
-  street: "",
+  dateOfBirth: "",
+});
+
+const shippingAddress = reactive({
+  streetName: "",
   city: "",
   country: "",
   postalCode: "",
 });
+
+const billingAddress = reactive({
+  streetName: "",
+  city: "",
+  country: "",
+  postalCode: "",
+});
+
+const useSameAddress = ref(false);
+const isDefaultShipping = ref(false);
+const isDefaultBilling = ref(false);
 const isLoading = ref(false);
-const countries = ref([{ title: "RU", value: "Россия" }]);
 
-const rules = computed(() => registrationRules);
+const countries = ref<CountryOption[]>([{ title: "RU", value: "Россия" }]);
 
-const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });
+const rules = computed(() => ({
+  auth: authRules,
+  personal: personalInfoRules,
+  shippingAddress: addressRules,
+  billingAddress: useSameAddress.value ? {} : addressRules,
+}));
+const v$ = useVuelidate(
+  rules,
+  { auth, personal, shippingAddress, billingAddress },
+  { $lazy: true, $autoDirty: true },
+);
 
+watch(
+  () => shippingAddress,
+  (value) => {
+    if (useSameAddress.value) {
+      Object.assign(billingAddress, value);
+    }
+  },
+  { deep: true },
+);
 async function handleSubmit(): Promise<void> {
   await v$.value.$validate();
   if (v$.value.$invalid) return;
@@ -34,30 +77,42 @@ async function handleSubmit(): Promise<void> {
   isLoading.value = true;
 
   const dateCustomerRequest: UserRegistrationData = {
-    email: form.email,
-    password: form.password,
-    firstName: form.firstName,
-    lastName: form.lastName,
-    dateOfBirth: form.birthDate,
-    addresses: [
-      {
-        streetName: form.street,
-        city: form.city,
-        postalCode: form.postalCode,
-        country: form.country,
-      },
-    ],
+    email: auth.email,
+    password: auth.password,
+    firstName: personal.firstName,
+    lastName: personal.lastName,
+    dateOfBirth: personal.dateOfBirth,
+    addresses: useSameAddress.value
+      ? [shippingAddress]
+      : [shippingAddress, billingAddress],
+    defaultShippingAddress: isDefaultShipping.value ? 0 : undefined,
+    defaultBillingAddress: useSameAddress.value
+      ? isDefaultShipping.value
+        ? 0
+        : undefined
+      : isDefaultBilling.value
+        ? 1
+        : undefined,
+    shippingAddresses: [0],
+    billingAddresses: useSameAddress.value ? [0] : [1],
   };
   try {
     const createdCustomer = await signUp(dateCustomerRequest);
     showSuccess(
       `Аккаунт успешно создан! Добро пожаловать, ${createdCustomer.customer.firstName}!`,
-      () => router.push({ name: "Main" }),
+      () => {
+        router.push({ name: "Main" });
+      },
     );
   } catch (error) {
-    showError(
-      `Произошла ошибка при регистрации. Пожалуйста, попробуйте ещё раз. ${error}`,
-    );
+    if (error instanceof Error) {
+      const message =
+        registrationErrorMessages[error.message] ||
+        "Произошла ошибка при регистрации. Пожалуйста, попробуйте ещё раз.";
+      showError(message);
+    } else {
+      showError("Произошла неизвестная ошибка. Попробуйте позже.");
+    }
   } finally {
     isLoading.value = false;
   }
@@ -68,187 +123,75 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
 <template>
   <form class="registration-form" @submit.prevent="handleSubmit">
-    <div class="form-section credentials-wrapper">
-      <BaseInputField
-        id="email"
-        v-model="form.email"
-        :vuelidate-rules="rules.email"
-        label="E-mail"
-        placeholder="user@example.com"
-        show-error
-        type="email"
-      />
-      <BaseInputField
-        id="password"
-        v-model="form.password"
-        :vuelidate-rules="rules.password"
-        label="Пароль"
-        placeholder="**********"
-        show-error
-        type="password"
+    <AuthForm v-model="auth" :rules="rules.auth" />
+
+    <PersonalInfoForm
+      v-model="personal"
+      :rules="rules.personal"
+      title="Личная информация"
+      class="form-container"
+    />
+
+    <AddressForm
+      v-model="shippingAddress"
+      :countries="countries"
+      :rules="rules.shippingAddress"
+      prefix="shipping"
+      title="Адрес доставки"
+      class="form-container"
+    />
+    <BaseCheckbox
+      v-model="isDefaultShipping"
+      label="Использовать по умолчанию для доставки"
+    />
+
+    <BaseCheckbox
+      v-model="useSameAddress"
+      label="Использовать адрес доставки для выставления счета"
+    />
+
+    <AddressForm
+      v-show="!useSameAddress"
+      v-model="billingAddress"
+      :countries="countries"
+      :rules="rules.billingAddress"
+      prefix="billing"
+      title="Адрес для выставления счета"
+      class="form-container"
+    />
+
+    <BaseCheckbox
+      v-show="!useSameAddress"
+      v-model="isDefaultBilling"
+      label="Использовать по умолчанию для выставления счета"
+    />
+
+    <div class="button-wrapper">
+      <BaseButton
+        :disabled="!isFormValid || isLoading"
+        :is-loading="isLoading"
+        size="xl"
+        text="Зарегистрироваться"
+        type="submit"
       />
     </div>
-    <div class="form-section personal-data-wrapper">
-      <h3 class="form-section-title">Личная информация</h3>
-      <BaseInputField
-        id="firstName"
-        v-model="form.firstName"
-        :vuelidate-rules="rules.firstName"
-        label="Имя"
-        placeholder="Иван"
-        show-error
-        type="text"
-      />
-
-      <BaseInputField
-        id="lastName"
-        v-model="form.lastName"
-        :vuelidate-rules="rules.lastName"
-        label="Фамилия"
-        placeholder="Иванов"
-        show-error
-        type="text"
-      />
-
-      <BaseInputField
-        id="birthDate"
-        v-model="form.birthDate"
-        :vuelidate-rules="rules.birthDate"
-        label="Дата рождения"
-        placeholder="01.01.2000"
-        show-error
-        type="date"
-      />
-    </div>
-
-    <div class="form-section address-wrapper">
-      <h3 class="form-section-title">Адрес доставки</h3>
-      <BaseInputField
-        id="street"
-        v-model="form.street"
-        :vuelidate-rules="rules.street"
-        label="Улица"
-        placeholder="ул. Ленина"
-        show-error
-        type="text"
-      />
-
-      <BaseInputField
-        id="city"
-        v-model="form.city"
-        :vuelidate-rules="rules.city"
-        label="Город"
-        placeholder="Москва"
-        show-error
-        type="text"
-      />
-
-      <BaseSelectField
-        id="country"
-        v-model="form.country"
-        :options="countries"
-        :vuelidate-rules="rules.country"
-        label="Страна"
-        placeholder="Выберите страну"
-        show-error
-      />
-
-      <BaseInputField
-        id="postalCode"
-        v-model="form.postalCode"
-        :vuelidate-rules="rules.postalCode"
-        label="Почтовый индекс"
-        placeholder="123456"
-        show-error
-        type="text"
-      />
-    </div>
-
-    <button :disabled="!isFormValid || isLoading" class="button" type="submit">
-      <span v-if="isLoading" class="spinner" />
-      <span v-else>Зарегистрироваться</span>
-    </button>
-    <p class="login-link">
-      Уже есть учетная запись?
-      <RouterLink :to="{ name: 'Login' }" class="login-button"
-        >Войти</RouterLink
-      >
-    </p>
   </form>
 </template>
 
 <style scoped>
-.form-section {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-column: span 2;
-  grid-row: 1;
-  gap: 1rem;
-
-  margin-bottom: 2rem;
+.registration-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
-
-.form-section-title {
-  grid-column: span 2;
-}
-
-.button {
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 10px 17px;
-  border: none;
-  color: var(--white);
-
-  background-color: var(--blue);
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-.button:hover {
-  background-color: var(--blue-hover);
-}
-
-.button:disabled {
-  pointer-events: none;
-  opacity: 0.8;
-  background-color: var(--blue-light);
-}
-
-.login-link {
+.form-container {
+  border-top: 2px solid var(--blue-light);
+  padding-top: 0.5rem;
   margin-top: 1rem;
-  font-size: 1rem;
 }
-
-.login-button {
-  color: var(--blue);
-  text-decoration: none;
-  margin-left: 0.3rem;
-  transition:
-    text-decoration 0.2s ease,
-    color 0.2s ease;
-}
-
-.login-button:hover {
-  text-decoration: underline;
-  color: var(--blue-hover);
-}
-
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--white);
-  border-top: 2px solid transparent;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  display: inline-block;
-  vertical-align: middle;
-  margin: 0 auto;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
 }
 </style>

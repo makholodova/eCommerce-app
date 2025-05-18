@@ -25,7 +25,7 @@ const isAtLeastAge =
     return birthDate <= minAllowedDate;
   };
 
-export const registrationRules = {
+export const authRules = {
   email: {
     required: helpers.withMessage("Email обязателен", required),
     email: helpers.withMessage("Неверный формат e-mail", email),
@@ -58,13 +58,11 @@ export const registrationRules = {
       helpers.regex(whitespaceRegExp),
     ),
   },
+};
 
+export const personalInfoRules = {
   firstName: {
     required: helpers.withMessage("Имя обязательно", required),
-    /*noWhitespace: helpers.withMessage(
-			"Имя не должно содержать пробелы",
-			helpers.regex(whitespaceRegEx)
-		),*/
     onlyLetters: helpers.withMessage(
       "Имя может содержать только буквы, пробелы и дефисы",
       helpers.regex(onlyLettersRegExp),
@@ -73,16 +71,12 @@ export const registrationRules = {
 
   lastName: {
     required: helpers.withMessage("Фамилия обязательна", required),
-    /*noWhitespace: helpers.withMessage(
-			"Фамилия не должна содержать пробелы",
-			helpers.regex(whitespaceRegEx)
-		),*/
     onlyLetters: helpers.withMessage(
-      "Допустимы может содержать только буквы, пробелы и дефисы",
+      "Фамилия может содержать только буквы, пробелы и дефисы",
       helpers.regex(onlyLettersRegExp),
     ),
   },
-  birthDate: {
+  dateOfBirth: {
     required: helpers.withMessage("Дата рождения обязательна", required),
     noWhitespace: helpers.withMessage(
       "Дата рождения не должна содержать пробелы",
@@ -93,8 +87,9 @@ export const registrationRules = {
       isAtLeastAge(14),
     ),
   },
-
-  street: {
+};
+export const addressRules = {
+  streetName: {
     required: helpers.withMessage("Улица обязательна", required),
   },
   city: {

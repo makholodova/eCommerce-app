@@ -4,6 +4,7 @@ type ButtonProps = {
   size?: "sm" | "md" | "lg" | "xl";
   type?: "button" | "submit";
   disabled?: boolean;
+  isLoading?: boolean;
 };
 
 const {
@@ -21,11 +22,14 @@ const emit = defineEmits<{
 <template>
   <button
     :type
-    :disabled
+    :disabled="disabled || isLoading"
     :class="['button', `size-${size}`]"
     @click="emit('click')"
   >
-    {{ text }}
+    <span v-if="isLoading" class="spinner" />
+    <span v-else
+      ><slot>{{ text }}</slot></span
+    >
   </button>
 </template>
 
@@ -75,5 +79,22 @@ const emit = defineEmits<{
   max-width: 164px;
   height: 44px;
   font-size: 14px;
+}
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--white);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
