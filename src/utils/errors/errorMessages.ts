@@ -4,3 +4,8 @@
 
   //дополнять по мере необходимости
 };
+
+export const loginErrorMessages: Record<string, string> = {
+  "Customer account with the given credentials not found.":
+    "Неверный email или пароль.",
+};
