@@ -46,6 +46,7 @@ const useSameAddress = ref(false);
 const isDefaultShipping = ref(false);
 const isDefaultBilling = ref(false);
 const isLoading = ref(false);
+const isRegistered = ref(false);
 
 const countries = ref<CountryOption[]>([{ title: "RU", value: "Россия" }]);
 
@@ -98,6 +99,10 @@ async function handleSubmit(): Promise<void> {
   };
   try {
     const createdCustomer = await signUp(dateCustomerRequest);
+
+    isRegistered.value = true;
+    isLoading.value = false;
+
     showSuccess(
       `Аккаунт успешно создан! Добро пожаловать, ${createdCustomer.customer.firstName}!`,
       () => {
@@ -105,6 +110,8 @@ async function handleSubmit(): Promise<void> {
       },
     );
   } catch (error) {
+    isLoading.value = false;
+
     if (error instanceof Error) {
       const message =
         registrationErrorMessages[error.message] ||
@@ -113,8 +120,6 @@ async function handleSubmit(): Promise<void> {
     } else {
       showError("Произошла неизвестная ошибка. Попробуйте позже.");
     }
-  } finally {
-    isLoading.value = false;
   }
 }
 
@@ -123,52 +128,55 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
 <template>
   <form class="registration-form" @submit.prevent="handleSubmit">
-    <AuthForm v-model="auth" :rules="rules.auth" />
+    <fieldset :disabled="isLoading || isRegistered" class="form-fieldset">
+      <AuthForm v-model="auth" :rules="rules.auth" />
 
-    <PersonalInfoForm
-      v-model="personal"
-      :rules="rules.personal"
-      title="Личная информация"
-      class="form-container"
-    />
+      <PersonalInfoForm
+        v-model="personal"
+        :rules="rules.personal"
+        title="Личная информация"
+        class="form-container"
+      />
 
-    <AddressForm
-      v-model="shippingAddress"
-      :countries="countries"
-      :rules="rules.shippingAddress"
-      prefix="shipping"
-      title="Адрес доставки"
-      class="form-container"
-    />
-    <BaseCheckbox
-      v-model="isDefaultShipping"
-      label="Использовать по умолчанию для доставки"
-    />
+      <AddressForm
+        v-model="shippingAddress"
+        :countries="countries"
+        :rules="rules.shippingAddress"
+        prefix="shipping"
+        title="Адрес доставки"
+        class="form-container"
+        :is-loading="isLoading || isRegistered"
+      />
+      <BaseCheckbox
+        v-model="isDefaultShipping"
+        label="Использовать по умолчанию для доставки"
+      />
 
-    <BaseCheckbox
-      v-model="useSameAddress"
-      label="Использовать адрес доставки для выставления счета"
-    />
+      <BaseCheckbox
+        v-model="useSameAddress"
+        label="Использовать адрес доставки для выставления счета"
+      />
 
-    <AddressForm
-      v-show="!useSameAddress"
-      v-model="billingAddress"
-      :countries="countries"
-      :rules="rules.billingAddress"
-      prefix="billing"
-      title="Адрес для выставления счета"
-      class="form-container"
-    />
+      <AddressForm
+        v-show="!useSameAddress"
+        v-model="billingAddress"
+        :countries="countries"
+        :rules="rules.billingAddress"
+        :is-loading="isLoading || isRegistered"
+        prefix="billing"
+        title="Адрес для выставления счета"
+        class="form-container"
+      />
 
-    <BaseCheckbox
-      v-show="!useSameAddress"
-      v-model="isDefaultBilling"
-      label="Использовать по умолчанию для выставления счета"
-    />
-
+      <BaseCheckbox
+        v-show="!useSameAddress"
+        v-model="isDefaultBilling"
+        label="Использовать по умолчанию для выставления счета"
+      />
+    </fieldset>
     <div class="button-wrapper">
       <BaseButton
-        :disabled="!isFormValid || isLoading"
+        :disabled="!isFormValid || isLoading || isRegistered"
         :is-loading="isLoading"
         size="xl"
         text="Зарегистрироваться"
@@ -183,6 +191,11 @@ const isFormValid = computed(() => !v$.value.$invalid);
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+.form-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
 }
 .form-container {
   border-top: 2px solid var(--blue-light);
