@@ -17,6 +17,8 @@ import AddressForm from "@/components/forms/AddressForm.vue";
 import BaseCheckbox from "@/components/ui/BaseCheckbox.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { registrationErrorMessages } from "@/utils/errors/errorMessages.ts";
+import { login } from "@/api/commercetools/login.ts";
+import { getUserProfile } from "@/api/commercetools/customer/profile.ts";
 
 const auth = reactive({
   email: "",
@@ -96,10 +98,23 @@ async function handleSubmit(): Promise<void> {
     shippingAddresses: [0],
     billingAddresses: useSameAddress.value ? [0] : [1],
   };
+
+  const loginData = {
+    email: auth.email,
+    password: auth.password,
+  };
+
   try {
-    const createdCustomer = await signUp(dateCustomerRequest);
+    await signUp(dateCustomerRequest);
+    const loginResult = await login(loginData);
+    console.log("Вход выполнен успешно:", loginResult.customer.firstName);
+
+    //временная проверка, выводит профиль созданного пользователя
+    const userData = await getUserProfile();
+    console.log("Профиль пользователя:", userData);
+
     showSuccess(
-      `Аккаунт успешно создан! Добро пожаловать, ${createdCustomer.customer.firstName}!`,
+      `Аккаунт успешно создан! Добро пожаловать, ${loginResult.customer.firstName}!`,
       () => {
         router.push({ name: "Main" });
       },
