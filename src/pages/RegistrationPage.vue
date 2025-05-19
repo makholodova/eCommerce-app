@@ -21,6 +21,7 @@ import RegistrationForm from "@/components/forms/RegistrationForm.vue";
 }
 
 .registration-page {
+  max-width: 1200px;
   width: 100%;
   margin: 20px auto;
   padding: 40px;
