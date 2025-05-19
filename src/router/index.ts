@@ -32,4 +32,13 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  if (user?.isAuthenticated && to.name === "Login") {
+    return next({ name: "Main" });
+  }
+  next();
+});
+
 export default router;

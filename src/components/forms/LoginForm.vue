@@ -38,7 +38,7 @@ async function handleSubmit(): Promise<void> {
     const userData = await getUserProfile();
     console.log("Профиль пользователя:", userData);
 
-    router.push({ name: "Main" });
+    await router.replace({ name: "Main" });
   } catch (error) {
     if (error instanceof Error) {
       const message =
