@@ -11,6 +11,7 @@ defineProps<{
   countries: CountryOption[];
   prefix: string;
   rules?: FormRules<AddressFormFields>;
+  isLoading?: boolean;
 }>();
 </script>
 
@@ -42,6 +43,7 @@ defineProps<{
       v-model="modelValue.country"
       :options="countries"
       :vuelidate-rules="rules?.country"
+      :is-loading="isLoading"
       label="Страна"
       placeholder="Выберите страну"
       show-error

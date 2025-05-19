@@ -18,6 +18,7 @@ const props = defineProps<{
     ValidatorFn | ValidationRuleWithoutParams | ValidationRuleWithParams
   >;
   showError?: boolean;
+  isLoading?: boolean;
 }>();
 
 const model = defineModel<string>({ required: true });
@@ -36,7 +37,11 @@ const selectValue = (val: string): void => {
 };
 
 const root = ref(null);
-onClickOutside(root, () => (isOpen.value = false));
+onClickOutside(root, () => {
+  if (!props.isLoading) {
+    isOpen.value = false;
+  }
+});
 
 const selectedLabel = computed(() => {
   return (
@@ -60,12 +65,13 @@ const errorMessage = computed(() => {
         :class="{
           invalid: v$.model.$error,
           valid: model && !v$.model.$error,
+          disabled: props.isLoading,
         }"
-        @click="toggleOpen"
+        @click="!props.isLoading && toggleOpen()"
       >
         {{ selectedLabel }}
       </div>
-      <ul v-if="isOpen" class="options">
+      <ul v-if="isOpen && !props.isLoading" class="options">
         <li
           v-for="option in options"
           :key="option.title"
@@ -123,6 +129,14 @@ const errorMessage = computed(() => {
 .base-input.invalid {
   border-color: var(--red);
   color: var(--red);
+}
+.base-input.disabled {
+  background-color: rgba(239, 239, 239, 0.3);
+  cursor: default;
+  pointer-events: none;
+
+  font-size: 1rem;
+  color: var(--grey-not-active);
 }
 
 .options {
