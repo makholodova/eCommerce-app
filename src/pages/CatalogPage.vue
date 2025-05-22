@@ -3,9 +3,18 @@
 <template>
   <div>
     <h3>catalog page</h3>
-    <router-link :to="{ name: 'Smartphones' }">Ссылка на смартфоны</router-link>
-    <router-link :to="{ name: 'Laptops' }">Ссылка на ноутбуки</router-link>
-    <router-link :to="{ name: 'Tablets' }">Ссылка на планшеты</router-link>
+    <router-link
+      :to="{ name: 'CatalogCategory', params: { category: 'smartphones' } }"
+      >Ссылка на смартфоны</router-link
+    >
+    <router-link
+      :to="{ name: 'CatalogCategory', params: { category: 'laptops' } }"
+      >Ссылка на ноутбуки</router-link
+    >
+    <router-link
+      :to="{ name: 'CatalogCategory', params: { category: 'tablets' } }"
+      >Ссылка на планшеты</router-link
+    >
   </div>
 </template>
 

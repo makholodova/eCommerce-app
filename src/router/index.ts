@@ -42,19 +42,9 @@ const routes = [
     component: () => import("@/pages/CatalogPage.vue"),
   },
   {
-    path: "/catalog/smartphones",
-    name: "Smartphones",
-    component: () => import("@/pages/SmartphonesPage.vue"),
-  },
-  {
-    path: "/catalog/laptops",
-    name: "Laptops",
-    component: () => import("@/pages/LaptopsPage.vue"),
-  },
-  {
-    path: "/catalog/tablets",
-    name: "Tablets",
-    component: () => import("@/pages/TabletsPage.vue"),
+    path: "/catalog/:category",
+    name: "CatalogCategory",
+    component: () => import("@/pages/CatalogProductsPage.vue"),
   },
 ];
 
