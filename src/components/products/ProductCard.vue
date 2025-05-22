@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import BaseButton from "@/components/ui/BaseButton.vue";
 const props = defineProps<{
+  id: string;
   title: string;
   image: string;
   price: string;
@@ -20,27 +21,27 @@ const imageURL =
 </script>
 
 <template>
-  <!-- <router-link :to="{ name: "Product", params: { productId: 'id'} }"> -->
-  <div class="card">
-    <div class="card-img-wrapper">
-      <img :src="imageURL" alt="card-image" class="card-img" />
-      <div v-if="isDiscounted" class="card-img-discounted-icon">
-        -{{ discountedPercentage }}%
+  <router-link :to="{ name: 'Product', params: { productId: props.id } }">
+    <div class="card">
+      <div class="card-img-wrapper">
+        <img :src="imageURL" alt="card-image" class="card-img" />
+        <div v-if="isDiscounted" class="card-img-discounted-icon">
+          -{{ discountedPercentage }}%
+        </div>
       </div>
-    </div>
-    <div class="card-title">{{ title }}</div>
-    <div class="card-description">
-      {{ description }}
-    </div>
-    <div class="card-price">
-      <div class="card-current-price">{{ price }} ₽</div>
-      <div v-if="isDiscounted" class="card-discounted-price">
-        {{ discountedprice }} ₽
+      <div class="card-title">{{ title }}</div>
+      <div class="card-description">
+        {{ description }}
       </div>
+      <div class="card-price">
+        <div class="card-current-price">{{ price }} ₽</div>
+        <div v-if="isDiscounted" class="card-discounted-price">
+          {{ discountedprice }} ₽
+        </div>
+      </div>
+      <base-button size="sm" class="card-btn" text="В корзину"></base-button>
     </div>
-    <base-button size="sm" class="card-btn" text="В корзину"></base-button>
-  </div>
-  <!-- </router-link> -->
+  </router-link>
 </template>
 
 <style scoped>

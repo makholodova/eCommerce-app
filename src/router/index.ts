@@ -47,6 +47,12 @@ const routes = [
     component: () => import("@/pages/CatalogProductsPage.vue"),
     props: true,
   },
+  {
+    path: "/product/:productId",
+    name: "Product",
+    component: () => import("@/pages/ProductPage.vue"),
+    props: true,
+  },
 ];
 
 const router = createRouter({

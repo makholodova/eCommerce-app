@@ -6,6 +6,7 @@ import ProductCard from "@/components/products/ProductCard.vue";
   <div>
     <h1>Products page</h1>
     <ProductCard
+      id="12345"
       title="Samsung"
       price="12345"
       image=""
