@@ -15,20 +15,24 @@ defineProps<{
     <BaseInputField
       id="email"
       v-model="modelValue.email"
+      name="email"
       :vuelidate-rules="rules?.email"
       label="E-mail"
       placeholder="user@example.com"
       show-error
       type="email"
+      autocomplete="email"
     />
     <BaseInputField
       id="password"
       v-model="modelValue.password"
+      name="password"
       :vuelidate-rules="rules?.password"
       label="Пароль"
       placeholder="**********"
       show-error
       type="password"
+      autocomplete="new-password"
     />
   </div>
 </template>

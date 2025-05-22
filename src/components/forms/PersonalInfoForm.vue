@@ -17,31 +17,37 @@ defineProps<{
     <BaseInputField
       id="firstName"
       v-model="modelValue.firstName"
+      name="firstName"
       :vuelidate-rules="rules?.firstName"
       label="Имя"
       placeholder="Иван"
       show-error
       type="text"
+      autocomplete="given-name"
     />
 
     <BaseInputField
       id="lastName"
       v-model="modelValue.lastName"
+      name="lastName"
       :vuelidate-rules="rules?.lastName"
       label="Фамилия"
       placeholder="Иванов"
       show-error
       type="text"
+      autocomplete="family-name"
     />
 
     <BaseInputField
       id="birthDate"
       v-model="modelValue.dateOfBirth"
+      name="birthDate"
       :vuelidate-rules="rules?.dateOfBirth"
       label="Дата рождения"
       placeholder="01.01.2000"
       show-error
       type="date"
+      autocomplete="bday"
     />
   </div>
 </template>
