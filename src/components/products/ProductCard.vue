@@ -45,6 +45,12 @@ const imageURL =
 </template>
 
 <style scoped>
+.a:hover,
+.router-link-active,
+a {
+  text-decoration: none;
+  color: black;
+}
 .card {
   max-width: 217px;
   padding: 24px;
