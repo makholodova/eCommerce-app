@@ -45,6 +45,7 @@ const routes = [
     path: "/catalog/:category",
     name: "CatalogCategory",
     component: () => import("@/pages/CatalogProductsPage.vue"),
+    props: true,
   },
 ];
 
