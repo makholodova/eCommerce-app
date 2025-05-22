@@ -30,6 +30,12 @@ const routes = [
     name: "Catalog",
     component: () => import("@/pages/CatalogPage.vue"),
   },
+  {
+    path: "/user",
+    name: "User",
+    component: () => import("@/pages/UserPage.vue"),
+    meta: { requires: "Auth" },
+  },
 ];
 
 const router = createRouter({
