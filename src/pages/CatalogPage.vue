@@ -1,7 +1,7 @@
 <script lang="ts" setup></script>
 
 <template>
-  <h3></h3>
+  <h3>catalog page</h3>
 </template>
 
 <style scoped></style>

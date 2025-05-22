@@ -25,6 +25,11 @@ const routes = [
     name: "notFoundPage",
     component: () => import("@/pages/NotFoundPage.vue"),
   },
+  {
+    path: "/catalog",
+    name: "Catalog",
+    component: () => import("@/pages/CatalogPage.vue"),
+  },
 ];
 
 const router = createRouter({

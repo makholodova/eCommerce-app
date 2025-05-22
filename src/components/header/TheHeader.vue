@@ -25,6 +25,16 @@ function logout(): void {
       </router-link>
       <nav>
         <ul class="navigation">
+          <router-link :to="{ name: 'Catalog' }">
+            <div class="link-wrapper">
+              <img
+                src="@/assets/icons/header-icons/catalog.png"
+                alt="catalog"
+                class="icon"
+              />
+              <p class="icon-description">Каталог</p>
+            </div>
+          </router-link>
           <router-link
             v-if="isAuthenticated"
             :to="{ name: 'Main' }"
