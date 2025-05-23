@@ -23,8 +23,9 @@ const imageURL =
 function redirectToProductPage(): void {
   router.push({ name: "Product", params: { productId: props.id } });
 }
-function addToCart(): void {
-  console.log("added to cart");
+function addToCart(event: Event): void {
+  event.preventDefault();
+  event.stopPropagation();
 }
 </script>
 
