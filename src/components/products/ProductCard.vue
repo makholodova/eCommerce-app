@@ -60,8 +60,8 @@ a {
   justify-content: center;
   align-items: center;
   gap: 20px;
-  cursor: pointer;
   transition: transform 0.4s ease-in;
+  cursor: pointer;
   font-family: Roboto;
   font-size: 20px;
 }
