@@ -30,6 +30,24 @@ const routes = [
     name: "Catalog",
     component: () => import("@/pages/CatalogPage.vue"),
   },
+  {
+    path: "/user",
+    name: "User",
+    component: () => import("@/pages/UserPage.vue"),
+    meta: { requires: "Auth" },
+  },
+  {
+    path: "/catalog/:category",
+    name: "CatalogCategory",
+    component: () => import("@/pages/CatalogProductsPage.vue"),
+    props: true,
+  },
+  {
+    path: "/product/:productId",
+    name: "Product",
+    component: () => import("@/pages/ProductPage.vue"),
+    props: true,
+  },
 ];
 
 const router = createRouter({

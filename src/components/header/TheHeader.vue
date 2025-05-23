@@ -25,6 +25,16 @@ function logout(): void {
       </router-link>
       <nav>
         <ul class="navigation">
+          <router-link :to="{ name: 'User' }">
+            <div class="link-wrapper">
+              <img
+                src="@/assets/icons/header-icons/profile.png"
+                alt="user profile"
+                class="icon"
+              />
+              <p class="icon-description">Профиль</p>
+            </div>
+          </router-link>
           <router-link :to="{ name: 'Catalog' }">
             <div class="link-wrapper">
               <img
