@@ -21,26 +21,27 @@ const imageURL =
 </script>
 
 <template>
-  <router-link :to="{ name: 'Product', params: { productId: props.id } }">
-    <div class="card">
-      <div class="card-img-wrapper">
-        <img :src="imageURL" alt="card-image" class="card-img" />
-        <div v-if="isDiscounted" class="card-img-discounted-icon">
-          -{{ discountedPercentage }}%
-        </div>
+  <router-link
+    :to="{ name: 'Product', params: { productId: props.id } }"
+    class="card"
+  >
+    <div class="card-img-wrapper">
+      <img :src="imageURL" alt="card-image" class="card-img" />
+      <div v-if="isDiscounted" class="card-img-discounted-icon">
+        -{{ discountedPercentage }}%
       </div>
-      <div class="card-title">{{ title }}</div>
-      <div class="card-description">
-        {{ description }}
-      </div>
-      <div class="card-price">
-        <div class="card-current-price">{{ price }} ₽</div>
-        <div v-if="isDiscounted" class="card-discounted-price">
-          {{ discountedprice }} ₽
-        </div>
-      </div>
-      <base-button size="sm" class="card-btn" text="В корзину"></base-button>
     </div>
+    <div class="card-title">{{ title }}</div>
+    <div class="card-description">
+      {{ description }}
+    </div>
+    <div class="card-price">
+      <div class="card-current-price">{{ price }} ₽</div>
+      <div v-if="isDiscounted" class="card-discounted-price">
+        {{ discountedprice }} ₽
+      </div>
+    </div>
+    <base-button size="sm" class="card-btn" text="В корзину"></base-button>
   </router-link>
 </template>
 
