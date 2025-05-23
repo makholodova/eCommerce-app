@@ -21,42 +21,50 @@ defineProps<{
     <BaseInputField
       :id="`${prefix}-streetName`"
       v-model="modelValue.streetName"
+      :name="`${prefix}-streetName`"
       :vuelidate-rules="rules?.streetName"
       label="Улица"
       placeholder="ул. Ленина"
       show-error
       type="text"
+      :autocomplete="`section-${prefix} address-line1`"
     />
 
     <BaseInputField
       :id="`${prefix}-city`"
       v-model="modelValue.city"
+      :name="`${prefix}-city`"
       :vuelidate-rules="rules?.city"
       label="Город"
       placeholder="Москва"
       show-error
       type="text"
+      :autocomplete="`section-${prefix} address-level2`"
     />
 
     <BaseSelectField
       :id="`${prefix}-country`"
       v-model="modelValue.country"
+      :name="`${prefix}-country`"
       :options="countries"
       :vuelidate-rules="rules?.country"
       :is-loading="isLoading"
       label="Страна"
       placeholder="Выберите страну"
       show-error
+      :autocomplete="`section-${prefix} country`"
     />
 
     <BaseInputField
       :id="`${prefix}-postalCode`"
       v-model="modelValue.postalCode"
+      :name="`${prefix}-postalCode`"
       :vuelidate-rules="rules?.postalCode"
       label="Почтовый индекс"
       placeholder="123456"
       show-error
       type="text"
+      :autocomplete="`section-${prefix} postal-code`"
     />
   </div>
 </template>

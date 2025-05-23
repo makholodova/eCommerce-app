@@ -60,20 +60,24 @@ const isFormValid = computed(() => !v$.value.$invalid);
       <BaseInputField
         id="email"
         v-model="form.email"
+        name="email"
         :vuelidate-rules="rules.email"
         label="E-mail"
         placeholder="user@example.com"
         show-error
         type="email"
+        autocomplete="email"
       />
       <BaseInputField
         id="password"
         v-model="form.password"
+        name="password"
         :vuelidate-rules="rules.password"
         label="Пароль"
         placeholder="**********"
         show-error
         type="password"
+        autocomplete="current-password"
       />
     </div>
     <div class="button-wrapper">

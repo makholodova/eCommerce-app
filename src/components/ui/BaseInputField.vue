@@ -10,6 +10,7 @@ import TogglePassword from "@/components/ui/TogglePassword.vue";
 
 const props = defineProps<{
   id: string;
+  name: string;
   label: string;
   type: string;
   vuelidateRules?: Record<
@@ -18,6 +19,7 @@ const props = defineProps<{
   >;
   placeholder?: string;
   showError?: boolean;
+  autocomplete?: string;
 }>();
 
 const isPasswordVisible = ref(false);
@@ -50,6 +52,7 @@ const errorMessage = computed(() => {
       <input
         :id
         v-model="inputValue"
+        :name="name"
         :class="[
           'base-input',
           {
@@ -59,6 +62,7 @@ const errorMessage = computed(() => {
         ]"
         :placeholder
         :type="isPasswordVisible && type === 'password' ? 'text' : type"
+        :autocomplete="autocomplete"
       />
       <TogglePassword
         v-if="type === 'password'"
