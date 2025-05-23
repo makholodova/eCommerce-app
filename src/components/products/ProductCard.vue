@@ -21,7 +21,10 @@ const imageURL =
   props.image || new URL("@/assets/card-image.png", import.meta.url).href;
 
 function redirectToProductPage(): void {
-  router.push({ name: "Product", params: { productId: props.id } });
+  router.push({
+    name: "Product",
+    params: { productId: props.id },
+  });
 }
 function addToCart(event: Event): void {
   event.preventDefault();
