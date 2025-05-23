@@ -26,9 +26,8 @@ function redirectToProductPage(): void {
     params: { productId: props.id },
   });
 }
-function addToCart(event: Event): void {
-  event.preventDefault();
-  event.stopPropagation();
+function addToCart(): void {
+  console.log("cart");
 }
 </script>
 
@@ -55,7 +54,7 @@ function addToCart(event: Event): void {
         size="sm"
         class="card-btn"
         text="В корзину"
-        @click="addToCart"
+        @click.prevent.stop="addToCart"
       ></base-button>
     </div>
   </div>
