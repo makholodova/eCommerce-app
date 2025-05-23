@@ -3,23 +3,17 @@ import RegistrationForm from "@/components/forms/RegistrationForm.vue";
 </script>
 
 <template>
-  <div class="container">
-    <div class="registration-page">
-      <h1 class="registration-page-title">Регистрация</h1>
-      <RegistrationForm />
-      <div class="login-link">
-        <span>Уже есть учетная запись?</span>
-        <router-link :to="{ name: 'Login' }">Войти</router-link>
-      </div>
+  <div class="registration-page">
+    <h1 class="registration-page-title">Регистрация</h1>
+    <RegistrationForm />
+    <div class="login-link">
+      <span>Уже есть учетная запись?</span>
+      <router-link :to="{ name: 'Login' }">Войти</router-link>
     </div>
   </div>
 </template>
 
 <style scoped>
-.container {
-  padding: 20px;
-}
-
 .registration-page {
   max-width: 1200px;
   width: 100%;
