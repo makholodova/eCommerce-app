@@ -15,7 +15,7 @@ const {
 } = defineProps<ButtonProps>();
 
 const emit = defineEmits<{
-  (e: "click"): void;
+  (e: "click", event: MouseEvent): void;
 }>();
 </script>
 
@@ -24,7 +24,7 @@ const emit = defineEmits<{
     :type
     :disabled="disabled || isLoading"
     :class="['button', `size-${size}`]"
-    @click.stop.prevent="emit('click')"
+    @click.stop.prevent="emit('click', $event)"
   >
     <span v-if="isLoading" class="spinner" />
     <span v-else
