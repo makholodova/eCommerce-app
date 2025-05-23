@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import BaseButton from "@/components/ui/BaseButton.vue";
+import router from "@/router";
 const props = defineProps<{
   id: string;
   title: string;
@@ -18,13 +19,17 @@ const description = props.description ?? "Гораздо лучше андрои
 const price = props.price ?? "123455";
 const imageURL =
   props.image || new URL("@/assets/card-image.png", import.meta.url).href;
+
+function redirectToProductPage(): void {
+  router.push({ name: "Product", params: { productId: props.id } });
+}
+function addToCart(): void {
+  console.log("added to cart");
+}
 </script>
 
 <template>
-  <router-link
-    :to="{ name: 'Product', params: { productId: props.id } }"
-    class="card"
-  >
+  <div class="card" @click="redirectToProductPage">
     <div class="card-img-wrapper">
       <img :src="imageURL" alt="card-image" class="card-img" />
       <div v-if="isDiscounted" class="card-img-discounted-icon">
@@ -42,19 +47,34 @@ const imageURL =
           {{ discountedprice }} ₽
         </div>
       </div>
-      <base-button size="sm" class="card-btn" text="В корзину"></base-button>
+      <base-button
+        size="sm"
+        class="card-btn"
+        text="В корзину"
+        @click="addToCart"
+      ></base-button>
     </div>
-  </router-link>
+  </div>
 </template>
 
 <style scoped>
+@media (hover: hover) and (pointer: fine) {
+  .card:not(:hover) {
+    transition: scale(1) 0.3s ease-in;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0);
+  }
+  .card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+}
 .a:hover,
-.router-link-active,
 a {
   text-decoration: none;
   color: black;
 }
 .card {
+  border-radius: 8px;
   max-width: 217px;
   padding: 24px;
   display: flex;
@@ -73,12 +93,6 @@ a {
   justify-content: center;
   align-items: center;
   gap: 20px;
-}
-.card:not(:hover) {
-  transition: scale(1) 0.3s ease-in;
-}
-.card:hover {
-  transform: scale(1.1);
 }
 .card-img-discounted-icon {
   position: absolute;

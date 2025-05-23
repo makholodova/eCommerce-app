@@ -92,6 +92,11 @@ function logout(): void {
 </template>
 
 <style scoped>
+@media (hover: hover) and (pointer: fine) {
+  a:not(.logo):hover {
+    background-color: #bcc5ff;
+  }
+}
 * {
   box-sizing: border-box;
   margin: 0;
@@ -141,21 +146,11 @@ nav .navigation {
   width: 20px;
   height: 20px;
 }
-/* .router-link-active .link-wrapper,
-a:active .link-wrapper {
-  border: 1px solid #BCC5FF;
-} */
-
 a {
   text-decoration: none;
   border-radius: 10px;
   display: block;
 }
-
-a:not(.logo):hover {
-  background-color: #bcc5ff;
-}
-
 @media (max-width: 600px) {
   .header {
     padding: 5px 8px;

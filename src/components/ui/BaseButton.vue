@@ -24,7 +24,7 @@ const emit = defineEmits<{
     :type
     :disabled="disabled || isLoading"
     :class="['button', `size-${size}`]"
-    @click="emit('click')"
+    @click.stop.prevent="emit('click')"
   >
     <span v-if="isLoading" class="spinner" />
     <span v-else
