@@ -162,12 +162,16 @@ const isFormValid = computed(() => !v$.value.$invalid);
         :is-loading="isLoading || isRegistered"
       />
       <BaseCheckbox
+        id="is-default-shipping"
         v-model="isDefaultShipping"
+        name="isDefaultShipping"
         label="Использовать по умолчанию для доставки"
       />
 
       <BaseCheckbox
+        id="use-same-address"
         v-model="useSameAddress"
+        name="useSameAddress"
         label="Использовать адрес доставки для выставления счета"
       />
 
@@ -184,7 +188,9 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
       <BaseCheckbox
         v-show="!useSameAddress"
+        id="is-default-billing"
         v-model="isDefaultBilling"
+        name="isDefaultBilling"
         label="Использовать по умолчанию для выставления счета"
       />
     </fieldset>

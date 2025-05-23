@@ -2,12 +2,20 @@
 const inputValue = defineModel<boolean>({ required: true });
 defineProps<{
   label: string;
+  id: string;
+  name: string;
 }>();
 </script>
 
 <template>
   <label class="checkbox">
-    <input v-model="inputValue" class="checkbox-input" type="checkbox" />
+    <input
+      :id="id"
+      v-model="inputValue"
+      :name="name"
+      class="checkbox-input"
+      type="checkbox"
+    />
     <span class="checkbox-label">{{ label }}</span>
   </label>
 </template>

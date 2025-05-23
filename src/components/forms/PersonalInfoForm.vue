@@ -47,7 +47,7 @@ defineProps<{
       placeholder="01.01.2000"
       show-error
       type="date"
-      autocomplete="bday"
+      autocomplete="date-of-birth"
     />
   </div>
 </template>
