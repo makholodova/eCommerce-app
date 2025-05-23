@@ -37,11 +37,6 @@ const routes = [
     meta: { requires: "Auth" },
   },
   {
-    path: "/catalog",
-    name: "Catalog",
-    component: () => import("@/pages/CatalogPage.vue"),
-  },
-  {
     path: "/catalog/:category",
     name: "CatalogCategory",
     component: () => import("@/pages/CatalogProductsPage.vue"),
