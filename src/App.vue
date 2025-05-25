@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import TheHeader from "./components/header/TheHeader.vue";
 import BaseContainer from "@/components/ui/BaseContainer.vue";
+import { useAuthStore } from "./store/useAuthStore";
+
+const authStore = useAuthStore();
+
+setTimeout(authStore.refreshToken, 10000);
 </script>
 
 <template>
