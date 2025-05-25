@@ -4,17 +4,17 @@ import { defineStore } from "pinia";
 export const useTokenStore = defineStore(
   "token",
   () => {
-    const token = ref<string | null>(null);
-    const refreshToken = ref<string | null>(null);
+    const token = ref<string>("");
+    const refreshToken = ref<string>("");
     const expirationTime = ref<number>(0);
 
     function setTokenStore(newToken: {
-      token: string | null;
-      refreshToken?: string | null;
+      token: string;
+      refreshToken?: string;
       expirationTime?: number;
     }): void {
       token.value = newToken.token;
-      refreshToken.value = newToken.refreshToken ?? null;
+      refreshToken.value = newToken.refreshToken ?? "";
       if (newToken.expirationTime !== 0 && newToken.expirationTime) {
         expirationTime.value = Date.now() + newToken.expirationTime * 1000;
       } else {

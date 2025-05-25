@@ -100,8 +100,8 @@ export const useAuthStore = defineStore("auth", () => {
   function logout(): void {
     if (refreshTimer !== null) clearTimeout(refreshTimer);
     tokenStore.setTokenStore({
-      token: null,
-      refreshToken: null,
+      token: "",
+      refreshToken: "",
       expirationTime: 0,
     });
   }
