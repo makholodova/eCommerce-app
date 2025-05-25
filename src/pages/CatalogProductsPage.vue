@@ -27,14 +27,13 @@ import ProductCard from "@/components/products/ProductCard.vue";
         title="Samsung"
         price="12345"
         image=""
-        discountedprice="1234"
+        discounted-price="445"
         description="sdfsdfsdfddfgdfgdfgdfgdf"
       />
       <ProductCard
         id="12345"
         title="Samsung"
         price="12345"
-        image=""
         discountedprice="1234"
         description="sdfsdfsdfddfgdfgdfgdfgdf"
       />

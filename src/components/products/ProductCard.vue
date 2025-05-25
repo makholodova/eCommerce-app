@@ -4,21 +4,14 @@ import router from "@/router";
 const props = defineProps<{
   id: string;
   title: string;
-  image: string;
+  image?: string;
   price: string;
-  description: string;
-  discountedprice?: string;
+  description?: string;
+  discountedPrice?: string;
   discountedPercentage?: string;
 }>();
 
-const isDiscounted = props.discountedprice ?? false;
-const discountedPercentage = props.discountedPercentage;
-const discountedprice = props.discountedprice;
-const title = props.title ?? "Samsung";
-const description = props.description ?? "Гораздо лучше андроида";
-const price = props.price ?? "123455";
-const imageURL =
-  props.image || new URL("@/assets/card-image.png", import.meta.url).href;
+const isDiscounted = !!props.discountedPrice;
 
 function redirectToProductPage(): void {
   router.push({
@@ -34,7 +27,7 @@ function addToCart(): void {
 <template>
   <div class="card" @click="redirectToProductPage">
     <div class="card-img-wrapper">
-      <img :src="imageURL" alt="card-image" class="card-img" />
+      <img :src="image" alt="card-image" class="card-img" />
       <div v-if="isDiscounted" class="card-img-discounted-icon">
         -{{ discountedPercentage }}%
       </div>
@@ -47,7 +40,7 @@ function addToCart(): void {
       <div class="card-price">
         <div class="card-current-price">{{ price }} ₽</div>
         <div v-if="isDiscounted" class="card-discounted-price">
-          {{ discountedprice }} ₽
+          {{ discountedPrice }} ₽
         </div>
       </div>
       <base-button
@@ -62,13 +55,16 @@ function addToCart(): void {
 
 <style scoped>
 @media (hover: hover) and (pointer: fine) {
-  .card:not(:hover) {
-    transition: scale(1) 0.3s ease-in;
+  .card {
+    transform: scale(1);
+    transition:
+      transform 0.3s ease-in,
+      box-shadow 0.3s ease-in;
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0);
   }
   .card:hover {
     transform: scale(1.02);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
   }
 }
 .a:hover,
@@ -132,7 +128,7 @@ a {
 .card-description {
   font-weight: 300;
   font-size: 14px;
-  color: #454545;
+  color: var(--grey-dark);
 }
 .card-price {
   display: flex;
@@ -149,7 +145,7 @@ a {
   font-weight: 300;
   font-size: 14px;
   text-decoration: line-through;
-  color: #ababab;
+  color: var(--grey);
   align-self: flex-end;
   text-align: center;
 }
