@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import BaseButton from "@/components/ui/BaseButton.vue";
 import router from "@/router";
+import { computed } from "vue";
 const props = defineProps<{
   id: string;
   title: string;
@@ -11,7 +12,7 @@ const props = defineProps<{
   discountedPercentage?: string;
 }>();
 
-const isDiscounted = !!props.discountedPrice;
+const isDiscounted = computed(() => !!props.discountedPrice);
 
 function redirectToProductPage(): void {
   router.push({
