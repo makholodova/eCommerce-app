@@ -1,4 +1,4 @@
-import { computed } from "vue";
+import { computed, watchEffect } from "vue";
 import { defineStore } from "pinia";
 import { useTokenStore } from "./useTokenStore";
 
@@ -8,13 +8,38 @@ const authUrl = import.meta.env.VITE_AUTH_URL;
 const encodedCredentials = btoa(`${clientId}:${clientSecret}`);
 
 export const useAuthStore = defineStore("auth", () => {
+  let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+  const REFRESH_BUFFER_MS = 1000 * 60 * 5;
+  let isRefreshing = false;
+
   const tokenStore = useTokenStore();
 
   const isAuthenticated = computed(() => {
     return !!tokenStore.token;
   });
 
+  const isTokenExpired = computed((): boolean => {
+    return tokenStore.expirationTime - (Date.now() + REFRESH_BUFFER_MS) <= 0;
+  });
+
+  async function updateTokenIfExpired(): Promise<boolean> {
+    try {
+      if (isTokenExpired.value && !isRefreshing) {
+        isRefreshing = true;
+        await refreshToken();
+        return true;
+      }
+    } catch {
+      console.log("не удалось обновить токен");
+      return false;
+    } finally {
+      isRefreshing = false;
+    }
+    return false;
+  }
+
   async function refreshToken(): Promise<void> {
+    if (refreshTimer !== null) clearTimeout(refreshTimer);
     if (!tokenStore.refreshToken) return logout();
     try {
       const response = await fetch(`${authUrl}/oauth/token`, {
@@ -42,6 +67,7 @@ export const useAuthStore = defineStore("auth", () => {
         refreshToken: data["refresh_token"],
         expirationTime: data["expires_in"],
       });
+      startRefreshToken();
     } catch (error) {
       if (error instanceof Error) {
         console.log(error.message);
@@ -50,11 +76,33 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  function startRefreshToken(): void {
+    if (refreshTimer !== null) clearTimeout(refreshTimer);
+    const delay = tokenStore.expirationTime - Date.now() - REFRESH_BUFFER_MS;
+    if (delay <= 0) {
+      refreshToken();
+    } else {
+      refreshTimer = setTimeout(() => refreshToken(), delay);
+    }
+  }
+
+  watchEffect(() => {
+    if (isAuthenticated.value) {
+      startRefreshToken();
+    } else {
+      if (refreshTimer !== null) {
+        clearTimeout(refreshTimer);
+        refreshTimer = null;
+      }
+    }
+  });
+
   function logout(): void {
+    if (refreshTimer !== null) clearTimeout(refreshTimer);
     tokenStore.setTokenStore({
       token: null,
       refreshToken: null,
-      expirationTime: null,
+      expirationTime: 0,
     });
   }
 
@@ -62,5 +110,6 @@ export const useAuthStore = defineStore("auth", () => {
     logout,
     isAuthenticated,
     refreshToken,
+    updateTokenIfExpired,
   };
 });

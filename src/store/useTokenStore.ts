@@ -11,11 +11,15 @@ export const useTokenStore = defineStore(
     function setTokenStore(newToken: {
       token: string | null;
       refreshToken?: string | null;
-      expirationTime?: number | null;
+      expirationTime?: number;
     }): void {
       token.value = newToken.token;
       refreshToken.value = newToken.refreshToken ?? null;
-      expirationTime.value = newToken.expirationTime ?? 0;
+      if (newToken.expirationTime !== 0 && newToken.expirationTime) {
+        expirationTime.value = Date.now() + newToken.expirationTime * 1000;
+      } else {
+        expirationTime.value = 0;
+      }
     }
 
     return {
