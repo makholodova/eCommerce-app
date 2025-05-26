@@ -10,3 +10,11 @@ export type FormRules<T> = {
     ValidatorFn | ValidationRuleWithoutParams | ValidationRuleWithParams
   >;
 };
+
+export type UIAddress = {
+  id: string;
+  country: string;
+  city?: string;
+  streetName?: string;
+  postalCode?: string;
+};
