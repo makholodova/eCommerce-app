@@ -11,34 +11,28 @@ function getImage(file: string): string {
 </script>
 
 <template>
-  <div class="container-main">
-    <div class="catalog">
-      <span>Главная/Каталог</span>
-      <h2 class="subtitle">Каталог</h2>
-      <div class="catalog-container">
-        <router-link
-          v-for="item in categories"
-          :key="item.name"
-          :to="{ name: 'CatalogCategory', params: { category: item.name } }"
-          class="category-card"
-        >
-          <img
-            :src="getImage(item.image)"
-            :alt="item.label"
-            class="category-image"
-          />
-          <span class="category-label">{{ item.label }}</span>
-        </router-link>
-      </div>
+  <div class="catalog">
+    <span>Главная/Каталог</span>
+    <h2 class="subtitle">Каталог</h2>
+    <div class="catalog-container">
+      <router-link
+        v-for="item in categories"
+        :key="item.name"
+        :to="{ name: 'CatalogCategory', params: { category: item.name } }"
+        class="category-card"
+      >
+        <img
+          :src="getImage(item.image)"
+          :alt="item.label"
+          class="category-image"
+        />
+        <span class="category-label">{{ item.label }}</span>
+      </router-link>
     </div>
   </div>
 </template>
 
 <style scoped>
-.container-main {
-  border: 1px solid red;
-}
-
 .catalog {
   display: flex;
   flex-direction: column;
