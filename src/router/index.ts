@@ -33,7 +33,7 @@ const routes = [
   {
     path: "/user",
     name: "User",
-    component: () => import("@/pages/UserPage.vue"),
+    component: () => import("@/pages/ProfilePage.vue"),
     meta: { requires: "Auth" },
   },
   {
