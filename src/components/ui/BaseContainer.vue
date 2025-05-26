@@ -1,9 +1,9 @@
 <script lang="ts" setup></script>
 
 <template>
-  <div class="container">
+  <main class="container">
     <slot></slot>
-  </div>
+  </main>
 </template>
 
 <style scoped>
@@ -11,5 +11,6 @@
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
+  padding: 0 clamp(16px, 5vw, 80px);
 }
 </style>

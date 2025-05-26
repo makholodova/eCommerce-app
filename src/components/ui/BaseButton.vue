@@ -13,10 +13,6 @@ const {
   text,
   disabled,
 } = defineProps<ButtonProps>();
-
-const emit = defineEmits<{
-  (e: "click"): void;
-}>();
 </script>
 
 <template>
@@ -24,7 +20,6 @@ const emit = defineEmits<{
     :type
     :disabled="disabled || isLoading"
     :class="['button', `size-${size}`]"
-    @click="emit('click')"
   >
     <span v-if="isLoading" class="spinner" />
     <span v-else
