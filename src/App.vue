@@ -5,7 +5,7 @@ import { useAuthStore } from "./store/useAuthStore";
 
 const authStore = useAuthStore();
 
-setTimeout(authStore.refreshToken, 10000);
+setTimeout(authStore.refreshToken, 15000);
 </script>
 
 <template>

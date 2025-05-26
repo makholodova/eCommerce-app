@@ -14,7 +14,7 @@ export const useTokenStore = defineStore(
       expirationTime?: number;
     }): void {
       token.value = newToken.token;
-      refreshToken.value = newToken.refreshToken ?? "";
+      refreshToken.value = newToken.refreshToken ?? refreshToken.value;
       if (newToken.expirationTime !== 0 && newToken.expirationTime) {
         expirationTime.value = Date.now() + newToken.expirationTime * 1000;
       } else {
