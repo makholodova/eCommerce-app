@@ -53,8 +53,13 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
-/* #app {
+.container-main {
   max-width: 1440px;
   width: 100%;
-  margin: 0 auto;
-} */
+  padding: 0 clamp(16px, 5vw, 80px);
+}
+
+.subtitle {
+  font-weight: 400;
+  font-size: clamp(20px, 3.5vw, 32px);
+}
