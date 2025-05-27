@@ -13,13 +13,12 @@ const clientId = import.meta.env.VITE_CLIENT_ID;
 const clientSecret = import.meta.env.VITE_CLIENT_SECRET;
 const authUrl = import.meta.env.VITE_AUTH_URL;
 const apiUrl = import.meta.env.VITE_API_URL;
-const scopesAnonymous = import.meta.env.VITE_SCOPES_VITE_SCOPES_ANONYMOUS.split(
-  " ",
-);
+const scopesAnonymous = import.meta.env.VITE_SCOPES_ANONYMOUS.split(" ");
 
 export function createAnonymousApiRoot(): ByProjectKeyRequestBuilder {
-  const tokenStore = useAnonymousTokenStore();
-  const { token, refreshToken, expirationTime } = storeToRefs(tokenStore);
+  const anonymousTokenStore = useAnonymousTokenStore();
+  const { token, refreshToken, expirationTime } =
+    storeToRefs(anonymousTokenStore);
 
   const authOptions: AnonymousAuthMiddlewareOptions = {
     host: authUrl,
@@ -37,7 +36,7 @@ export function createAnonymousApiRoot(): ByProjectKeyRequestBuilder {
         expirationTime: expirationTime.value,
       }),
       set: (newAnonymusToken) => {
-        tokenStore.setTokenStore(newAnonymusToken);
+        anonymousTokenStore.setAnonymousToken(newAnonymusToken);
       },
     },
   };

@@ -1,14 +1,15 @@
 import { createAnonymousApiRoot } from "./createAnonymousClient";
 
-export async function loginAsAnonymous(): Promise<void> {
+export async function loginAnonymous(): Promise<void> {
   const apiRoot = createAnonymousApiRoot();
 
   try {
-    await apiRoot.me().get().execute();
-
-    console.log("Анонимный токен успешно получен и сохранён");
+    await apiRoot.categories().get().execute();
   } catch (error) {
-    console.error("Ошибка при создании анонимного токена:", error);
-    throw new Error("Не удалось авторизовать анонимного пользователя");
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Не удалось авторизовать анонимного пользователя");
+    }
   }
 }

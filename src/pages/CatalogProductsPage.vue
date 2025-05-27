@@ -4,6 +4,10 @@ import ProductCard from "@/components/ui/ProductCard.vue";
 import { getCategoryByKey } from "@/api/commercetools/products/categories";
 import { getProductsCategory } from "@/api/commercetools/products/products";
 import type { ProductProjection } from "@commercetools/platform-sdk";
+import { useTokenStore } from "@/store/useTokenStore";
+import { useAnonymousTokenStore } from "@/store/useAnonymousTokenStore";
+import { loginAnonymous } from "@/api/commercetools/loginAnonymous";
+//import { getCategoris } from "@/api/commercetools/products/categories";
 
 const props = defineProps<{ category: string }>();
 
@@ -17,6 +21,16 @@ const title = categoryTitles[props.category];
 const products = ref<ProductProjection[]>([]);
 
 onMounted(async () => {
+  const tokenStore = useTokenStore();
+  const anonymousStore = useAnonymousTokenStore();
+
+  if (!tokenStore.token && !anonymousStore.token) {
+    await loginAnonymous();
+  }
+
+  //const data = await getCategoris();
+  //console.log("dataCategoris", data);
+
   const category = await getCategoryByKey(props.category);
   console.log("Category ", category);
 

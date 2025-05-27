@@ -8,7 +8,7 @@ export const useAnonymousTokenStore = defineStore(
     const refreshToken = ref<string>("");
     const expirationTime = ref<number>(0);
 
-    function setTokenStore(newToken: {
+    function setAnonymousToken(newToken: {
       token: string;
       refreshToken?: string;
       expirationTime?: number;
@@ -26,7 +26,7 @@ export const useAnonymousTokenStore = defineStore(
       token,
       refreshToken,
       expirationTime,
-      setTokenStore,
+      setAnonymousToken,
     };
   },
   {
