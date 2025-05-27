@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
-import { useTokenStore } from "@/store/useTokenStore";
 import { computed } from "vue";
 import BaseContainer from "@/components/ui/BaseContainer.vue";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const route = useRoute();
-const token = useTokenStore();
+const authStore = useAuthStore();
 const router = useRouter();
 
-const isAuthenticated = computed(() => token.isAuthenticated);
+const isAuthenticated = computed(() => authStore.isAuthenticated);
 
 function logout(): void {
-  token.logout();
+  authStore.logout();
   router.push({ name: "Main" });
 }
 </script>
@@ -105,7 +105,7 @@ function logout(): void {
 header {
   width: 100%;
   border-bottom: 1px solid #c1c1c1;
-  box-shadow: 0 2px 4px rgba(193, 193, 193, 0.6);
+  box-shadow: 0 2px 5px rgba(193, 193, 193, 0.6);
 }
 .header {
   padding: 10px 80px;

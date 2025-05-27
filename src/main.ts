@@ -4,19 +4,20 @@ import "@/assets/styles/global.css";
 import App from "./App.vue";
 import router from "./router";
 import pinia from "./store";
-import { useTokenStore } from "./store/useTokenStore";
+import { useAuthStore } from "./store/useAuthStore";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
 const app = createApp(App);
 app.use(pinia);
 app.use(router);
+pinia.use(piniaPluginPersistedstate);
 
 app.mount("#app");
 
 router.beforeEach(async (to, _, next): Promise<void> => {
-  const store = useTokenStore();
-  store.checkIfUserIsAuthorized();
+  const authStore = useAuthStore();
 
-  if (to.meta.requires === "unAuth" && store.isAuthenticated) {
+  if (to.meta.requires === "unAuth" && authStore.isAuthenticated) {
     return next({ name: "Main" });
   }
 
