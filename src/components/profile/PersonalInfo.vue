@@ -9,6 +9,7 @@ import UserEditForm from "@/components/profile/UserEditForm.vue";
 
 import PasswordEditForm from "@/components/profile/PasswordEditForm.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
+import { showError, showSuccess } from "@/utils/toast.ts";
 
 const userStore = useUserStore();
 const { openedModal, openModal, closeModal } = useModal();
@@ -48,12 +49,29 @@ const onEdit = (): void => {
 };
 
 const onSubmitUserEdit = (): void => {
-  console.log("Отредактировали и отправили");
-  closeModal();
+  try {
+    //userStore.updateUser(editableUser.value))
+    showSuccess("Профиль успешно обновлён");
+  } catch (e) {
+    // выводить конкретные ошибки
+    if (e instanceof Error) {
+      showError(`Не удалось обновить профиль, ${e.message}`);
+    }
+  } finally {
+    closeModal();
+  }
 };
 const onSubmitPasswordEdit = (): void => {
-  console.log("Отредактировали пароль");
-  closeModal();
+  try {
+    showSuccess("Пароль успешно обновлён");
+  } catch (e) {
+    // выводить конкретные ошибки
+    if (e instanceof Error) {
+      showError(`Не удалось обновить пароль, ${e.message}`);
+    }
+  } finally {
+    closeModal();
+  }
 };
 </script>
 
@@ -89,13 +107,12 @@ const onSubmitPasswordEdit = (): void => {
 
     <BaseModal
       v-if="openedModal === 'password'"
-      :title="'Редактировать пароль'"
+      :title="'Обновите пароль'"
       :is-open="true"
-      name="user-edit"
+      name="password-edit"
       @close="closeModal"
-      @submit="onSubmitPasswordEdit"
     >
-      <PasswordEditForm />
+      <PasswordEditForm @submit="onSubmitPasswordEdit" @close="closeModal" />
     </BaseModal>
   </div>
 </template>

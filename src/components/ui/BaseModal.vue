@@ -17,10 +17,6 @@ defineProps<{
 </template>
 
 <style scoped>
-body.modal-overlay {
-  overflow: hidden;
-}
-
 .modal-overlay {
   position: fixed;
   inset: 0;
