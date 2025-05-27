@@ -105,7 +105,7 @@ function logout(): void {
 header {
   width: 100%;
   border-bottom: 1px solid #c1c1c1;
-  box-shadow: 0 2px 4px rgba(193, 193, 193, 0.6);
+  box-shadow: 0 2px 5px rgba(193, 193, 193, 0.6);
 }
 .header {
   padding: 10px 80px;
