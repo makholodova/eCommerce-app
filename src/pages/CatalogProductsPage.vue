@@ -8,6 +8,7 @@ import { useTokenStore } from "@/store/useTokenStore";
 import { useAnonymousTokenStore } from "@/store/useAnonymousTokenStore";
 import { loginAnonymous } from "@/api/commercetools/loginAnonymous";
 import { productAdapter } from "@/adapters/product.adapter";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const props = defineProps<{ category: string }>();
 
@@ -21,6 +22,9 @@ const title = categoryTitles[props.category];
 const products = ref<ProductProjection[]>([]);
 
 onMounted(async () => {
+  const auth = useAuthStore();
+  await auth.updateTokenIfExpired();
+
   const tokenStore = useTokenStore();
   const anonymousStore = useAnonymousTokenStore();
 

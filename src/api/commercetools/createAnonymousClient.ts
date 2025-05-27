@@ -7,6 +7,7 @@ import { createApiBuilderFromCtpClient } from "@commercetools/platform-sdk";
 import type { ByProjectKeyRequestBuilder } from "@commercetools/platform-sdk";
 import { useAnonymousTokenStore } from "@/store/useAnonymousTokenStore";
 import { storeToRefs } from "pinia";
+import { getAnonymousId } from "@/utils/anonymousId";
 
 const projectKey = import.meta.env.VITE_PROJECT_KEY;
 const clientId = import.meta.env.VITE_CLIENT_ID;
@@ -20,6 +21,8 @@ export function createAnonymousApiRoot(): ByProjectKeyRequestBuilder {
   const { token, refreshToken, expirationTime } =
     storeToRefs(anonymousTokenStore);
 
+  const anonymousId = getAnonymousId();
+
   const authOptions: AnonymousAuthMiddlewareOptions = {
     host: authUrl,
     projectKey,
@@ -28,15 +31,24 @@ export function createAnonymousApiRoot(): ByProjectKeyRequestBuilder {
       clientSecret,
     },
     scopes: scopesAnonymous,
-    fetch: globalThis.fetch,
+    fetch: async (url: RequestInfo, options?: RequestInit) => {
+      const modifiedUrl =
+        typeof url === "string" ? new URL(url) : new URL(url.toString());
+      modifiedUrl.searchParams.set("anonymous_id", anonymousId);
+      return fetch(modifiedUrl, options);
+    },
     tokenCache: {
       get: () => ({
         token: token.value,
         refreshToken: refreshToken.value,
         expirationTime: expirationTime.value,
+        anonymousId: anonymousId,
       }),
-      set: (newAnonymusToken) => {
-        anonymousTokenStore.setAnonymousToken(newAnonymusToken);
+      set: (newAnonymousToken) => {
+        anonymousTokenStore.setAnonymousToken({
+          ...newAnonymousToken,
+          anonymousId,
+        });
       },
     },
   };
