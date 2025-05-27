@@ -7,7 +7,7 @@ import type { ProductProjection } from "@commercetools/platform-sdk";
 import { useTokenStore } from "@/store/useTokenStore";
 import { useAnonymousTokenStore } from "@/store/useAnonymousTokenStore";
 import { loginAnonymous } from "@/api/commercetools/loginAnonymous";
-//import { getCategoris } from "@/api/commercetools/products/categories";
+import { productAdapter } from "@/adapters/product.adapter";
 
 const props = defineProps<{ category: string }>();
 
@@ -28,9 +28,6 @@ onMounted(async () => {
     await loginAnonymous();
   }
 
-  //const data = await getCategoris();
-  //console.log("dataCategoris", data);
-
   const category = await getCategoryByKey(props.category);
   console.log("Category ", category);
 
@@ -39,37 +36,7 @@ onMounted(async () => {
   console.log("products.value ", products.value);
 });
 
-function getAttribute(product: ProductProjection, attrName: string): string {
-  const attr = product.masterVariant.attributes?.find(
-    (a) => a.name === attrName,
-  );
-  const value = attrName === "color" ? attr?.value.key : attr?.value.label;
-  return value;
-}
-
-const normalizedProducts = computed(() =>
-  products.value.map((product) => {
-    const priceObj = product.masterVariant.prices?.[0];
-    const price = priceObj?.value?.centAmount ?? null;
-    const discountedPrice = priceObj?.discounted?.value?.centAmount ?? null;
-    const discountedPercentage =
-      price && discountedPrice
-        ? Math.round(((price - discountedPrice) / price) * 100)
-        : null;
-
-    return {
-      id: product.id,
-      title: product.name?.ru,
-      description:
-        `${product.description?.ru ?? ""} ${getAttribute(product, "rom") ?? ""} ${getAttribute(product, "color") ?? ""}`.trim(),
-      image: product.masterVariant.images?.[0]?.url,
-      price,
-      discountedPrice,
-      sku: product.masterVariant.sku ?? "",
-      discountedPercentage,
-    };
-  }),
-);
+const normalizedProducts = computed(() => products.value.map(productAdapter));
 </script>
 
 <template>
@@ -83,7 +50,7 @@ const normalizedProducts = computed(() =>
           :key="product.id"
           :title="product.title"
           :image="product.image"
-          :description="product.description"
+          :description="`${product.description} ${product.attributes.rom} ${product.attributes.color}`"
           :price="product.price ?? undefined"
           :discounted-price="product.discountedPrice ?? undefined"
           :discounted-percentage="product.discountedPercentage ?? undefined"
