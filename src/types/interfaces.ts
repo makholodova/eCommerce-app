@@ -20,3 +20,10 @@ export interface CountryOption {
   title: string;
   value: string;
 }
+
+export interface UserFormModel {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  email: string;
+}
