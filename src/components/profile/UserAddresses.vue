@@ -1,8 +1,13 @@
 ﻿<script lang="ts" setup>
+import { ref } from "vue";
 import { useUserStore } from "@/store/useUserStore.ts";
+import { toUIAddressFromPlatform } from "@/adapters/address.adapter.ts";
+import { useModal } from "@/composables/useModal.ts";
+import type { UIAddress } from "@/types/types.ts";
+import type { CountryOption } from "@/types/interfaces.ts";
+import BaseModal from "@/components/ui/BaseModal.vue";
+import AddressEditForm from "@/components/profile/AddressEditForm.vue";
 import AddressCard from "@/components/profile/AddressCard.vue";
-import type { Address } from "@commercetools/platform-sdk";
-import { toUIAddress } from "@/adapters/address.adapter.ts";
 
 const userStore = useUserStore();
 
@@ -10,6 +15,19 @@ const shippingAddresses = userStore.shippingAddresses;
 const billingAddresses = userStore.billingAddresses;
 
 const isDefault = userStore.isDefault;
+
+const { openedModal, openModal, closeModal } = useModal();
+const defaultAddress: UIAddress = {
+  id: "",
+  country: "",
+  city: "",
+  streetName: "",
+  postalCode: "",
+};
+
+const addressToEdit = ref<UIAddress>({ ...defaultAddress });
+
+const countries = ref<CountryOption[]>([{ title: "RU", value: "Россия" }]); //нужно брать из комерзтоолс наверно
 
 const toggleDefaultShipping = (id: string): void => {
   console.log("Установить адрес доставки по умолчанию");
@@ -36,8 +54,18 @@ const onAddAddressBilling = (): void => {
   console.log("Добавить адрес счета");
 };
 
-const onEditAddress = (address: Address): void => {
+const openAddressModal = (address?: UIAddress): void => {
+  addressToEdit.value = address ?? { ...defaultAddress };
+  openModal("address");
+};
+
+const onEditAddress = (address: UIAddress): void => {
   console.log("Редактирование адреса", address);
+  openAddressModal(address);
+};
+
+const onSubmitAddress = (address: UIAddress): void => {
+  console.log("Сохранение адреса", address);
 };
 
 const onRemoveAddress = (id: string): void => {
@@ -58,7 +86,7 @@ const onRemoveAddress = (id: string): void => {
       <AddressCard
         v-for="address in shippingAddresses"
         :key="address.id"
-        :address="toUIAddress(address)"
+        :address="toUIAddressFromPlatform(address)"
         :is-default="isDefault(address.id, 'shipping')"
         @edit="onEditAddress"
         @remove="onRemoveAddress"
@@ -75,13 +103,28 @@ const onRemoveAddress = (id: string): void => {
       <AddressCard
         v-for="address in billingAddresses"
         :key="address.id"
-        :address="toUIAddress(address)"
+        :address="toUIAddressFromPlatform(address)"
         :is-default="isDefault(address.id, 'billing')"
         @edit="onEditAddress"
         @remove="onRemoveAddress"
         @default-toggle="toggleDefaultBilling"
       />
     </div>
+
+    <BaseModal
+      v-if="openedModal === 'address'"
+      :title="'Редактировать адрес'"
+      :is-open="true"
+      name="address-edit"
+      @close="closeModal"
+    >
+      <AddressEditForm
+        :address="addressToEdit"
+        :countries="countries"
+        @submit="onSubmitAddress"
+        @close="closeModal"
+      />
+    </BaseModal>
   </div>
 </template>
 
