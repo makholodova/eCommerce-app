@@ -30,6 +30,7 @@ const routes = [
     path: "/catalog",
     name: "Catalog",
     component: () => import("@/pages/CatalogPage.vue"),
+    props: true,
   },
   {
     path: "/user",

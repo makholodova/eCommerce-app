@@ -55,5 +55,5 @@ body {
 
 .subtitle {
   font-weight: 400;
-  font-size: clamp(20px, 5.5vw, 32px);
+  font-size: clamp(20px, 6vw, 32px);
 }
