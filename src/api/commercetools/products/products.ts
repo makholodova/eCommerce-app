@@ -11,3 +11,16 @@ export async function getProductsCategory(
   });
   return response.data;
 }
+
+export async function searchProductsInCategory(
+  categoryId: string,
+  query: string,
+): Promise<ProductProjectionPagedSearchResponse> {
+  const response = await api.get("/product-projections/search", {
+    params: {
+      "filter.query": `categories.id:"${categoryId}"`,
+      "text.ru": query,
+    },
+  });
+  return response.data;
+}
