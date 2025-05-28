@@ -9,6 +9,13 @@ export const useAnonymousTokenStore = defineStore(
     const expirationTime = ref<number>(0);
     const anonymousId = ref<string>("");
 
+    function reset(): void {
+      token.value = "";
+      refreshToken.value = "";
+      expirationTime.value = 0;
+      anonymousId.value = "";
+    }
+
     function setAnonymousToken(newAnonymousToken: {
       token: string;
       refreshToken?: string;
@@ -35,6 +42,7 @@ export const useAnonymousTokenStore = defineStore(
       expirationTime,
       anonymousId,
       setAnonymousToken,
+      reset,
     };
   },
   {

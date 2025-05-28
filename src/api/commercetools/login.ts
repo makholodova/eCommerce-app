@@ -15,13 +15,6 @@ export async function login(
       })
       .execute();
 
-    const userState = {
-      firstName: response.body.customer.firstName,
-      isAuthenticated: true,
-    };
-
-    localStorage.setItem("user", JSON.stringify(userState));
-
     return response.body;
   } catch (error) {
     if (error instanceof Error) {
