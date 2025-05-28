@@ -69,10 +69,8 @@ export const useAuthStore = defineStore("auth", () => {
       });
       startRefreshToken();
     } catch (error) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      }
       logout();
+      throw error instanceof Error ? error : new Error("Unknown error");
     }
   }
 
