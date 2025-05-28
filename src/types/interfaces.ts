@@ -21,6 +21,29 @@ export interface CountryOption {
   value: string;
 }
 
+export interface ProductAttribute {
+  brand?: string;
+  model?: string;
+  color?: string;
+  screen?: string;
+  ram?: string;
+  rom?: string;
+  cores?: number;
+  wattage?: string;
+  weight?: string;
+}
+
+export interface ProductAdapter {
+  id: string;
+  title: string;
+  description: string;
+  image?: string;
+  price: number | null;
+  discountedPrice: number | null;
+  discountedPercentage: number | null;
+  attributes: ProductAttribute;
+}
+
 export interface UserFormModel {
   firstName: string;
   lastName: string;

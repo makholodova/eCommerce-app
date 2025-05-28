@@ -18,7 +18,7 @@ import LoginForm from "@/components/forms/LoginForm.vue";
   max-width: 542px;
   width: 100%;
   margin: 30px auto;
-  padding: clamp(12px, 8vw, 40px) clamp(12px, 9vw, 60px);
+  padding: clamp(12px, 8vw, 40px) clamp(10px, 7vw, 60px);
   border-radius: 40px;
   background-color: var(--blue-lighter);
 }
@@ -48,5 +48,14 @@ h1 {
 .register-prompt a:hover {
   text-decoration: underline;
   color: var(--blue-hover);
+}
+
+@media (max-width: 470px) {
+  .register-prompt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+  }
 }
 </style>
