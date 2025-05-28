@@ -4,7 +4,6 @@ import { useTokenStore } from "@/store/useTokenStore";
 import { useAnonymousTokenStore } from "@/store/useAnonymousTokenStore";
 import { API_BASE_URL } from "@/utils/constants";
 import { useAuthStore } from "@/store/useAuthStore";
-import { loginAnonymous } from "./loginAnonymous";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -38,29 +37,29 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response.status === 401 && !originalRequest._retry) {
+      console.log("попали на 401 ошибку");
+
       originalRequest._retry = true;
       if (userToken.value) {
+        console.log("попали на то что истек юзер токен");
         try {
           await authStore.refreshToken();
+          console.log("новый токен получен" + tokenStore.token);
+
           originalRequest.headers["Authorization"] =
             `Bearer ${tokenStore.token}`;
-          return axios(originalRequest);
+          return api(originalRequest);
         } catch (error) {
           return Promise.reject(error);
         }
       }
       if (anonymousToken.value) {
-        try {
-          await loginAnonymous();
-          originalRequest.headers["Authorization"] =
-            `Bearer ${anonymousStore.token}`;
-          return axios(originalRequest);
-        } catch (error) {
-          return Promise.reject(error);
-        }
+        await authStore.refreshAnonymusToken();
+        originalRequest.headers["Authorization"] =
+          `Bearer ${anonymousStore.token}`;
+        return api(originalRequest);
       }
     }
-
     return Promise.reject(error);
   },
 );

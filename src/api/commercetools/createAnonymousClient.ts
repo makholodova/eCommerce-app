@@ -44,6 +44,7 @@ export function createAnonymousApiRoot(): ByProjectKeyRequestBuilder {
         expirationTime: expirationTime.value,
         anonymousId: anonymousId,
       }),
+
       set: (newAnonymousToken) => {
         anonymousTokenStore.setAnonymousToken({
           ...newAnonymousToken,
