@@ -17,7 +17,7 @@ const billingAddresses = userStore.billingAddresses;
 
 const isDefault = userStore.isDefault;
 
-const { openedModal, openModal, closeModal } = useModal();
+const { modalState, openModal, closeModal } = useModal();
 const defaultAddress: UIAddress = {
   id: "",
   country: "",
@@ -123,11 +123,10 @@ const onRemoveAddress = (id: string): void => {
     </div>
 
     <BaseModal
-      v-if="openedModal === 'address'"
-      :title="'Редактировать адрес'"
+      v-if="modalState === 'address'"
+      title="Редактировать адрес"
       :is-open="true"
       name="address-edit"
-      @close="closeModal"
     >
       <AddressEditForm
         :address="addressToEdit"

@@ -12,7 +12,7 @@ import BaseModal from "@/components/ui/BaseModal.vue";
 import { showError, showSuccess } from "@/utils/toast.ts";
 
 const userStore = useUserStore();
-const { openedModal, openModal, closeModal } = useModal();
+const { modalState, openModal, closeModal } = useModal();
 
 const personalInfo = computed(() => ({
   Имя: userStore.firstName,
@@ -92,11 +92,10 @@ const onSubmitPasswordEdit = (): void => {
     <BaseButton text="Редактировать" type="button" @click="onEdit" />
 
     <BaseModal
-      v-if="openedModal === 'edit'"
+      v-if="modalState === 'edit'"
       :title="'Редактировать профиль'"
       :is-open="true"
       name="user-edit"
-      @close="closeModal"
     >
       <UserEditForm
         v-model="editableUser"
@@ -106,11 +105,10 @@ const onSubmitPasswordEdit = (): void => {
     </BaseModal>
 
     <BaseModal
-      v-if="openedModal === 'password'"
+      v-if="modalState === 'password'"
       :title="'Обновите пароль'"
       :is-open="true"
       name="password-edit"
-      @close="closeModal"
     >
       <PasswordEditForm @submit="onSubmitPasswordEdit" @close="closeModal" />
     </BaseModal>

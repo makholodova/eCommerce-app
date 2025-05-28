@@ -4,21 +4,21 @@ import type { Ref } from "vue";
 export type ModalType = "edit" | "password" | "address" | null;
 
 export function useModal(): {
-  openedModal: Ref<ModalType>;
+  modalState: Ref<ModalType>;
   openModal: (type: ModalType) => void;
   closeModal: () => void;
 } {
-  const openedModal = ref<ModalType>(null);
+  const modalState = ref<ModalType>(null);
 
   function openModal(type: ModalType): void {
-    openedModal.value = type;
+    modalState.value = type;
   }
   function closeModal(): void {
-    openedModal.value = null;
+    modalState.value = null;
   }
 
   return {
-    openedModal,
+    modalState,
     openModal,
     closeModal,
   };
