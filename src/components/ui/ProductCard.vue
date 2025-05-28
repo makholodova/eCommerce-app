@@ -2,14 +2,15 @@
 import BaseButton from "@/components/ui/BaseButton.vue";
 import router from "@/router";
 import { computed } from "vue";
+
 const props = defineProps<{
   id: string;
   title: string;
   image?: string;
-  price: string;
   description?: string;
-  discountedPrice?: string;
-  discountedPercentage?: string;
+  price?: number;
+  discountedPrice?: number;
+  discountedPercentage?: number;
 }>();
 
 const isDiscounted = computed(() => !!props.discountedPrice);
@@ -38,11 +39,12 @@ function addToCart(): void {
       <p class="card-description">
         {{ description }}
       </p>
-      <div class="card-price">
+      <div v-if="isDiscounted" class="card-price">
+        <div class="card-current-price">{{ discountedPrice }} ₽</div>
+        <div class="card-discounted-price">{{ price }} ₽</div>
+      </div>
+      <div v-else class="card-price">
         <div class="card-current-price">{{ price }} ₽</div>
-        <div v-if="isDiscounted" class="card-discounted-price">
-          {{ discountedPrice }} ₽
-        </div>
       </div>
       <base-button
         size="sm"
@@ -84,7 +86,6 @@ a {
   gap: 20px;
   transition: transform 0.4s ease-in;
   cursor: pointer;
-  font-family: Roboto;
   font-size: 20px;
 }
 .card-information {
@@ -109,8 +110,8 @@ a {
   border-radius: 8px;
 }
 .card-img-wrapper {
-  max-width: 169px;
-  min-width: 101px;
+  width: 169px;
+  height: 216px;
   position: relative;
   display: flex;
   align-items: center;
@@ -118,8 +119,8 @@ a {
   overflow: hidden;
 }
 .card-img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 .card-title {
@@ -128,7 +129,8 @@ a {
 }
 .card-description {
   font-weight: 300;
-  font-size: 14px;
+  font-size: 18px;
+  margin: 0;
   color: var(--grey-dark);
 }
 .card-price {
@@ -161,7 +163,9 @@ a {
     align-self: flex-start;
     flex-shrink: 1;
     max-width: 101px;
+    max-height: 139px;
     width: 100%;
+    height: 100%;
   }
   .card-information {
     flex: 1;
@@ -187,6 +191,11 @@ a {
   .card-btn {
     width: 100%;
     align-self: center;
+  }
+
+  .card-img-discounted-icon {
+    width: 48px;
+    height: 33px;
   }
 }
 </style>
