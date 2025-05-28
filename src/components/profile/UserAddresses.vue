@@ -8,6 +8,7 @@ import type { CountryOption } from "@/types/interfaces.ts";
 import BaseModal from "@/components/ui/BaseModal.vue";
 import AddressEditForm from "@/components/profile/AddressEditForm.vue";
 import AddressCard from "@/components/profile/AddressCard.vue";
+import { showError, showSuccess } from "@/utils/toast.ts";
 
 const userStore = useUserStore();
 
@@ -65,7 +66,17 @@ const onEditAddress = (address: UIAddress): void => {
 };
 
 const onSubmitAddress = (address: UIAddress): void => {
-  console.log("Сохранение адреса", address);
+  console.log("Обновленный адрес:", address);
+  try {
+    showSuccess(`Адрес успешно обновлён`);
+  } catch (e) {
+    // выводить конкретные ошибки
+    if (e instanceof Error) {
+      showError(`Не удалось обновить адрес, ${e.message}`);
+    }
+  } finally {
+    closeModal();
+  }
 };
 
 const onRemoveAddress = (id: string): void => {
