@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const routes = [
   {
@@ -29,6 +30,7 @@ const routes = [
     path: "/catalog",
     name: "Catalog",
     component: () => import("@/pages/CatalogPage.vue"),
+    props: true,
   },
   {
     path: "/user",
@@ -56,9 +58,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to, _, next) => {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-  if (user?.isAuthenticated && to.name === "Login") {
+  const authStore = useAuthStore();
+  if (authStore.isAuthenticated && to.name === "Login") {
     return next({ name: "Main" });
   }
   next();
