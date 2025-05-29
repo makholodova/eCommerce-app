@@ -1,19 +1,38 @@
 ﻿<script lang="ts" setup>
-defineProps<{
+import { watch } from "vue";
+import { useScrollLock } from "@vueuse/core";
+
+const props = defineProps<{
   title: string;
   isOpen: boolean;
 }>();
+
+const emit = defineEmits<{
+  (e: "close"): void;
+}>();
+
+const isScrollLocked = useScrollLock(document.body);
+
+watch(
+  () => props.isOpen,
+  (val) => {
+    isScrollLocked.value = val;
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
-  <div v-if="isOpen" class="modal-overlay">
-    <div class="modal-window">
-      <h2 class="modal-title">{{ title }}</h2>
-      <div class="modal-content">
-        <slot />
+  <teleport to="body">
+    <div v-if="isOpen" class="modal-overlay" @click.self="emit('close')">
+      <div class="modal-window">
+        <h2 class="modal-title">{{ title }}</h2>
+        <div class="modal-content">
+          <slot />
+        </div>
       </div>
     </div>
-  </div>
+  </teleport>
 </template>
 
 <style scoped>
@@ -39,6 +58,5 @@ defineProps<{
   font-weight: 500;
   text-align: center;
   font-size: 22px;
-  /* margin-bottom: 1rem;*/
 }
 </style>

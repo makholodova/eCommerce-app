@@ -127,6 +127,7 @@ const onRemoveAddress = (id: string): void => {
       title="Редактировать адрес"
       :is-open="true"
       name="address-edit"
+      @close="closeModal"
     >
       <AddressEditForm
         :address="addressToEdit"

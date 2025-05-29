@@ -96,6 +96,7 @@ const onSubmitPasswordEdit = (): void => {
       :title="'Редактировать профиль'"
       :is-open="true"
       name="user-edit"
+      @close="closeModal"
     >
       <UserEditForm
         v-model="editableUser"
@@ -109,6 +110,7 @@ const onSubmitPasswordEdit = (): void => {
       :title="'Обновите пароль'"
       :is-open="true"
       name="password-edit"
+      @close="closeModal"
     >
       <PasswordEditForm @submit="onSubmitPasswordEdit" @close="closeModal" />
     </BaseModal>
