@@ -145,7 +145,7 @@ header {
   height: 100%;
   object-fit: contain;
 }
-nav .navigation {
+.navigation {
   display: flex;
   gap: 32px;
 }
