@@ -14,8 +14,12 @@ function onSearchClick(): void {
 
 <template>
   <div class="container">
-    <div class="search">
-      <button type="button" class="button-search" @click="onSearchClick">
+    <div
+      class="search"
+      :class="{ 'search--disabled': !inputValue.trim() }"
+      @click="onSearchClick"
+    >
+      <button type="button" class="button-search">
         <img :src="IconSearch" alt="search" class="icon-search" />
       </button>
     </div>
@@ -84,6 +88,11 @@ function onSearchClick(): void {
 
 .input-search::placeholder {
   color: #666;
+}
+
+.search--disabled {
+  pointer-events: none;
+  cursor: not-allowed;
 }
 
 @media (max-width: 495px) {
