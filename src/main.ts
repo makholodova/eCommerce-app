@@ -11,13 +11,3 @@ app.use(pinia);
 app.use(router);
 
 app.mount("#app");
-
-router.beforeEach(async (to, _, next): Promise<void> => {
-  const authStore = useAuthStore();
-
-  if (to.meta.requires === "unAuth" && authStore.isAuthenticated) {
-    return next({ name: "Main" });
-  }
-
-  next();
-});
