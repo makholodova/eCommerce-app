@@ -1,7 +1,7 @@
 import { createCustomerApiRoot } from "./createCustomer";
 import type { UserLoginData } from "@/types/user-login.types";
 import type { CustomerSignInResult } from "@commercetools/platform-sdk";
-import { useUserStore } from "@/store/useUserStore.ts";
+import { useAnonymousTokenStore } from "@/store/useAnonymousTokenStore";
 
 export async function login(
   loginData: UserLoginData,
@@ -16,18 +16,8 @@ export async function login(
       })
       .execute();
 
-    /*const userState = {
-      firstName: response.body.customer.firstName,
-      isAuthenticated: true,
-    };
-
-    localStorage.setItem("user", JSON.stringify(userState));
-    */
-
-    // ⬇ Обновляем userStore
-    const userStore = useUserStore();
-    userStore.customer = response.body.customer;
-    userStore.isAuthenticated = true;
+    const anonymousTokenStore = useAnonymousTokenStore();
+    if (anonymousTokenStore.token) anonymousTokenStore.reset();
 
     return response.body;
   } catch (error) {
