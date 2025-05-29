@@ -16,11 +16,18 @@ export async function searchProductsInCategory(
   categoryId: string,
   query: string,
 ): Promise<ProductProjectionPagedSearchResponse> {
+  const trimmedQuery = query.trim();
+  const fuzzyLevel =
+    trimmedQuery.length <= 2 ? 0 : trimmedQuery.length === 3 ? 1 : 2;
+
   const response = await api.get("/product-projections/search", {
     params: {
       "filter.query": `categories.id:"${categoryId}"`,
-      "text.ru": query,
+      "text.ru": `*${trimmedQuery}*`,
+      fuzzy: true,
+      fuzzyLevel,
     },
   });
+
   return response.data;
 }

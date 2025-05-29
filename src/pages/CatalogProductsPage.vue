@@ -15,6 +15,7 @@ import SearchInput from "@/components/ui/SearchInput.vue";
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
 const searchQuery = ref<string>("");
+const isLoaded = ref(false);
 
 const categoryTitles: Record<string, string> = {
   smartphones: "Смартфоны",
@@ -22,31 +23,41 @@ const categoryTitles: Record<string, string> = {
   tablets: "Планшеты",
 };
 
-const title = categoryTitles[props.category];
+const title = computed(
+  () => categoryTitles[props.category] || "Неизвестная категория",
+);
+const isSearchWord = computed(() => products.value.length > 0);
 
-onMounted(async () => {
-  const auth = useAuthStore();
+const auth = useAuthStore();
+
+async function getCategoryId<T>(
+  fn: (categoryId: string) => Promise<T>,
+): Promise<T> {
   await auth.updateTokenIfExpired();
-
   const category = await getCategoryByKey(props.category);
-  const productsResult = await getProductsCategory(category.id);
-  console.log(productsResult);
+  return fn(category.id);
+}
+
+async function loadInitialProducts(): Promise<void> {
+  const productsResult = await getCategoryId(getProductsCategory);
   products.value = productsResult.results;
-});
+  isLoaded.value = true;
+}
+
+async function handleSearchClick(query: string): Promise<void> {
+  const productsResult = await getCategoryId((categoryId) =>
+    searchProductsInCategory(categoryId, query),
+  );
+  console.log("productsResult ", productsResult);
+  products.value = productsResult.results;
+  console.log("products.value ", products.value);
+}
 
 const normalizedProducts = computed(() => products.value.map(productAdapter));
 
-async function handleSearchClick(query: string): Promise<void> {
-  console.log("Поиск:", query);
-
-  const auth = useAuthStore();
-  await auth.updateTokenIfExpired();
-
-  const category = await getCategoryByKey(props.category);
-  const productsResult = await searchProductsInCategory(category.id, query);
-  console.log(productsResult);
-  products.value = productsResult.results;
-}
+onMounted(() => {
+  loadInitialProducts();
+});
 </script>
 
 <template>
@@ -59,7 +70,10 @@ async function handleSearchClick(query: string): Promise<void> {
       </div>
       <SearchInput v-model="searchQuery" @search="handleSearchClick" />
     </div>
-    <div v-if="normalizedProducts.length > 0">
+    <div v-if="!isLoaded">
+      <h2 class="subtitle">Загрузка товаров...</h2>
+    </div>
+    <div v-else-if="isSearchWord">
       <div class="product-list">
         <ProductCard
           v-for="product in normalizedProducts"
@@ -74,6 +88,7 @@ async function handleSearchClick(query: string): Promise<void> {
         />
       </div>
     </div>
+    <h2 v-else class="subtitle">Товары не найдены</h2>
   </div>
 </template>
 
