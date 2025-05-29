@@ -21,7 +21,7 @@ export function createAnonymousApiRoot(): ByProjectKeyRequestBuilder {
   const { token, refreshToken, expirationTime } =
     storeToRefs(anonymousTokenStore);
 
-  const anonymousId = getAnonymousId();
+  const anonymousId = anonymousTokenStore.anonymousId || getAnonymousId();
 
   const authOptions: AnonymousAuthMiddlewareOptions = {
     host: authUrl,
@@ -44,6 +44,7 @@ export function createAnonymousApiRoot(): ByProjectKeyRequestBuilder {
         expirationTime: expirationTime.value,
         anonymousId: anonymousId,
       }),
+
       set: (newAnonymousToken) => {
         anonymousTokenStore.setAnonymousToken({
           ...newAnonymousToken,

@@ -1,13 +1,18 @@
 import { computed, watchEffect } from "vue";
 import { defineStore } from "pinia";
 import { useTokenStore } from "./useTokenStore";
+import { useAnonymousTokenStore } from "./useAnonymousTokenStore";
+import { getAnonymousId } from "@/utils/anonymousId";
 
 const clientId = import.meta.env.VITE_CLIENT_ID;
 const clientSecret = import.meta.env.VITE_CLIENT_SECRET;
 const authUrl = import.meta.env.VITE_AUTH_URL;
 const encodedCredentials = btoa(`${clientId}:${clientSecret}`);
+const projectKey = import.meta.env.VITE_PROJECT_KEY;
+const scopesAnonymous = import.meta.env.VITE_SCOPES_ANONYMOUS.split(" ");
 
 export const useAuthStore = defineStore("auth", () => {
+  const anonymousStore = useAnonymousTokenStore();
   let refreshTimer: ReturnType<typeof setTimeout> | null = null;
   const REFRESH_BUFFER_MS = 1000 * 60 * 5;
   let isRefreshing = false;
@@ -38,6 +43,33 @@ export const useAuthStore = defineStore("auth", () => {
     return false;
   }
 
+  async function refreshAnonymusToken(): Promise<void> {
+    const anonymous_id = anonymousStore.anonymousId || getAnonymousId();
+    const response = await fetch(
+      `${authUrl}/oauth/${projectKey}/anonymous/token`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Basic ${encodedCredentials}`,
+        },
+        body: new URLSearchParams({
+          grant_type: "client_credentials",
+          scope: scopesAnonymous.join(" "),
+        }),
+      },
+    );
+    if (!response.ok)
+      throw new Error("Не удалось получить токен анонимного пользователя");
+    const tokenData = await response.json();
+    anonymousStore.setAnonymousToken({
+      token: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      expirationTime: tokenData.expires_in,
+      anonymousId: anonymous_id,
+    });
+  }
+
   async function refreshToken(): Promise<void> {
     if (refreshTimer !== null) clearTimeout(refreshTimer);
     if (!tokenStore.refreshToken) return logout();
@@ -62,6 +94,8 @@ export const useAuthStore = defineStore("auth", () => {
 
       const data = await response.json();
 
+      console.log(data + "новые данные");
+
       tokenStore.setTokenStore({
         token: data["access_token"],
         refreshToken: data["refresh_token"],
@@ -69,10 +103,8 @@ export const useAuthStore = defineStore("auth", () => {
       });
       startRefreshToken();
     } catch (error) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      }
       logout();
+      throw error instanceof Error ? error : new Error("Unknown error");
     }
   }
 
@@ -99,11 +131,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   function logout(): void {
     if (refreshTimer !== null) clearTimeout(refreshTimer);
-    tokenStore.setTokenStore({
-      token: "",
-      refreshToken: "",
-      expirationTime: 0,
-    });
+    tokenStore.reset();
   }
 
   return {
@@ -111,5 +139,6 @@ export const useAuthStore = defineStore("auth", () => {
     isAuthenticated,
     refreshToken,
     updateTokenIfExpired,
+    refreshAnonymusToken,
   };
 });

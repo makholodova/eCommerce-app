@@ -24,6 +24,7 @@ function onSearchClick(): void {
       type="text"
       placeholder="Поиск..."
       class="input-search"
+      @keydown.enter="onSearchClick"
     />
   </div>
 </template>

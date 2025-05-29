@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import ProductCard from "@/components/ui/ProductCard.vue";
 import { getCategoryByKey } from "@/api/commercetools/products/categories";
@@ -12,6 +12,7 @@ import { productAdapter } from "@/adapters/product.adapter";
 import { useAuthStore } from "@/store/useAuthStore";
 import IconArrow from "@/assets/icons/icon-arrow.png";
 import SearchInput from "@/components/ui/SearchInput.vue";
+import BaseSpinner from "@/components/ui/BaseSpinner.vue";
 
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
@@ -64,6 +65,10 @@ async function handleSearchClick(query: string): Promise<void> {
   console.log("products.value ", products.value);
 }
 
+watch(searchQuery, async (newQuery) => {
+  if (newQuery === "") await loadInitialProducts();
+});
+
 const normalizedProducts = computed(() => products.value.map(productAdapter));
 
 onMounted(() => {
@@ -86,9 +91,7 @@ onMounted(() => {
       </div>
       <SearchInput v-model="searchQuery" @search="handleSearchClick" />
     </div>
-    <div v-if="!isLoaded">
-      <h2 class="subtitle">Загрузка товаров...</h2>
-    </div>
+    <BaseSpinner v-if="!isLoaded" />
     <div v-else-if="isSearchWord">
       <div class="product-list">
         <ProductCard
