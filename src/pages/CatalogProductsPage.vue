@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import ProductCard from "@/components/ui/ProductCard.vue";
 import { getCategoryByKey } from "@/api/commercetools/products/categories";
 import {
@@ -29,6 +30,16 @@ const title = computed(
 const isSearchWord = computed(() => products.value.length > 0);
 
 const auth = useAuthStore();
+
+const router = useRouter();
+
+function goBackToCatalogPage(): void {
+  if (window.history.length > 1) {
+    router.back();
+  } else {
+    router.push({ name: "Catalog" });
+  }
+}
 
 async function getCategoryId<T>(
   fn: (categoryId: string) => Promise<T>,
@@ -65,7 +76,12 @@ onMounted(() => {
     <span class="breadcrumbs">Главная/Каталог/Смартфоны</span>
     <div class="toolbar">
       <div class="toolbar-nav">
-        <img :src="IconArrow" alt="arrow" class="arrow" />
+        <img
+          :src="IconArrow"
+          alt="arrow"
+          class="arrow"
+          @click="goBackToCatalogPage"
+        />
         <h1 class="subtitle">{{ title }}</h1>
       </div>
       <SearchInput v-model="searchQuery" @search="handleSearchClick" />
