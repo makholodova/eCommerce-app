@@ -126,7 +126,6 @@ const onRemoveAddress = (id: string): void => {
       v-if="modalState === 'address'"
       title="Редактировать адрес"
       :is-open="true"
-      name="address-edit"
       @close="closeModal"
     >
       <AddressEditForm
