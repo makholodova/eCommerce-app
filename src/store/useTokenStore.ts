@@ -8,6 +8,12 @@ export const useTokenStore = defineStore(
     const refreshToken = ref<string>("");
     const expirationTime = ref<number>(0);
 
+    function reset(): void {
+      token.value = "";
+      refreshToken.value = "";
+      expirationTime.value = 0;
+    }
+
     function setTokenStore(newToken: {
       token: string;
       refreshToken?: string;
@@ -27,6 +33,7 @@ export const useTokenStore = defineStore(
       refreshToken,
       expirationTime,
       setTokenStore,
+      reset,
     };
   },
   {
