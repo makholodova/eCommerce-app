@@ -1,21 +1,22 @@
 ﻿<script lang="ts" setup>
 import { ref } from "vue";
-import { useUserStore } from "@/store/useUserStore.ts";
-import { toUIAddressFromPlatform } from "@/adapters/address.adapter.ts";
+import { useUserAddressStore } from "@/store/useUserAddressStore.ts";
 import { useModal } from "@/composables/useModal.ts";
+import { showError, showSuccess } from "@/utils/toast.ts";
+import { toUIAddressFromPlatform } from "@/adapters/address.adapter.ts";
+import AddressCard from "@/components/profile/ui/AddressCard.vue";
+import UserAddressForm from "@/components/profile/forms/UserAddressForm.vue";
+import BaseModal from "@/components/ui/BaseModal.vue";
 import type { UIAddress } from "@/types/types.ts";
 import type { CountryOption } from "@/types/interfaces.ts";
-import BaseModal from "@/components/ui/BaseModal.vue";
-import AddressEditForm from "@/components/profile/AddressEditForm.vue";
-import AddressCard from "@/components/profile/AddressCard.vue";
-import { showError, showSuccess } from "@/utils/toast.ts";
 
-const userStore = useUserStore();
+const userAddressStore = useUserAddressStore();
 
-const shippingAddresses = userStore.shippingAddresses;
-const billingAddresses = userStore.billingAddresses;
+const shippingAddresses = userAddressStore.shippingAddresses;
+const billingAddresses = userAddressStore.billingAddresses;
 
-const isDefault = userStore.isDefault;
+const isDefaultShipping = userAddressStore.isDefaultShipping;
+const isDefaultBilling = userAddressStore.isDefaultBilling;
 
 const { modalState, openModal, closeModal } = useModal();
 const defaultAddress: UIAddress = {
@@ -32,8 +33,8 @@ const countries = ref<CountryOption[]>([{ title: "RU", value: "Россия" }])
 
 const toggleDefaultShipping = (id: string): void => {
   console.log("Установить адрес доставки по умолчанию");
-  const current = userStore.defaultShippingId;
-  userStore.updateCustomerInfo({
+  const current = userAddressStore.defaultShippingId;
+  userAddressStore.updateCustomerInfo({
     defaultShippingAddressId: current === id ? undefined : id,
   });
 };
@@ -41,8 +42,8 @@ const toggleDefaultShipping = (id: string): void => {
 const toggleDefaultBilling = (id: string): void => {
   console.log("Установить адрес счета по умолчанию");
 
-  const current = userStore.defaultBillingId;
-  userStore.updateCustomerInfo({
+  const current = userAddressStore.defaultBillingId;
+  userAddressStore.updateCustomerInfo({
     defaultBillingAddressId: current === id ? undefined : id,
   });
 };
@@ -98,7 +99,7 @@ const onRemoveAddress = (id: string): void => {
         v-for="address in shippingAddresses"
         :key="address.id"
         :address="toUIAddressFromPlatform(address)"
-        :is-default="isDefault(address.id, 'shipping')"
+        :is-default="isDefaultShipping"
         @edit="onEditAddress"
         @remove="onRemoveAddress"
         @default-toggle="toggleDefaultShipping"
@@ -115,7 +116,7 @@ const onRemoveAddress = (id: string): void => {
         v-for="address in billingAddresses"
         :key="address.id"
         :address="toUIAddressFromPlatform(address)"
-        :is-default="isDefault(address.id, 'billing')"
+        :is-default="isDefaultBilling"
         @edit="onEditAddress"
         @remove="onRemoveAddress"
         @default-toggle="toggleDefaultBilling"
@@ -128,7 +129,7 @@ const onRemoveAddress = (id: string): void => {
       :is-open="true"
       @close="closeModal"
     >
-      <AddressEditForm
+      <UserAddressForm
         :address="addressToEdit"
         :countries="countries"
         @submit="onSubmitAddress"
