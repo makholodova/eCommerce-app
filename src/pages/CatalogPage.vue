@@ -8,6 +8,7 @@ import { getProductsCategory } from "@/api/commercetools/products/products";
 import { checkValidSession } from "@/utils/validSession";
 import { useAuthStore } from "@/store/useAuthStore";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
+import { productErrorMessages } from "@/utils/errors/errorMessages";
 
 const categories = [
   { name: "smartphones", label: "Смартфоны", image: "smartphone.png" },
@@ -24,14 +25,25 @@ const isLoaded = ref(false);
 
 async function loadInitialProducts(): Promise<void> {
   const auth = useAuthStore();
-  await auth.updateTokenIfExpired();
 
-  await checkValidSession();
+  try {
+    await auth.updateTokenIfExpired();
+    await checkValidSession();
 
-  const category = await getCategoryByKey("popular");
-  const productsResult = await getProductsCategory(category.id);
-  popularProducts.value = productsResult.results;
-  isLoaded.value = true;
+    const category = await getCategoryByKey("popular");
+    const productsResult = await getProductsCategory(category.id);
+    popularProducts.value = productsResult.results;
+    isLoaded.value = true;
+  } catch (error) {
+    if (error instanceof Error) {
+      const message =
+        productErrorMessages[error.message] || "Ошибка при загрузке товаров.";
+      console.error(message, error);
+      popularProducts.value = [];
+    }
+  } finally {
+    isLoaded.value = true;
+  }
 }
 
 const normalizedPopularProducts = computed(() =>

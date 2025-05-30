@@ -13,6 +13,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import IconArrow from "@/assets/icons/icon-arrow.png";
 import SearchInput from "@/components/ui/SearchInput.vue";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
+import { productErrorMessages } from "@/utils/errors/errorMessages";
 
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
@@ -44,25 +45,51 @@ function goBackToCatalogPage(): void {
 
 async function getCategoryId<T>(
   fn: (categoryId: string) => Promise<T>,
-): Promise<T> {
-  await auth.updateTokenIfExpired();
-  const category = await getCategoryByKey(props.category);
-  return fn(category.id);
+): Promise<T | null> {
+  try {
+    await auth.updateTokenIfExpired();
+    const category = await getCategoryByKey(props.category);
+    return await fn(category.id);
+  } catch (error) {
+    if (error instanceof Error) {
+      const message =
+        productErrorMessages[error.message] || "Ошибка при загрузке товаров.";
+      console.error(message, error);
+    }
+
+    return null;
+  }
 }
 
 async function loadInitialProducts(): Promise<void> {
+  isLoaded.value = false;
+
   const productsResult = await getCategoryId(getProductsCategory);
-  products.value = productsResult.results;
+
+  if (productsResult) {
+    products.value = productsResult.results;
+  } else {
+    products.value = [];
+  }
+
   isLoaded.value = true;
 }
 
 async function handleSearchClick(query: string): Promise<void> {
+  isLoaded.value = false;
+
   const productsResult = await getCategoryId((categoryId) =>
     searchProductsInCategory(categoryId, query),
   );
-  console.log("productsResult ", productsResult);
-  products.value = productsResult.results;
-  console.log("products.value ", products.value);
+  if (productsResult) {
+    console.log("productsResult ", productsResult);
+    products.value = productsResult.results;
+    console.log("products.value ", products.value);
+  } else {
+    products.value = [];
+  }
+
+  isLoaded.value = true;
 }
 
 watch(searchQuery, async (newQuery) => {
