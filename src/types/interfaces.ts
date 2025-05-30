@@ -43,3 +43,10 @@ export interface ProductAdapter {
   discountedPercentage: number | null;
   attributes: ProductAttribute;
 }
+
+export interface UserFormModel {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  email: string;
+}

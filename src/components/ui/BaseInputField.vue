@@ -92,7 +92,7 @@ const errorMessage = computed(() => {
 .base-input {
   border: 1px solid var(--grey-not-active);
   border-radius: 8px;
-  padding: 11px 8px 11px 16px;
+  padding: 11px 35px 11px 16px;
   width: 100%;
 
   font-size: 1rem;

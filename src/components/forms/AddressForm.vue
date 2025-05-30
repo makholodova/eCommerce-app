@@ -7,9 +7,9 @@ import BaseSelectField from "@/components/ui/BaseSelectField.vue";
 const modelValue = defineModel<AddressFormFields>({ required: true });
 
 defineProps<{
-  title: string;
   countries: CountryOption[];
   prefix: string;
+  title?: string;
   rules?: FormRules<AddressFormFields>;
   isLoading?: boolean;
 }>();
@@ -17,7 +17,7 @@ defineProps<{
 
 <template>
   <div class="form-section address-wrapper">
-    <h3 class="form-section-title">{{ title }}</h3>
+    <h3 v-if="title" class="form-section-title">{{ title }}</h3>
     <BaseInputField
       :id="`${prefix}-streetName`"
       v-model="modelValue.streetName"

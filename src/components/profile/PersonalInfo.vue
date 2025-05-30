@@ -1,9 +1,18 @@
 ﻿<script lang="ts" setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useUserStore } from "@/store/useUserStore";
 import BaseButton from "@/components/ui/BaseButton.vue";
+import { useModal } from "@/composables/useModal.ts";
+import type { UserFormModel } from "@/types/interfaces.ts";
+
+import UserEditForm from "@/components/profile/UserEditForm.vue";
+
+import PasswordEditForm from "@/components/profile/PasswordEditForm.vue";
+import BaseModal from "@/components/ui/BaseModal.vue";
+import { showError, showSuccess } from "@/utils/toast.ts";
 
 const userStore = useUserStore();
+const { modalState, openModal, closeModal } = useModal();
 
 const personalInfo = computed(() => ({
   Имя: userStore.firstName,
@@ -12,11 +21,57 @@ const personalInfo = computed(() => ({
   "Дата рождения": userStore.dateOfBirth,
 }));
 
+const editableUser = ref<UserFormModel>({
+  firstName: userStore.firstName,
+  lastName: userStore.lastName,
+  email: userStore.email,
+  dateOfBirth: userStore.dateOfBirth,
+});
+
+console.log(editableUser.value);
+
 const onChangePassword = (): void => {
+  openModal("password");
+
   console.log("Изменить пароль");
 };
+
 const onEdit = (): void => {
+  editableUser.value = {
+    firstName: userStore.firstName,
+    lastName: userStore.lastName,
+    email: userStore.email,
+    dateOfBirth: userStore.dateOfBirth,
+  };
+
+  openModal("edit");
   console.log("Редактирование");
+};
+
+const onSubmitUserEdit = (): void => {
+  try {
+    //userStore.updateUser(editableUser.value))
+    showSuccess("Профиль успешно обновлён");
+  } catch (e) {
+    // выводить конкретные ошибки
+    if (e instanceof Error) {
+      showError(`Не удалось обновить профиль, ${e.message}`);
+    }
+  } finally {
+    closeModal();
+  }
+};
+const onSubmitPasswordEdit = (): void => {
+  try {
+    showSuccess("Пароль успешно обновлён");
+  } catch (e) {
+    // выводить конкретные ошибки
+    if (e instanceof Error) {
+      showError(`Не удалось обновить пароль, ${e.message}`);
+    }
+  } finally {
+    closeModal();
+  }
 };
 </script>
 
@@ -35,6 +90,28 @@ const onEdit = (): void => {
       @click="onChangePassword"
     />
     <BaseButton text="Редактировать" type="button" @click="onEdit" />
+
+    <BaseModal
+      v-if="modalState === 'edit'"
+      :title="'Редактировать профиль'"
+      :is-open="true"
+      @close="closeModal"
+    >
+      <UserEditForm
+        v-model="editableUser"
+        @submit="onSubmitUserEdit"
+        @close="closeModal"
+      />
+    </BaseModal>
+
+    <BaseModal
+      v-if="modalState === 'password'"
+      :title="'Обновите пароль'"
+      :is-open="true"
+      @close="closeModal"
+    >
+      <PasswordEditForm @submit="onSubmitPasswordEdit" @close="closeModal" />
+    </BaseModal>
   </div>
 </template>
 

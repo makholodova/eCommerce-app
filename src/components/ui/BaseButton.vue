@@ -5,6 +5,7 @@ type ButtonProps = {
   type?: "button" | "submit";
   disabled?: boolean;
   isLoading?: boolean;
+  variant?: "primary" | "secondary";
 };
 
 const {
@@ -12,6 +13,7 @@ const {
   type = "button",
   text,
   disabled,
+  variant = "primary",
 } = defineProps<ButtonProps>();
 </script>
 
@@ -19,7 +21,7 @@ const {
   <button
     :type
     :disabled="disabled || isLoading"
-    :class="['button', `size-${size}`]"
+    :class="['button', `size-${size}`, `variant-${variant}`]"
   >
     <span v-if="isLoading" class="spinner" />
     <span v-else
@@ -35,15 +37,9 @@ const {
   cursor: pointer;
   width: 100%;
   font-weight: 500;
-  background-color: var(--blue);
-  color: var(--white);
   transition:
     background 0.2s ease,
     color 0.2s ease;
-}
-
-.button:hover {
-  background-color: var(--blue-hover);
 }
 
 .button:disabled {
@@ -75,6 +71,23 @@ const {
   height: 44px;
   font-size: 14px;
 }
+
+.variant-primary {
+  background-color: var(--blue);
+  color: var(--white);
+}
+.variant-primary:hover {
+  background-color: var(--blue-hover);
+}
+
+.variant-secondary {
+  background-color: var(--grey);
+  color: var(--white);
+}
+.variant-secondary:hover {
+  background-color: var(--grey-dark);
+}
+
 .spinner {
   width: 18px;
   height: 18px;
