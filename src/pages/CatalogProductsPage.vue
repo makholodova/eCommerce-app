@@ -6,6 +6,7 @@ import { getCategoryByKey } from "@/api/commercetools/products/categories";
 import {
   getProductsCategory,
   searchProductsInCategory,
+  getFilteredProducts,
 } from "@/api/commercetools/products/products";
 import type { ProductProjection } from "@commercetools/platform-sdk";
 import { productAdapter } from "@/adapters/product.adapter";
@@ -14,11 +15,13 @@ import IconArrow from "@/assets/icons/icon-arrow.png";
 import SearchInput from "@/components/ui/SearchInput.vue";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
 import { productErrorMessages } from "@/utils/errors/errorMessages";
+import ProductFilter from "@/components/ui/ProductFilter.vue";
 
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
 const searchQuery = ref<string>("");
 const isLoaded = ref(false);
+const filters = ref<Record<string, string[]>>({});
 
 const categoryTitles: Record<string, string> = {
   smartphones: "Смартфоны",
@@ -32,7 +35,6 @@ const title = computed(
 const isSearchWord = computed(() => products.value.length > 0);
 
 const auth = useAuthStore();
-
 const router = useRouter();
 
 function goBackToCatalogPage(): void {
@@ -56,7 +58,6 @@ async function getCategoryId<T>(
         productErrorMessages[error.message] || "Ошибка при загрузке товаров.";
       console.error(message, error);
     }
-
     return null;
   }
 }
@@ -65,12 +66,7 @@ async function loadInitialProducts(): Promise<void> {
   isLoaded.value = false;
 
   const productsResult = await getCategoryId(getProductsCategory);
-
-  if (productsResult) {
-    products.value = productsResult.results;
-  } else {
-    products.value = [];
-  }
+  products.value = productsResult?.results ?? [];
 
   isLoaded.value = true;
 }
@@ -82,18 +78,27 @@ async function handleSearchClick(query: string): Promise<void> {
     searchProductsInCategory(categoryId, query),
   );
   if (productsResult) {
+    //products.value = productsResult?.results ?? [];
     console.log("productsResult ", productsResult);
     products.value = productsResult.results;
     console.log("products.value ", products.value);
   } else {
     products.value = [];
   }
-
   isLoaded.value = true;
 }
 
 watch(searchQuery, async (newQuery) => {
   if (newQuery === "") await loadInitialProducts();
+});
+
+watch(filters, async (newFilters) => {
+  isLoaded.value = false;
+  const productsResult = await getCategoryId((categoryId) =>
+    getFilteredProducts(categoryId, newFilters),
+  );
+  products.value = productsResult?.results ?? [];
+  isLoaded.value = true;
 });
 
 const normalizedProducts = computed(() => products.value.map(productAdapter));
@@ -118,23 +123,26 @@ onMounted(() => {
       </div>
       <SearchInput v-model="searchQuery" @search="handleSearchClick" />
     </div>
-    <BaseSpinner v-if="!isLoaded" />
-    <div v-else-if="isSearchWord">
-      <div class="product-list">
-        <ProductCard
-          v-for="product in normalizedProducts"
-          :id="product.id"
-          :key="product.id"
-          :title="product.title"
-          :image="product.image"
-          :description="`${product.description} ${product.attributes.rom} ${product.attributes.color}`"
-          :price="product.price ?? undefined"
-          :discounted-price="product.discountedPrice ?? undefined"
-          :discounted-percentage="product.discountedPercentage ?? undefined"
-        />
+    <div>
+      <ProductFilter @update:filters="filters = $event" />
+      <BaseSpinner v-if="!isLoaded" />
+      <div v-else-if="isSearchWord">
+        <div class="product-list">
+          <ProductCard
+            v-for="product in normalizedProducts"
+            :id="product.id"
+            :key="product.id"
+            :title="product.title"
+            :image="product.image"
+            :description="`${product.description} ${product.attributes.rom} ${product.attributes.color}`"
+            :price="product.price ?? undefined"
+            :discounted-price="product.discountedPrice ?? undefined"
+            :discounted-percentage="product.discountedPercentage ?? undefined"
+          />
+        </div>
       </div>
+      <h2 v-else class="subtitle">Товары не найдены</h2>
     </div>
-    <h2 v-else class="subtitle">Товары не найдены</h2>
   </div>
 </template>
 
