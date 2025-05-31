@@ -8,8 +8,7 @@ import { login } from "@/api/commercetools/login";
 import { loginErrorMessages } from "@/utils/errors/errorMessages";
 import { showError } from "@/utils/toast.ts";
 import router from "@/router";
-import { useUserAddressStore } from "@/store/useUserAddressStore.ts";
-import { useUserProfileStore } from "@/store/useUserProfileStore.ts";
+import { sharedCustomer } from "@/store/sharedCustomer.ts";
 
 const form = reactive({
   email: "",
@@ -34,8 +33,7 @@ async function handleSubmit(): Promise<void> {
   try {
     const result = await login(loginData);
 
-    useUserProfileStore().setCustomer(result.customer);
-    useUserAddressStore().setCustomer(result.customer);
+    sharedCustomer.value = result.customer;
 
     await router.replace({ name: "Main" });
   } catch (error) {

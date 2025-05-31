@@ -19,8 +19,7 @@ import BaseButton from "@/components/ui/BaseButton.vue";
 import { registrationErrorMessages } from "@/utils/errors/errorMessages.ts";
 import { login } from "@/api/commercetools/login.ts";
 
-import { useUserProfileStore } from "@/store/useUserProfileStore.ts";
-import { useUserAddressStore } from "@/store/useUserAddressStore.ts";
+import { sharedCustomer } from "@/store/sharedCustomer.ts";
 
 const auth = reactive({
   email: "",
@@ -113,8 +112,7 @@ async function handleSubmit(): Promise<void> {
 
     const loginResult = await login(loginData);
 
-    useUserProfileStore().setCustomer(loginResult.customer);
-    useUserAddressStore().setCustomer(loginResult.customer);
+    sharedCustomer.value = loginResult.customer;
 
     isRegistered.value = true;
     isLoading.value = false;
