@@ -9,3 +9,7 @@ export const loginErrorMessages: Record<string, string> = {
   "Customer account with the given credentials not found.":
     "Неверный email или пароль.",
 };
+
+export const passwordErrorMessages: Record<string, string> = {
+  "Request failed with status code 400": "Текущий пароль указан неверно.",
+};

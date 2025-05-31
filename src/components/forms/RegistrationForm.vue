@@ -18,7 +18,9 @@ import BaseCheckbox from "@/components/ui/BaseCheckbox.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { registrationErrorMessages } from "@/utils/errors/errorMessages.ts";
 import { login } from "@/api/commercetools/login.ts";
-import { getUserProfile } from "@/api/commercetools/customer/profile.ts";
+
+import { useUserProfileStore } from "@/store/useUserProfileStore.ts";
+import { useUserAddressStore } from "@/store/useUserAddressStore.ts";
 
 const auth = reactive({
   email: "",
@@ -58,6 +60,7 @@ const rules = computed(() => ({
   shippingAddress: addressRules,
   billingAddress: useSameAddress.value ? {} : addressRules,
 }));
+
 const v$ = useVuelidate(
   rules,
   { auth, personal, shippingAddress, billingAddress },
@@ -107,15 +110,14 @@ async function handleSubmit(): Promise<void> {
 
   try {
     await signUp(dateCustomerRequest);
+
     const loginResult = await login(loginData);
-    console.log("Вход выполнен успешно:", loginResult.customer.firstName);
+
+    useUserProfileStore().setCustomer(loginResult.customer);
+    useUserAddressStore().setCustomer(loginResult.customer);
 
     isRegistered.value = true;
     isLoading.value = false;
-
-    //временная проверка, выводит профиль созданного пользователя
-    const userData = await getUserProfile();
-    console.log("Профиль пользователя:", userData);
 
     showSuccess(
       `Аккаунт успешно создан! Добро пожаловать, ${loginResult.customer.firstName}!`,
