@@ -1,14 +1,26 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
-import { useDebounceFn } from "@vueuse/core";
+import { ref, onMounted } from "vue";
 import BaseCheckbox from "./BaseCheckbox.vue";
 import { productFilters, filterLabels } from "@/utils/dataProductFilters";
+import BaseButton from "./BaseButton.vue";
+import { useFilterStore } from "@/store/useProductFilterStore";
+import IconCross from "@/assets/icons/icon-cross1.svg";
+
+const filterStore = useFilterStore();
+
+const props = defineProps<{
+  category: string;
+  isMobile?: boolean;
+  onClose?: () => void;
+}>();
 
 const emit = defineEmits<{
-  (e: "update:filters", value: Record<string, string[]>): void;
+  (e: "update:filters", value: Record<string, string[] | number>): void;
 }>();
 
 const selectedFilters = ref<Record<string, Record<string, boolean>>>({});
+const priceMin = ref<number | null>(null);
+const priceMax = ref<number | null>(null);
 
 for (const [groupName, options] of Object.entries(productFilters)) {
   selectedFilters.value[groupName] = {};
@@ -31,31 +43,107 @@ function collectFilters(
       result[group] = selected;
     }
   }
-
   return result;
 }
 
-const emitFiltered = useDebounceFn(() => {
-  const activeFilters = collectFilters(selectedFilters.value);
-  console.log("Выбранные фильтры:", activeFilters);
-  emit("update:filters", activeFilters);
-}, 800);
+function initializeFiltersFromStore(): void {
+  const {
+    selectedFilters: storeSelected,
+    priceMin: storeMin,
+    priceMax: storeMax,
+  } = filterStore.getFilters(props.category);
 
-watch(
-  selectedFilters,
-  () => {
-    emitFiltered();
-  },
-  { deep: true },
-);
+  priceMin.value = storeMin;
+  priceMax.value = storeMax;
+
+  for (const [groupName, options] of Object.entries(productFilters)) {
+    const groupFromStore = storeSelected[groupName] ?? {};
+
+    for (const option of options) {
+      selectedFilters.value[groupName][option.key] =
+        groupFromStore[option.key] ?? false;
+    }
+  }
+}
+
+function resetFilters(): void {
+  for (const group of Object.keys(selectedFilters.value)) {
+    for (const key of Object.keys(selectedFilters.value[group])) {
+      selectedFilters.value[group][key] = false;
+    }
+  }
+  priceMin.value = null;
+  priceMax.value = null;
+
+  filterStore.resetFilters(props.category);
+  emit("update:filters", {});
+}
+
+function applyFilters(): void {
+  console.log("применить");
+
+  const checkBoxFilters = collectFilters(selectedFilters.value);
+
+  console.log("checkBoxFilters ", checkBoxFilters);
+
+  const activeFilters: Record<string, string[] | number> = {
+    ...checkBoxFilters,
+  };
+
+  console.log("activeFilters ", activeFilters);
+
+  if (priceMin.value !== null) {
+    activeFilters.priceMin = priceMin.value;
+  }
+  if (priceMax.value !== null) {
+    activeFilters.priceMax = priceMax.value;
+  }
+
+  console.log("activeFilters ", activeFilters);
+
+  filterStore.setFilters(props.category, {
+    selectedFilters: selectedFilters.value,
+    priceMin: priceMin.value,
+    priceMax: priceMax.value,
+  });
+
+  emit("update:filters", activeFilters);
+
+  if (props.isMobile && props.onClose) {
+    props.onClose();
+  }
+}
+
+onMounted(() => initializeFiltersFromStore());
 </script>
 
 <template>
   <div class="container">
+    <button v-if="isMobile" type="button" class="button-cross" @click="onClose">
+      <img :src="IconCross" alt="cross" class="icon-cross" />
+    </button>
+    <div class="filter-price">
+      <h3 class="title">Цена, ₽</h3>
+      <div class="price-range">
+        <input
+          v-model="priceMin"
+          type="number"
+          placeholder="от 4 500 ₽"
+          class="price-input price-input-min"
+        />
+        <div class="price-separator"></div>
+        <input
+          v-model="priceMax"
+          type="number"
+          placeholder="до 300 500 ₽"
+          class="price-input price-input-max"
+        />
+      </div>
+    </div>
     <div
       v-for="(options, groupName) in productFilters"
       :key="groupName"
-      class="group"
+      class="filter-checkbox"
     >
       <h3 class="title">{{ filterLabels[groupName] }}</h3>
       <div v-for="option in options" :key="option.key" class="variant">
@@ -67,25 +155,89 @@ watch(
         />
       </div>
     </div>
+    <div class="button-control">
+      <BaseButton
+        text="Сбросить"
+        size="xs"
+        variant="primary"
+        @click="resetFilters"
+      />
+      <BaseButton
+        text="Применить"
+        size="xs"
+        variant="primary"
+        @click="applyFilters"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
 .container {
-  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  max-width: 276px;
   width: 100%;
   padding: 16px;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
-.group {
+
+.filter-checkbox {
   margin: 8px 0;
 }
 
 .title {
-  font-weight: 400;
   font-size: 16px;
   margin: 5px 0;
+}
+.price-range {
+  display: flex;
+  align-items: center;
+  margin: 12px 0 14px;
+}
+
+.price-input {
+  padding: 12px 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--blue-light);
+  color: var(--grey-dark);
+}
+
+.price-input-min {
+  max-width: 100px;
+  width: 100%;
+}
+
+.price-input-max {
+  max-width: 120px;
+  width: 100%;
+}
+
+.price-separator {
+  flex: 1;
+  margin: 0 2px;
+  border-top: 1px solid var(--grey-light);
+}
+
+.button-control {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-cross {
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.icon-cross {
+  width: 36px;
 }
 </style>

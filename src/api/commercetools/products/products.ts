@@ -1,5 +1,6 @@
 import api from "@/api/commercetools/axiosInstance";
 import type { ProductProjectionPagedSearchResponse } from "@commercetools/platform-sdk";
+import { MIN_PPRICE, MAX_PPRICE } from "@/utils/constants";
 
 export async function getProductsCategory(
   categoryId: string,
@@ -34,22 +35,25 @@ export async function searchProductsInCategory(
 
 export async function getFilteredProducts(
   categoryId: string,
-  filters: Record<string, string[]>,
+  filters: Record<string, string[] | number>,
 ): Promise<ProductProjectionPagedSearchResponse> {
   const filterQuery: string[] = [`categories.id:"${categoryId}"`];
 
   for (const [key, values] of Object.entries(filters)) {
-    if (values.length === 0) continue;
-
-    /*const attributeFilters = values.map(
-      (value) => `variants.attributes.${key}.key:"${value}"`,
-    );
-
-    filterQuery.push(...attributeFilters);*/
+    if (!Array.isArray(values)) continue;
 
     const joinedValues = values.map((v) => `"${v}"`).join(",");
     filterQuery.push(`variants.attributes.${key}.key:${joinedValues}`);
   }
+
+  const min =
+    typeof filters.priceMin === "number" ? filters.priceMin : MIN_PPRICE;
+  const max =
+    typeof filters.priceMax === "number" ? filters.priceMax : MAX_PPRICE;
+
+  filterQuery.push(`variants.price.centAmount:range(${min} to ${max})`);
+
+  console.log("filterQuery ", filterQuery);
 
   const response = await api.get("/product-projections/search", {
     params: {
