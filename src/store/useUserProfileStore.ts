@@ -48,6 +48,9 @@ export const useUserProfileStore = defineStore(
         throw error;
       }
     }
+    function setCustomer(data: Customer): void {
+      customer.value = data;
+    }
 
     return {
       customer,
@@ -56,6 +59,7 @@ export const useUserProfileStore = defineStore(
       dateOfBirth,
       email,
       updatePersonalInfo,
+      setCustomer,
     };
   },
   {

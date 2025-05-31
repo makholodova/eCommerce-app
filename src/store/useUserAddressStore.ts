@@ -43,6 +43,10 @@ export const useUserAddressStore = defineStore(
       };
     }
 
+    function setCustomer(data: Customer): void {
+      customer.value = data;
+    }
+
     return {
       customer,
       addresses,
@@ -53,6 +57,7 @@ export const useUserAddressStore = defineStore(
       isDefaultShipping,
       isDefaultBilling,
       updateCustomerInfo,
+      setCustomer,
     };
   },
   {

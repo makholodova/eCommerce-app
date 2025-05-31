@@ -9,9 +9,16 @@ import BaseModal from "@/components/ui/BaseModal.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import type { UserFormModel } from "@/types/interfaces.ts";
 import { storeToRefs } from "pinia";
+import { changeCustomerPassword } from "@/api/commercetools/customer/changeCustomerPassword.ts";
+import { useAuthStore } from "@/store/useAuthStore.ts";
+import { login } from "@/api/commercetools/login.ts";
+import { useUserAddressStore } from "@/store/useUserAddressStore.ts";
+import { passwordErrorMessages } from "@/utils/errors/errorMessages.ts";
+
+const authStore = useAuthStore();
 
 const userProfileStore = useUserProfileStore();
-const { firstName, lastName, email, dateOfBirth } =
+const { customer, firstName, lastName, email, dateOfBirth } =
   storeToRefs(userProfileStore);
 const { updatePersonalInfo } = userProfileStore;
 
@@ -58,16 +65,44 @@ const openPasswordChangeModal = (): void => {
   openModal("password");
 };
 
-const submitPasswordChange = (): void => {
+const submitPasswordChange = async (
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> => {
+  if (!customer.value?.version) {
+    showError("Не удалось получить данные пользователя");
+    return;
+  }
+
   try {
+    await changeCustomerPassword({
+      version: customer.value.version,
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    });
+
+    authStore.logout();
+
+    const result = await login({
+      email: email.value,
+      password: newPassword,
+    });
+
+    userProfileStore.setCustomer(result.customer);
+    useUserAddressStore().setCustomer(result.customer);
+
     showSuccess("Пароль успешно обновлён");
-  } catch (e) {
-    // выводить конкретные ошибки
-    if (e instanceof Error) {
-      showError(`Не удалось обновить пароль, ${e.message}`);
-    }
-  } finally {
     closeModal();
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+      const message =
+        passwordErrorMessages[error.message] ||
+        "Произошла ошибка при смене пароля. Пожалуйста, попробуйте ещё раз.";
+      showError(message);
+    } else {
+      showError("Произошла неизвестная ошибка. Попробуйте позже.");
+    }
   }
 };
 </script>
