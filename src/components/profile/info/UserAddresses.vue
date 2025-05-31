@@ -9,14 +9,12 @@ import UserAddressForm from "@/components/profile/forms/UserAddressForm.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
 import type { UIAddress } from "@/types/types.ts";
 import type { CountryOption } from "@/types/interfaces.ts";
+import { storeToRefs } from "pinia";
 
 const userAddressStore = useUserAddressStore();
-
-const shippingAddresses = userAddressStore.shippingAddresses;
-const billingAddresses = userAddressStore.billingAddresses;
-
-const isDefaultShipping = userAddressStore.isDefaultShipping;
-const isDefaultBilling = userAddressStore.isDefaultBilling;
+const { shippingAddresses, billingAddresses } = storeToRefs(userAddressStore);
+const { isDefaultShipping, isDefaultBilling, updateCustomerInfo } =
+  userAddressStore;
 
 const { modalState, openModal, closeModal } = useModal();
 const defaultAddress: UIAddress = {
@@ -43,7 +41,7 @@ const toggleDefaultBilling = (id: string): void => {
   console.log("Установить адрес счета по умолчанию");
 
   const current = userAddressStore.defaultBillingId;
-  userAddressStore.updateCustomerInfo({
+  updateCustomerInfo({
     defaultBillingAddressId: current === id ? undefined : id,
   });
 };

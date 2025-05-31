@@ -8,37 +8,42 @@ import UserPasswordForm from "@/components/profile/forms/UserPasswordForm.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import type { UserFormModel } from "@/types/interfaces.ts";
+import { storeToRefs } from "pinia";
 
 const userProfileStore = useUserProfileStore();
+const { firstName, lastName, email, dateOfBirth } =
+  storeToRefs(userProfileStore);
+const { updatePersonalInfo } = userProfileStore;
+
 const { modalState, openModal, closeModal } = useModal();
 
 const personalInfo = computed(() => ({
-  Имя: userProfileStore.firstName,
-  Фамилия: userProfileStore.lastName,
-  "E-mail": userProfileStore.email,
-  "Дата рождения": userProfileStore.dateOfBirth,
+  Имя: firstName.value,
+  Фамилия: lastName.value,
+  "E-mail": email.value,
+  "Дата рождения": dateOfBirth.value,
 }));
 
 const editableUser = ref<UserFormModel>({
-  firstName: userProfileStore.firstName,
-  lastName: userProfileStore.lastName,
-  email: userProfileStore.email,
-  dateOfBirth: userProfileStore.dateOfBirth,
+  firstName: firstName.value,
+  lastName: lastName.value,
+  email: email.value,
+  dateOfBirth: dateOfBirth.value,
 });
 
 const openProfileEditModal = (): void => {
   editableUser.value = {
-    firstName: userProfileStore.firstName,
-    lastName: userProfileStore.lastName,
-    email: userProfileStore.email,
-    dateOfBirth: userProfileStore.dateOfBirth,
+    firstName: firstName.value,
+    lastName: lastName.value,
+    email: email.value,
+    dateOfBirth: dateOfBirth.value,
   };
   openModal("edit");
 };
 
 const submitProfileChanges = async (): Promise<void> => {
   try {
-    await userProfileStore.updatePersonalInfo(editableUser.value);
+    await updatePersonalInfo(editableUser.value);
     showSuccess("Профиль успешно обновлён");
   } catch (e) {
     if (e instanceof Error) {
