@@ -1,14 +1,13 @@
 ﻿import { ref } from "vue";
-import { ref } from "vue";
 import type { Ref } from "vue";
 
 export type ModalType =
   | "edit"
   | "password"
   | "address"
+  | "filter"
   | "addBilling"
   | "addShipping"
-  | "filter"
   | null;
 
 export function useModal(): {
