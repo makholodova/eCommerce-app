@@ -1,21 +1,13 @@
 <script lang="ts" setup>
 import arrowIcon from "@/assets/icons/icon-arrow.png";
-type breadCrumbType = {
-  routeName:
-    | "Main"
-    | "Catalog"
-    | "CatalogCategory"
-    | "Product"
-    | "User"
-    | "Register"
-    | "Login";
-  breadcrumbName: string;
-};
+import type { breadCrumbType } from "@/types/user-login.types";
+
 const props = defineProps<{
   breadcrumbs: breadCrumbType[];
 }>();
 
-const previousPage = props.breadcrumbs[props.breadcrumbs.length - 2];
+const previousPage =
+  props.breadcrumbs[props.breadcrumbs.length - 2] || props.breadcrumbs[0];
 </script>
 
 <template>
@@ -28,7 +20,7 @@ const previousPage = props.breadcrumbs[props.breadcrumbs.length - 2];
         :class="{ 'previous-pages': inx !== breadcrumbs.length - 1 }"
         >{{
           breadcrumbRoute.breadcrumbName +
-          `${inx !== breadcrumbs.length - 1 ? "/" : ""}`
+          `${inx !== breadcrumbs.length - 1 ? " / " : ""}`
         }}
       </router-link>
     </div>

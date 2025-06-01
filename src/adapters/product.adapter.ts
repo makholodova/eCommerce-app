@@ -52,7 +52,6 @@ export function productAdapter(product: ProductProjection): ProductAdapter {
         break;
     }
   }
-
   const priceObj = product.masterVariant.prices?.[0];
   const price = priceObj?.value?.centAmount ?? null;
   const discountedPrice = priceObj?.discounted?.value?.centAmount ?? null;
