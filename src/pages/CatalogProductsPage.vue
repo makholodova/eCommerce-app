@@ -74,7 +74,7 @@ async function getCategoryId<T>(
   }
 }
 
-async function loadInitialProducts(): Promise<void> {
+async function loadProducts(query?: string): Promise<void> {
   isLoaded.value = false;
 
   const productsResult = await getCategoryId((categoryId) => {
@@ -82,6 +82,9 @@ async function loadInitialProducts(): Promise<void> {
     console.log("filters ", filters);
     const filtersForApi = getDataFiltersForApi(filters);
 
+    if (query) {
+      return searchProductsInCategory(categoryId, query, filtersForApi ?? {});
+    }
     return filtersForApi
       ? getFilteredProducts(categoryId, filtersForApi)
       : getProductsCategory(categoryId);
@@ -91,14 +94,12 @@ async function loadInitialProducts(): Promise<void> {
   isLoaded.value = true;
 }
 
-async function handleSearchClick(query: string): Promise<void> {
-  isLoaded.value = false;
+async function loadInitialProducts(): Promise<void> {
+  await loadProducts();
+}
 
-  const productsResult = await getCategoryId((categoryId) =>
-    searchProductsInCategory(categoryId, query),
-  );
-  products.value = productsResult?.results ?? [];
-  isLoaded.value = true;
+async function handleSearchClick(query: string): Promise<void> {
+  await loadProducts(query);
 }
 
 watch(searchQuery, async (newQuery) => {
@@ -107,9 +108,17 @@ watch(searchQuery, async (newQuery) => {
 
 watch(filters, async (newFilters) => {
   isLoaded.value = false;
-  const productsResult = await getCategoryId((categoryId) =>
-    getFilteredProducts(categoryId, newFilters),
-  );
+  const productsResult = await getCategoryId((categoryId) => {
+    if (searchQuery.value.trim()) {
+      return searchProductsInCategory(
+        categoryId,
+        searchQuery.value,
+        newFilters,
+      );
+    } else {
+      return getFilteredProducts(categoryId, newFilters);
+    }
+  });
   products.value = productsResult?.results ?? [];
   isLoaded.value = true;
 });
