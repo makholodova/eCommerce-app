@@ -104,6 +104,7 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
 <style scoped>
 .form-content {
+  max-width: 272px;
   width: 100%;
   margin-top: 2rem;
 }

@@ -74,6 +74,7 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
 <style scoped>
 .form-content {
+  max-width: 478px;
   margin-top: 2rem;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -93,6 +94,7 @@ const isFormValid = computed(() => !v$.value.$invalid);
 }
 @media (max-width: 650px) {
   .form-content {
+    max-width: 272px;
     grid-template-columns: repeat(1, 1fr);
   }
   .modal-actions {
