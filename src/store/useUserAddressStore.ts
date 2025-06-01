@@ -50,15 +50,16 @@ export const useUserAddressStore = defineStore(
 
     async function updateAddressActions(
       actions: CustomerUpdateAction[],
-    ): Promise<void> {
-      if (!customer.value) return;
+    ): Promise<Customer> {
+      if (!customer.value) throw new Error("Нет данных пользователя");
 
       try {
-        const updated = await updateCustomerProfile(
+        const response = await updateCustomerProfile(
           customer.value.version,
           actions,
         );
-        customer.value = updated;
+        customer.value = response;
+        return response;
       } catch (error) {
         console.error("Не удалось обновить адреса:", error);
         throw error;

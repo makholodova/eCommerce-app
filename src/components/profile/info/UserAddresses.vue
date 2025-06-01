@@ -34,7 +34,6 @@ const addressToEdit = ref<UIAddress>({ ...defaultAddress });
 const countries = ref<CountryOption[]>([{ title: "RU", value: "Россия" }]); //нужно брать из комерзтоолс наверно
 
 const toggleDefaultShipping = (id: string): void => {
-  console.log("Установить адрес доставки по умолчанию");
   const current = userAddressStore.defaultShippingId;
   userAddressStore.updateCustomerInfo({
     defaultShippingAddressId: current === id ? undefined : id,
@@ -42,38 +41,80 @@ const toggleDefaultShipping = (id: string): void => {
 };
 
 const toggleDefaultBilling = (id: string): void => {
-  console.log("Установить адрес счета по умолчанию");
-
   const current = userAddressStore.defaultBillingId;
   updateCustomerInfo({
     defaultBillingAddressId: current === id ? undefined : id,
   });
 };
 
-const onAddAddressShipping = (): void => {
-  console.log("Добавить адрес доставки");
+const openAddShippingModal = (): void => {
+  addressToEdit.value = { ...defaultAddress };
+  openModal("addShipping");
 };
 
-const onAddAddressBilling = (): void => {
-  console.log("Добавить адрес счета");
+const openAddBillingModal = (): void => {
+  addressToEdit.value = { ...defaultAddress };
+  openModal("addBilling");
 };
 
-const openAddressModal = (address?: UIAddress): void => {
-  addressToEdit.value = address ?? { ...defaultAddress };
-  openModal("address");
+const openEditAddressModal = (address: UIAddress): void => {
+  addressToEdit.value = address;
+  openModal("edit");
 };
 
-const onEditAddress = (address: UIAddress): void => {
-  console.log("Редактирование адреса", address);
-  openAddressModal(address);
-};
-
-const onSubmitAddress = (address: UIAddress): void => {
-  console.log("Обновленный адрес:", address);
+const onSubmitShippingAddress = async (address: UIAddress): Promise<void> => {
   try {
-    showSuccess(`Адрес успешно обновлён`);
+    const updatedCustomer = await updateAddressActions([
+      { action: "addAddress", address: address },
+    ]);
+
+    const lastAddress = updatedCustomer.addresses.at(-1);
+    if (!lastAddress?.id)
+      throw new Error("Не удалось получить ID нового адреса");
+
+    await updateAddressActions([
+      { action: "addShippingAddressId", addressId: lastAddress.id },
+    ]);
+
+    showSuccess("Адрес добавлен");
+    closeModal();
   } catch (e) {
-    // выводить конкретные ошибки
+    if (e instanceof Error) {
+      showError(`Ошибка удаления, ${e.message}`);
+    }
+  }
+};
+const onSubmitBillingAddress = async (address: UIAddress): Promise<void> => {
+  try {
+    const updatedCustomer = await updateAddressActions([
+      { action: "addAddress", address: address },
+    ]);
+
+    const lastAddress = updatedCustomer.addresses.at(-1);
+    if (!lastAddress?.id)
+      throw new Error("Не удалось получить ID нового адреса");
+
+    await updateAddressActions([
+      { action: "addBillingAddressId", addressId: lastAddress.id },
+    ]);
+
+    showSuccess("Адрес добавлен");
+    closeModal();
+  } catch (e) {
+    if (e instanceof Error) {
+      showError(`Ошибка удаления, ${e.message}`);
+    }
+  }
+};
+
+const onSubmitEditedAddress = async (address: UIAddress): Promise<void> => {
+  try {
+    await updateAddressActions([
+      { action: "changeAddress", addressId: address.id, address: address },
+    ]);
+    showSuccess(`Адрес успешно обновлён`);
+    closeModal();
+  } catch (e) {
     if (e instanceof Error) {
       showError(`Не удалось обновить адрес, ${e.message}`);
     }
@@ -87,7 +128,6 @@ const onRemoveShippingAddress = async (id: string): Promise<void> => {
     await updateAddressActions([
       { action: "removeShippingAddressId", addressId: id },
     ]);
-
     showSuccess("Адрес удалён");
   } catch (e) {
     if (e instanceof Error) {
@@ -100,7 +140,6 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
     await updateAddressActions([
       { action: "removeBillingAddressId", addressId: id },
     ]);
-
     showSuccess("Адрес удалён");
   } catch (e) {
     if (e instanceof Error) {
@@ -115,7 +154,7 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
     <div class="profile-addresses__section">
       <h2 class="profile-addresses__title">Адреса доставки</h2>
 
-      <div class="address-card address-card--add" @click="onAddAddressShipping">
+      <div class="address-card address-card--add" @click="openAddShippingModal">
         <div class="add-icon">+</div>
         <p>Добавить адрес</p>
       </div>
@@ -125,7 +164,7 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
         :key="address.id"
         :address="toUIAddressFromPlatform(address)"
         :is-default="isDefaultShipping"
-        @edit="onEditAddress"
+        @edit="openEditAddressModal"
         @remove="onRemoveShippingAddress"
         @default-toggle="toggleDefaultShipping"
       />
@@ -133,7 +172,7 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
 
     <div class="profile-addresses__section">
       <h2 class="profile-addresses__title">Адреса для выставления счета</h2>
-      <div class="address-card address-card--add" @click="onAddAddressBilling">
+      <div class="address-card address-card--add" @click="openAddBillingModal">
         <div class="add-icon">+</div>
         <p>Добавить адрес</p>
       </div>
@@ -142,14 +181,42 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
         :key="address.id"
         :address="toUIAddressFromPlatform(address)"
         :is-default="isDefaultBilling"
-        @edit="onEditAddress"
+        @edit="openEditAddressModal"
         @remove="onRemoveBillingAddress"
         @default-toggle="toggleDefaultBilling"
       />
     </div>
 
     <BaseModal
-      v-if="modalState === 'address'"
+      v-if="modalState === 'addShipping'"
+      title="Добавить адрес доставки"
+      :is-open="true"
+      @close="closeModal"
+    >
+      <UserAddressForm
+        :address="addressToEdit"
+        :countries="countries"
+        @submit="onSubmitShippingAddress"
+        @close="closeModal"
+      />
+    </BaseModal>
+
+    <BaseModal
+      v-if="modalState === 'addBilling'"
+      title="Добавить адрес для выставления счета"
+      :is-open="true"
+      @close="closeModal"
+    >
+      <UserAddressForm
+        :address="addressToEdit"
+        :countries="countries"
+        @submit="onSubmitBillingAddress"
+        @close="closeModal"
+      />
+    </BaseModal>
+
+    <BaseModal
+      v-if="modalState === 'edit'"
       title="Редактировать адрес"
       :is-open="true"
       @close="closeModal"
@@ -157,7 +224,7 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
       <UserAddressForm
         :address="addressToEdit"
         :countries="countries"
-        @submit="onSubmitAddress"
+        @submit="onSubmitEditedAddress"
         @close="closeModal"
       />
     </BaseModal>

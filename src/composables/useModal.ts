@@ -1,7 +1,13 @@
 ﻿import { ref } from "vue";
 import type { Ref } from "vue";
 
-export type ModalType = "edit" | "password" | "address" | null;
+export type ModalType =
+  | "edit"
+  | "password"
+  | "address"
+  | "addBilling"
+  | "addShipping"
+  | null;
 
 export function useModal(): {
   modalState: Ref<ModalType>;
