@@ -25,6 +25,7 @@ const { updatePersonalInfo } = userProfileStore;
 const { modalState, openModal, closeModal } = useModal();
 
 const isPasswordSubmitting = ref(false);
+const isProfileSubmitting = ref(false);
 
 const personalInfo = computed(() => ({
   Имя: firstName.value,
@@ -51,15 +52,18 @@ const openProfileEditModal = (): void => {
 };
 
 const submitProfileChanges = async (): Promise<void> => {
+  isProfileSubmitting.value = true;
+
   try {
     await updatePersonalInfo(editableUser.value);
     showSuccess("Профиль успешно обновлён");
+    closeModal();
   } catch (e) {
     if (e instanceof Error) {
       showError(e.message);
     }
   } finally {
-    closeModal();
+    isProfileSubmitting.value = false;
   }
 };
 
@@ -138,6 +142,7 @@ const submitPasswordChange = async (
     >
       <UserProfileForm
         v-model="editableUser"
+        :is-loading="isProfileSubmitting"
         @submit="submitProfileChanges"
         @close="closeModal"
       />
