@@ -12,8 +12,8 @@ import { storeToRefs } from "pinia";
 import { changeCustomerPassword } from "@/api/commercetools/customer/changeCustomerPassword.ts";
 import { useAuthStore } from "@/store/useAuthStore.ts";
 import { login } from "@/api/commercetools/login.ts";
-import { useUserAddressStore } from "@/store/useUserAddressStore.ts";
 import { passwordErrorMessages } from "@/utils/errors/errorMessages.ts";
+import { sharedCustomer } from "@/store/sharedCustomer.ts";
 
 const authStore = useAuthStore();
 
@@ -88,8 +88,7 @@ const submitPasswordChange = async (
       password: newPassword,
     });
 
-    userProfileStore.setCustomer(result.customer);
-    useUserAddressStore().setCustomer(result.customer);
+    sharedCustomer.value = result.customer;
 
     showSuccess("Пароль успешно обновлён");
     closeModal();
