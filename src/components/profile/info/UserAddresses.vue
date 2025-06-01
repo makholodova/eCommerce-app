@@ -13,8 +13,12 @@ import { storeToRefs } from "pinia";
 
 const userAddressStore = useUserAddressStore();
 const { shippingAddresses, billingAddresses } = storeToRefs(userAddressStore);
-const { isDefaultShipping, isDefaultBilling, updateCustomerInfo } =
-  userAddressStore;
+const {
+  updateAddressActions,
+  isDefaultShipping,
+  isDefaultBilling,
+  updateCustomerInfo,
+} = userAddressStore;
 
 const { modalState, openModal, closeModal } = useModal();
 const defaultAddress: UIAddress = {
@@ -78,8 +82,31 @@ const onSubmitAddress = (address: UIAddress): void => {
   }
 };
 
-const onRemoveAddress = (id: string): void => {
-  console.log("Удаление адреса", id);
+const onRemoveShippingAddress = async (id: string): Promise<void> => {
+  try {
+    await updateAddressActions([
+      { action: "removeShippingAddressId", addressId: id },
+    ]);
+
+    showSuccess("Адрес удалён");
+  } catch (e) {
+    if (e instanceof Error) {
+      showError(`Ошибка удаления, ${e.message}`);
+    }
+  }
+};
+const onRemoveBillingAddress = async (id: string): Promise<void> => {
+  try {
+    await updateAddressActions([
+      { action: "removeBillingAddressId", addressId: id },
+    ]);
+
+    showSuccess("Адрес удалён");
+  } catch (e) {
+    if (e instanceof Error) {
+      showError(`Ошибка удаления, ${e.message}`);
+    }
+  }
 };
 </script>
 
@@ -99,7 +126,7 @@ const onRemoveAddress = (id: string): void => {
         :address="toUIAddressFromPlatform(address)"
         :is-default="isDefaultShipping"
         @edit="onEditAddress"
-        @remove="onRemoveAddress"
+        @remove="onRemoveShippingAddress"
         @default-toggle="toggleDefaultShipping"
       />
     </div>
@@ -116,7 +143,7 @@ const onRemoveAddress = (id: string): void => {
         :address="toUIAddressFromPlatform(address)"
         :is-default="isDefaultBilling"
         @edit="onEditAddress"
-        @remove="onRemoveAddress"
+        @remove="onRemoveBillingAddress"
         @default-toggle="toggleDefaultBilling"
       />
     </div>

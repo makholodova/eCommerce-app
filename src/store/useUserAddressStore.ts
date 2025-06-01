@@ -1,7 +1,11 @@
 ﻿import { computed } from "vue";
 import { defineStore } from "pinia";
-import type { Customer } from "@commercetools/platform-sdk";
+import type {
+  Customer,
+  CustomerUpdateAction,
+} from "@commercetools/platform-sdk";
 import { sharedCustomer } from "@/store/sharedCustomer.ts";
+import { updateCustomerProfile } from "@/api/commercetools/customer/updateCustomerProfile.ts";
 
 export const useUserAddressStore = defineStore(
   "userAddress",
@@ -44,8 +48,21 @@ export const useUserAddressStore = defineStore(
       };
     }
 
-    function setCustomer(data: Customer): void {
-      customer.value = data;
+    async function updateAddressActions(
+      actions: CustomerUpdateAction[],
+    ): Promise<void> {
+      if (!customer.value) return;
+
+      try {
+        const updated = await updateCustomerProfile(
+          customer.value.version,
+          actions,
+        );
+        customer.value = updated;
+      } catch (error) {
+        console.error("Не удалось обновить адреса:", error);
+        throw error;
+      }
     }
 
     return {
@@ -58,7 +75,7 @@ export const useUserAddressStore = defineStore(
       isDefaultShipping,
       isDefaultBilling,
       updateCustomerInfo,
-      setCustomer,
+      updateAddressActions,
     };
   },
   {
