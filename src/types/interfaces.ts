@@ -37,7 +37,8 @@ export interface ProductAdapter {
   id: string;
   title: string;
   description: string;
-  image?: string;
+  //image?: string;
+  images: string[];
   price: number | null;
   discountedPrice: number | null;
   discountedPercentage: number | null;

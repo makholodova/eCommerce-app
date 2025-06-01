@@ -86,10 +86,6 @@ function onSearchClick(): void {
   border-radius: 8px;
 }
 
-.input-search::placeholder {
-  color: #666;
-}
-
 .search--disabled {
   pointer-events: none;
   cursor: not-allowed;

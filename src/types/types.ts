@@ -18,3 +18,13 @@ export type UIAddress = {
   streetName?: string;
   postalCode?: string;
 };
+
+export type FilterData = {
+  selectedFilters: Record<string, Record<string, boolean>>;
+  priceMin: number | null;
+  priceMax: number | null;
+};
+
+export type FilterMap = {
+  [categoryKey: string]: FilterData;
+};
