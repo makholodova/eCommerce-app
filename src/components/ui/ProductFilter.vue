@@ -97,17 +97,23 @@ onMounted(() => initializeFiltersFromStore());
       <h3 class="title">Цена, ₽</h3>
       <div class="price-range">
         <input
+          id="price-min"
           v-model="priceMin"
+          name="priceMin"
           type="number"
           placeholder="от 4 500 ₽"
           class="price-input price-input-min"
+          autocomplete="off"
         />
         <div class="price-separator"></div>
         <input
+          id="price-max"
           v-model="priceMax"
+          name="priceMax"
           type="number"
           placeholder="до 300 500 ₽"
           class="price-input price-input-max"
+          autocomplete="off"
         />
       </div>
     </div>

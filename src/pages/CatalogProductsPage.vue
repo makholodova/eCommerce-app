@@ -23,6 +23,7 @@ import { useModal } from "@/composables/useModal";
 import { MOBILE_FILTER_BREAKPOINT } from "@/utils/constants";
 import { useFilterStore } from "@/store/useProductFilterStore";
 import { getDataFiltersForApi } from "@/utils/filters/filters";
+import ProductSort from "@/components/ui/ProductSort.vue";
 
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
@@ -135,7 +136,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <div class="container-products">
     <span class="breadcrumbs">Главная/Каталог/Смартфоны</span>
     <div class="toolbar">
       <div class="toolbar-nav">
@@ -149,15 +150,19 @@ onMounted(() => {
       </div>
       <SearchInput v-model="searchQuery" @search="handleSearchClick" />
     </div>
+    <ProductSort v-if="!isMobile" class="sort" />
     <div class="product">
       <ProductFilter
         v-if="!isMobile"
         :category="props.category"
         @update:filters="filters = $event"
       />
-      <div v-if="isMobile" class="product-filter" @click="openModal('filter')">
-        <img :src="IconFilter" alt="filter" class="filter-icon" />
-        <span>Фильтры</span>
+      <div v-if="isMobile" class="product-mobi">
+        <div class="product-filter" @click="openModal('filter')">
+          <img :src="IconFilter" alt="filter" class="filter-icon" />
+          <span>Фильтры</span>
+        </div>
+        <ProductSort class="sort" />
       </div>
       <BaseModal
         v-if="isMobile && modalState === 'filter'"
@@ -192,6 +197,11 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.container-products {
+  display: flex;
+  flex-direction: column;
+}
+
 .toolbar {
   display: flex;
   gap: clamp(40px, 9vw, 140px);
@@ -208,6 +218,11 @@ onMounted(() => {
 .arrow {
   cursor: pointer;
   width: clamp(8px, 2.5vw, 13px);
+}
+
+.sort {
+  padding: 0 40px 16px 0;
+  margin-left: auto;
 }
 
 .product-filter {
@@ -251,6 +266,17 @@ onMounted(() => {
 
   .product {
     flex-direction: column;
+  }
+
+  .sort {
+    padding: 0;
+    margin: 0;
+  }
+
+  .product-mobi {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
   }
 }
 </style>
