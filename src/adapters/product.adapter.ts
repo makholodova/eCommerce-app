@@ -65,7 +65,7 @@ export function productAdapter(product: ProductProjection): ProductAdapter {
     id: product.id,
     title: product.name?.ru ?? "",
     description: product.description?.ru ?? "",
-    image: product.masterVariant.images?.[0]?.url,
+    images: product.masterVariant.images?.map((img) => img.url) ?? [],
     price,
     discountedPrice,
     discountedPercentage,
