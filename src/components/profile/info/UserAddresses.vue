@@ -29,6 +29,7 @@ const defaultAddress: UIAddress = {
   streetName: "",
   postalCode: "",
 };
+const isSubmitting = ref(false);
 
 const addressToEdit = ref<UIAddress>({ ...defaultAddress });
 
@@ -98,6 +99,7 @@ const openEditAddressModal = (address: UIAddress): void => {
 };
 
 const onSubmitShippingAddress = async (address: UIAddress): Promise<void> => {
+  isSubmitting.value = true;
   try {
     const updatedCustomer = await updateAddressActions([
       { action: "addAddress", address: address },
@@ -117,9 +119,12 @@ const onSubmitShippingAddress = async (address: UIAddress): Promise<void> => {
     if (e instanceof Error) {
       showError(`Ошибка удаления, ${e.message}`);
     }
+  } finally {
+    isSubmitting.value = false;
   }
 };
 const onSubmitBillingAddress = async (address: UIAddress): Promise<void> => {
+  isSubmitting.value = true;
   try {
     const updatedCustomer = await updateAddressActions([
       { action: "addAddress", address: address },
@@ -139,10 +144,13 @@ const onSubmitBillingAddress = async (address: UIAddress): Promise<void> => {
     if (e instanceof Error) {
       showError(`Ошибка удаления, ${e.message}`);
     }
+  } finally {
+    isSubmitting.value = false;
   }
 };
 
 const onSubmitEditedAddress = async (address: UIAddress): Promise<void> => {
+  isSubmitting.value = true;
   try {
     await updateAddressActions([
       { action: "changeAddress", addressId: address.id, address: address },
@@ -154,7 +162,7 @@ const onSubmitEditedAddress = async (address: UIAddress): Promise<void> => {
       showError(`Не удалось обновить адрес, ${e.message}`);
     }
   } finally {
-    closeModal();
+    isSubmitting.value = false;
   }
 };
 
@@ -231,6 +239,7 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
       <UserAddressForm
         :address="addressToEdit"
         :countries="countries"
+        :is-loading="isSubmitting"
         @submit="onSubmitShippingAddress"
         @close="closeModal"
       />
@@ -245,6 +254,7 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
       <UserAddressForm
         :address="addressToEdit"
         :countries="countries"
+        :is-loading="isSubmitting"
         @submit="onSubmitBillingAddress"
         @close="closeModal"
       />
@@ -259,6 +269,7 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
       <UserAddressForm
         :address="addressToEdit"
         :countries="countries"
+        :is-loading="isSubmitting"
         @submit="onSubmitEditedAddress"
         @close="closeModal"
       />

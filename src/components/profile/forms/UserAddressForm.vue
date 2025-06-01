@@ -11,6 +11,7 @@ import { toFormFields, toUIAddress } from "@/adapters/address.adapter.ts";
 const props = defineProps<{
   address: UIAddress;
   countries: CountryOption[];
+  isLoading?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -41,21 +42,23 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
 <template>
   <div>
-    <form class="form-content" @submit.prevent="handleSubmit">
-      <AddressForm
-        v-model="formModel"
-        :countries="countries"
-        :rules="rules"
-        prefix="address"
-        title=""
-      />
-
+    <form @submit.prevent="handleSubmit">
+      <fieldset :disabled="isLoading" class="form-fieldset form-content">
+        <AddressForm
+          v-model="formModel"
+          :countries="countries"
+          :rules="rules"
+          prefix="address"
+          title=""
+        />
+      </fieldset>
       <div class="modal-actions">
         <BaseButton
           size="xl"
           text="Сохранить"
           type="submit"
-          :disabled="!isFormValid"
+          :is-loading="isLoading"
+          :disabled="!isFormValid || isLoading"
         />
         <BaseButton
           size="xl"
@@ -83,7 +86,11 @@ const isFormValid = computed(() => !v$.value.$invalid);
   justify-content: flex-end;
   gap: 0.5rem;
 }
-
+.form-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
 @media (max-width: 650px) {
   .form-content {
     grid-template-columns: repeat(1, 1fr);
