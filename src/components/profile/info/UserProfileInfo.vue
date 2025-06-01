@@ -24,6 +24,8 @@ const { updatePersonalInfo } = userProfileStore;
 
 const { modalState, openModal, closeModal } = useModal();
 
+const isPasswordSubmitting = ref(false);
+
 const personalInfo = computed(() => ({
   Имя: firstName.value,
   Фамилия: lastName.value,
@@ -73,7 +75,7 @@ const submitPasswordChange = async (
     showError("Не удалось получить данные пользователя");
     return;
   }
-
+  isPasswordSubmitting.value = true;
   try {
     await changeCustomerPassword({
       version: customer.value.version,
@@ -102,6 +104,8 @@ const submitPasswordChange = async (
     } else {
       showError("Произошла неизвестная ошибка. Попробуйте позже.");
     }
+  } finally {
+    isPasswordSubmitting.value = false;
   }
 };
 </script>
@@ -145,7 +149,11 @@ const submitPasswordChange = async (
       :is-open="true"
       @close="closeModal"
     >
-      <UserPasswordForm @submit="submitPasswordChange" @close="closeModal" />
+      <UserPasswordForm
+        :is-loading="isPasswordSubmitting"
+        @submit="submitPasswordChange"
+        @close="closeModal"
+      />
     </BaseModal>
   </div>
 </template>

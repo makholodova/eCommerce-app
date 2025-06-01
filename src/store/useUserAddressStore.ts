@@ -44,17 +44,12 @@ export const useUserAddressStore = defineStore(
     ): Promise<Customer> {
       if (!customer.value) throw new Error("Нет данных пользователя");
 
-      try {
-        const response = await updateCustomerProfile(
-          customer.value.version,
-          actions,
-        );
-        customer.value = response;
-        return response;
-      } catch (error) {
-        console.error("Не удалось обновить адреса:", error);
-        throw error;
-      }
+      const response = await updateCustomerProfile(
+        customer.value.version,
+        actions,
+      );
+      customer.value = response;
+      return response;
     }
 
     return {

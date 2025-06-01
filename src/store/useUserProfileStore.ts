@@ -38,16 +38,11 @@ export const useUserProfileStore = defineStore(
           action: "setDateOfBirth",
           dateOfBirth: data.dateOfBirth,
         });
-      try {
-        const updateCustomer = await updateCustomerProfile(
-          customer.value.version,
-          actions,
-        );
-        customer.value = updateCustomer;
-      } catch (error) {
-        console.error("Не удалось обновить профиль:", error);
-        throw error;
-      }
+      const updateCustomer = await updateCustomerProfile(
+        customer.value.version,
+        actions,
+      );
+      customer.value = updateCustomer;
     }
     function setCustomer(data: Customer): void {
       customer.value = data;
