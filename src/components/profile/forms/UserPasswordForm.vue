@@ -12,6 +12,10 @@ const form = reactive({
   confirmPassword: "",
 });
 
+const { isLoading = false } = defineProps<{
+  isLoading?: boolean;
+}>();
+
 const emit = defineEmits<{
   (e: "close"): void;
   (e: "submit", currentPassword: string, newPassword: string): void;
@@ -41,48 +45,50 @@ const isFormValid = computed(() => !v$.value.$invalid);
 <template>
   <div>
     <form class="form-content" @submit.prevent="handleSubmit">
-      <BaseInputField
-        id="current-password"
-        v-model="form.currentPassword"
-        name="currentPassword"
-        :vuelidate-rules="rules.currentPassword"
-        label="Текущий пароль"
-        placeholder="**********"
-        show-error
-        type="password"
-        autocomplete="current-password"
-      />
+      <fieldset :disabled="isLoading" class="form-fieldset">
+        <BaseInputField
+          id="current-password"
+          v-model="form.currentPassword"
+          name="currentPassword"
+          :vuelidate-rules="rules.currentPassword"
+          label="Текущий пароль"
+          placeholder="**********"
+          show-error
+          type="password"
+          autocomplete="current-password"
+        />
 
-      <BaseInputField
-        id="new-password"
-        v-model="form.newPassword"
-        name="newPassword"
-        :vuelidate-rules="rules.newPassword"
-        label="Новый пароль"
-        placeholder="**********"
-        show-error
-        type="password"
-        autocomplete="new-password"
-      />
+        <BaseInputField
+          id="new-password"
+          v-model="form.newPassword"
+          name="newPassword"
+          :vuelidate-rules="rules.newPassword"
+          label="Новый пароль"
+          placeholder="**********"
+          show-error
+          type="password"
+          autocomplete="new-password"
+        />
 
-      <BaseInputField
-        id="confirm-password"
-        v-model="form.confirmPassword"
-        name="confirmPassword"
-        :vuelidate-rules="rules.confirmPassword"
-        label="Подтверждение нового пароля"
-        placeholder="**********"
-        show-error
-        type="password"
-        autocomplete="confirm-password"
-      />
-
+        <BaseInputField
+          id="confirm-password"
+          v-model="form.confirmPassword"
+          name="confirmPassword"
+          :vuelidate-rules="rules.confirmPassword"
+          label="Подтверждение нового пароля"
+          placeholder="**********"
+          show-error
+          type="password"
+          autocomplete="confirm-password"
+        />
+      </fieldset>
       <div class="modal-actions">
         <BaseButton
           size="xl"
           text="Сохранить"
           type="submit"
-          :disabled="!isFormValid"
+          :is-loading="isLoading"
+          :disabled="!isFormValid || isLoading"
         />
         <BaseButton
           size="xl"
@@ -106,5 +112,10 @@ const isFormValid = computed(() => !v$.value.$invalid);
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+}
+.form-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
 }
 </style>
