@@ -1,4 +1,5 @@
 ﻿import { ref } from "vue";
+import { ref } from "vue";
 import type { Ref } from "vue";
 
 export type ModalType =
@@ -7,6 +8,7 @@ export type ModalType =
   | "address"
   | "addBilling"
   | "addShipping"
+  | "filter"
   | null;
 
 export function useModal(): {
