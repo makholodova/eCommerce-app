@@ -154,11 +154,12 @@ const breadcrumbsRoutes: breadCrumbType[] = [
 .image-wrapper {
   max-width: 411px;
   width: 100%;
-  min-width: 100px;
+  min-width: 267px;
   aspect-ratio: 4 / 3;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 .image-wrapper img {
   width: 100%;
