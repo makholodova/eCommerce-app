@@ -1,67 +1,64 @@
 ﻿<script lang="ts" setup>
 import { computed, ref } from "vue";
-import { useUserStore } from "@/store/useUserStore";
-import BaseButton from "@/components/ui/BaseButton.vue";
+import { useUserProfileStore } from "@/store/useUserProfileStore.ts";
 import { useModal } from "@/composables/useModal.ts";
-import type { UserFormModel } from "@/types/interfaces.ts";
-
-import UserEditForm from "@/components/profile/UserEditForm.vue";
-
-import PasswordEditForm from "@/components/profile/PasswordEditForm.vue";
-import BaseModal from "@/components/ui/BaseModal.vue";
 import { showError, showSuccess } from "@/utils/toast.ts";
+import UserProfileForm from "@/components/profile/forms/UserProfileForm.vue";
+import UserPasswordForm from "@/components/profile/forms/UserPasswordForm.vue";
+import BaseModal from "@/components/ui/BaseModal.vue";
+import BaseButton from "@/components/ui/BaseButton.vue";
+import type { UserFormModel } from "@/types/interfaces.ts";
+import { storeToRefs } from "pinia";
 
-const userStore = useUserStore();
+const userProfileStore = useUserProfileStore();
+const { firstName, lastName, email, dateOfBirth } =
+  storeToRefs(userProfileStore);
+const { updatePersonalInfo } = userProfileStore;
+
 const { modalState, openModal, closeModal } = useModal();
 
 const personalInfo = computed(() => ({
-  Имя: userStore.firstName,
-  Фамилия: userStore.lastName,
-  "E-mail": userStore.email,
-  "Дата рождения": userStore.dateOfBirth,
+  Имя: firstName.value,
+  Фамилия: lastName.value,
+  "E-mail": email.value,
+  "Дата рождения": dateOfBirth.value,
 }));
 
 const editableUser = ref<UserFormModel>({
-  firstName: userStore.firstName,
-  lastName: userStore.lastName,
-  email: userStore.email,
-  dateOfBirth: userStore.dateOfBirth,
+  firstName: firstName.value,
+  lastName: lastName.value,
+  email: email.value,
+  dateOfBirth: dateOfBirth.value,
 });
 
-console.log(editableUser.value);
-
-const onChangePassword = (): void => {
-  openModal("password");
-
-  console.log("Изменить пароль");
-};
-
-const onEdit = (): void => {
+const openProfileEditModal = (): void => {
   editableUser.value = {
-    firstName: userStore.firstName,
-    lastName: userStore.lastName,
-    email: userStore.email,
-    dateOfBirth: userStore.dateOfBirth,
+    firstName: firstName.value,
+    lastName: lastName.value,
+    email: email.value,
+    dateOfBirth: dateOfBirth.value,
   };
-
   openModal("edit");
-  console.log("Редактирование");
 };
 
-const onSubmitUserEdit = (): void => {
+const submitProfileChanges = async (): Promise<void> => {
   try {
-    //userStore.updateUser(editableUser.value))
+    await updatePersonalInfo(editableUser.value);
     showSuccess("Профиль успешно обновлён");
   } catch (e) {
-    // выводить конкретные ошибки
     if (e instanceof Error) {
-      showError(`Не удалось обновить профиль, ${e.message}`);
+      showError(e.message);
     }
   } finally {
     closeModal();
   }
 };
-const onSubmitPasswordEdit = (): void => {
+
+const openPasswordChangeModal = (): void => {
+  openModal("password");
+};
+
+const submitPasswordChange = (): void => {
   try {
     showSuccess("Пароль успешно обновлён");
   } catch (e) {
@@ -87,9 +84,13 @@ const onSubmitPasswordEdit = (): void => {
     <BaseButton
       text="Изменить пароль"
       type="button"
-      @click="onChangePassword"
+      @click="openPasswordChangeModal"
     />
-    <BaseButton text="Редактировать" type="button" @click="onEdit" />
+    <BaseButton
+      text="Редактировать профиль"
+      type="button"
+      @click="openProfileEditModal"
+    />
 
     <BaseModal
       v-if="modalState === 'edit'"
@@ -97,9 +98,9 @@ const onSubmitPasswordEdit = (): void => {
       :is-open="true"
       @close="closeModal"
     >
-      <UserEditForm
+      <UserProfileForm
         v-model="editableUser"
-        @submit="onSubmitUserEdit"
+        @submit="submitProfileChanges"
         @close="closeModal"
       />
     </BaseModal>
@@ -110,7 +111,7 @@ const onSubmitPasswordEdit = (): void => {
       :is-open="true"
       @close="closeModal"
     >
-      <PasswordEditForm @submit="onSubmitPasswordEdit" @close="closeModal" />
+      <UserPasswordForm @submit="submitPasswordChange" @close="closeModal" />
     </BaseModal>
   </div>
 </template>
@@ -119,7 +120,6 @@ const onSubmitPasswordEdit = (): void => {
 .profile-section {
   display: flex;
   flex-direction: column;
-  /*  align-items: center;*/
   gap: 2rem;
 }
 .profile-info {

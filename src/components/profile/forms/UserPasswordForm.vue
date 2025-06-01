@@ -36,14 +36,6 @@ const rules = computed(() => ({
   confirmPassword: authRules.password,
 }));
 
-/*confirmPassword: {
-    ...authRules.password,
-    sameAsNew: helpers.withMessage(
-      "Пароли не совпадают",
-      sameAs(() => form.newPassword)
-    )
-  }*/
-
 const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });
 
 const isFormValid = computed(() => !v$.value.$invalid);
