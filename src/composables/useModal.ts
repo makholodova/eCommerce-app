@@ -5,6 +5,7 @@ export type ModalType =
   | "edit"
   | "password"
   | "address"
+  | "filter"
   | "addBilling"
   | "addShipping"
   | null;
