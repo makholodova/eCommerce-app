@@ -1,15 +1,16 @@
-﻿import { computed, ref } from "vue";
+﻿import { computed } from "vue";
 import { defineStore } from "pinia";
 import type {
   Customer,
   CustomerUpdateAction,
 } from "@commercetools/platform-sdk";
 import { updateCustomerProfile } from "@/api/commercetools/customer/updateCustomerProfile.ts";
+import { sharedCustomer } from "@/store/sharedCustomer.ts";
 
 export const useUserProfileStore = defineStore(
-  "user",
+  "userProfile",
   () => {
-    const customer = ref<Customer | null>(null);
+    const customer = sharedCustomer;
 
     const firstName = computed(() => customer.value?.firstName ?? "");
     const lastName = computed(() => customer.value?.lastName ?? "");
@@ -48,6 +49,9 @@ export const useUserProfileStore = defineStore(
         throw error;
       }
     }
+    function setCustomer(data: Customer): void {
+      customer.value = data;
+    }
 
     return {
       customer,
@@ -56,6 +60,7 @@ export const useUserProfileStore = defineStore(
       dateOfBirth,
       email,
       updatePersonalInfo,
+      setCustomer,
     };
   },
   {

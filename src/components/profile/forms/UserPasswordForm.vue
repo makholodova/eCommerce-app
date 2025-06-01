@@ -14,26 +14,22 @@ const form = reactive({
 
 const emit = defineEmits<{
   (e: "close"): void;
-  (
-    e: "submit",
-    payload: { currentPassword: string; newPassword: string },
-  ): void;
+  (e: "submit", currentPassword: string, newPassword: string): void;
 }>();
 
 async function handleSubmit(): Promise<void> {
   const isValid = await v$.value.$validate();
   if (!isValid) return;
-
-  emit("submit", {
-    currentPassword: form.currentPassword,
-    newPassword: form.newPassword,
-  });
+  emit("submit", form.currentPassword, form.newPassword);
 }
 
 const rules = computed(() => ({
   currentPassword: authRules.password,
   newPassword: authRules.password,
-  confirmPassword: authRules.password,
+  confirmPassword: {
+    ...authRules.password,
+    sameAsNew: authRules.sameAsPassword(() => form.newPassword),
+  },
 }));
 
 const v$ = useVuelidate(rules, form, { $lazy: true, $autoDirty: true });

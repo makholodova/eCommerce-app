@@ -1,4 +1,10 @@
-import { email, helpers, minLength, required } from "@vuelidate/validators";
+import {
+  email,
+  helpers,
+  minLength,
+  required,
+  sameAs,
+} from "@vuelidate/validators";
 import {
   digitRegExp,
   lowercaseRegExp,
@@ -9,6 +15,7 @@ import {
   whitespaceRegExp,
 } from "@/utils/baseRegEx.ts";
 import { normalizeDate } from "@/utils/date.ts";
+import type { ValidationRule } from "@vuelidate/core";
 
 const allowedCountries = ["RU"];
 
@@ -58,6 +65,8 @@ export const authRules = {
       helpers.regex(whitespaceRegExp),
     ),
   },
+  sameAsPassword: (getNewPassword: () => string): ValidationRule =>
+    helpers.withMessage("Пароли не совпадают", sameAs(getNewPassword())),
 };
 
 export const personalInfoRules = {

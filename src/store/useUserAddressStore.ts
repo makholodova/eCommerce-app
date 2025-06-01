@@ -1,11 +1,12 @@
-﻿import { computed, ref } from "vue";
+﻿import { computed } from "vue";
 import { defineStore } from "pinia";
 import type { Customer } from "@commercetools/platform-sdk";
+import { sharedCustomer } from "@/store/sharedCustomer.ts";
 
 export const useUserAddressStore = defineStore(
-  "user",
+  "userAddress",
   () => {
-    const customer = ref<Customer | null>(null);
+    const customer = sharedCustomer;
 
     const addresses = computed(() => customer.value?.addresses ?? []);
 
@@ -43,6 +44,10 @@ export const useUserAddressStore = defineStore(
       };
     }
 
+    function setCustomer(data: Customer): void {
+      customer.value = data;
+    }
+
     return {
       customer,
       addresses,
@@ -53,6 +58,7 @@ export const useUserAddressStore = defineStore(
       isDefaultShipping,
       isDefaultBilling,
       updateCustomerInfo,
+      setCustomer,
     };
   },
   {
