@@ -1,11 +1,11 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import type { FilterType } from "@/types/types";
+import type { FilterMap } from "@/types/types";
 
 export const useFilterStore = defineStore(
   "filters",
   () => {
-    const filtersMap = ref<FilterType>({});
+    const filtersMap = ref<FilterMap>({});
 
     function setFilters(
       category: string,

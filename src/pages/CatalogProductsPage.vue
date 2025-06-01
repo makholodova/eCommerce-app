@@ -2,6 +2,7 @@
 import { onMounted, ref, computed, watch } from "vue";
 import { useEventListener } from "@vueuse/core";
 import { useRouter } from "vue-router";
+import type { ProductProjection } from "@commercetools/platform-sdk";
 import ProductCard from "@/components/ui/ProductCard.vue";
 import { getCategoryByKey } from "@/api/commercetools/products/categories";
 import {
@@ -9,7 +10,6 @@ import {
   searchProductsInCategory,
   getFilteredProducts,
 } from "@/api/commercetools/products/products";
-import type { ProductProjection } from "@commercetools/platform-sdk";
 import { productAdapter } from "@/adapters/product.adapter";
 import { useAuthStore } from "@/store/useAuthStore";
 import IconArrow from "@/assets/icons/icon-arrow.png";
@@ -22,6 +22,7 @@ import BaseModal from "@/components/ui/BaseModal.vue";
 import { useModal } from "@/composables/useModal";
 import { MOBILE_FILTER_BREAKPOINT } from "@/utils/constants";
 import { useFilterStore } from "@/store/useProductFilterStore";
+import { getDataFiltersForApi } from "@/utils/filters/filters";
 
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
@@ -33,42 +34,6 @@ const isMobile = ref(window.innerWidth <= MOBILE_FILTER_BREAKPOINT);
 const { modalState, openModal, closeModal } = useModal();
 
 const filterStore = useFilterStore();
-
-function getFiltersForApi(
-  category: string,
-): Record<string, string[] | number> | null {
-  const { selectedFilters, priceMin, priceMax } =
-    filterStore.getFilters(category);
-
-  const hasAnySelected = Object.keys(selectedFilters).some((group) =>
-    Object.values(selectedFilters[group] ?? {}).includes(true),
-  );
-
-  const hasFilters = hasAnySelected || priceMin !== null || priceMax !== null;
-
-  if (!hasFilters) return null;
-
-  const filtersForApi: Record<string, string[] | number> = {};
-
-  for (const [group, options] of Object.entries(selectedFilters)) {
-    const selected = Object.entries(options)
-      .filter(([, isChecked]) => isChecked)
-      .map(([key]) => key);
-
-    if (selected.length > 0) {
-      filtersForApi[group] = selected;
-    }
-  }
-
-  if (priceMin !== null) {
-    filtersForApi.priceMin = priceMin;
-  }
-  if (priceMax !== null) {
-    filtersForApi.priceMax = priceMax;
-  }
-
-  return filtersForApi;
-}
 
 const categoryTitles: Record<string, string> = {
   smartphones: "Смартфоны",
@@ -113,13 +78,13 @@ async function loadInitialProducts(): Promise<void> {
   isLoaded.value = false;
 
   const productsResult = await getCategoryId((categoryId) => {
-    const filtersForApi = getFiltersForApi(props.category);
+    const filters = filterStore.getFilters(props.category);
+    console.log("filters ", filters);
+    const filtersForApi = getDataFiltersForApi(filters);
 
-    if (filtersForApi) {
-      return getFilteredProducts(categoryId, filtersForApi);
-    } else {
-      return getProductsCategory(categoryId);
-    }
+    return filtersForApi
+      ? getFilteredProducts(categoryId, filtersForApi)
+      : getProductsCategory(categoryId);
   });
 
   products.value = productsResult?.results ?? [];
@@ -132,14 +97,7 @@ async function handleSearchClick(query: string): Promise<void> {
   const productsResult = await getCategoryId((categoryId) =>
     searchProductsInCategory(categoryId, query),
   );
-  if (productsResult) {
-    //products.value = productsResult?.results ?? [];
-    console.log("productsResult ", productsResult);
-    products.value = productsResult.results;
-    console.log("products.value ", products.value);
-  } else {
-    products.value = [];
-  }
+  products.value = productsResult?.results ?? [];
   isLoaded.value = true;
 }
 
@@ -156,14 +114,14 @@ watch(filters, async (newFilters) => {
   isLoaded.value = true;
 });
 
+useEventListener("resize", () => {
+  isMobile.value = window.innerWidth <= MOBILE_FILTER_BREAKPOINT;
+});
+
 const normalizedProducts = computed(() => products.value.map(productAdapter));
 
 onMounted(() => {
   loadInitialProducts();
-});
-
-useEventListener("resize", () => {
-  isMobile.value = window.innerWidth <= 812;
 });
 </script>
 

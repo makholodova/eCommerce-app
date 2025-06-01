@@ -1,10 +1,14 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import BaseCheckbox from "./BaseCheckbox.vue";
-import { productFilters, filterLabels } from "@/utils/dataProductFilters";
+import {
+  productFilters,
+  filterLabels,
+} from "@/utils/filters/dataProductFilters";
 import BaseButton from "./BaseButton.vue";
 import { useFilterStore } from "@/store/useProductFilterStore";
-import IconCross from "@/assets/icons/icon-cross1.svg";
+import IconCross from "@/assets/icons/icon-cross.svg";
+import { convertFiltersToApiFormat } from "@/utils/filters/filters";
 
 const filterStore = useFilterStore();
 
@@ -22,28 +26,13 @@ const selectedFilters = ref<Record<string, Record<string, boolean>>>({});
 const priceMin = ref<number | null>(null);
 const priceMax = ref<number | null>(null);
 
+console.log("selectedFilters ", selectedFilters);
+
 for (const [groupName, options] of Object.entries(productFilters)) {
   selectedFilters.value[groupName] = {};
   for (const option of options) {
     selectedFilters.value[groupName][option.key] = false;
   }
-}
-
-function collectFilters(
-  filters: Record<string, Record<string, boolean>>,
-): Record<string, string[]> {
-  const result: Record<string, string[]> = {};
-
-  for (const [group, values] of Object.entries(filters)) {
-    const selected = Object.entries(values)
-      .filter(([, isChecked]) => isChecked)
-      .map(([key]) => key);
-
-    if (selected.length > 0) {
-      result[group] = selected;
-    }
-  }
-  return result;
 }
 
 function initializeFiltersFromStore(): void {
@@ -80,34 +69,16 @@ function resetFilters(): void {
 }
 
 function applyFilters(): void {
-  console.log("применить");
-
-  const checkBoxFilters = collectFilters(selectedFilters.value);
-
-  console.log("checkBoxFilters ", checkBoxFilters);
-
-  const activeFilters: Record<string, string[] | number> = {
-    ...checkBoxFilters,
-  };
-
-  console.log("activeFilters ", activeFilters);
-
-  if (priceMin.value !== null) {
-    activeFilters.priceMin = priceMin.value;
-  }
-  if (priceMax.value !== null) {
-    activeFilters.priceMax = priceMax.value;
-  }
-
-  console.log("activeFilters ", activeFilters);
-
-  filterStore.setFilters(props.category, {
+  const filterData = {
     selectedFilters: selectedFilters.value,
     priceMin: priceMin.value,
     priceMax: priceMax.value,
-  });
+  };
 
-  emit("update:filters", activeFilters);
+  filterStore.setFilters(props.category, filterData);
+  const filtersForApi = convertFiltersToApiFormat(filterData);
+
+  emit("update:filters", filtersForApi);
 
   if (props.isMobile && props.onClose) {
     props.onClose();
