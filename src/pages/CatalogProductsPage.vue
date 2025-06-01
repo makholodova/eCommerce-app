@@ -23,6 +23,7 @@ import { useFilterStore } from "@/store/useProductFilterStore";
 import { getDataFiltersForApi } from "@/utils/filters/filters";
 import type { breadCrumbType } from "@/types/user-login.types";
 import BaseBreadcrumbs from "@/components/ui/BaseBreadcrumbs.vue";
+import ProductSort from "@/components/ui/ProductSort.vue";
 
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
@@ -151,15 +152,19 @@ if (title.value) {
     <div class="toolbar">
       <SearchInput v-model="searchQuery" @search="handleSearchClick" />
     </div>
+    <ProductSort v-if="!isMobile" class="sort" />
     <div class="product">
       <ProductFilter
         v-if="!isMobile"
         :category="props.category"
         @update:filters="filters = $event"
       />
-      <div v-if="isMobile" class="product-filter" @click="openModal('filter')">
-        <img :src="IconFilter" alt="filter" class="filter-icon" />
-        <span>Фильтры</span>
+      <div v-if="isMobile" class="product-mobi">
+        <div class="product-filter" @click="openModal('filter')">
+          <img :src="IconFilter" alt="filter" class="filter-icon" />
+          <span>Фильтры</span>
+        </div>
+        <ProductSort class="sort" />
       </div>
       <BaseModal
         v-if="isMobile && modalState === 'filter'"
@@ -216,6 +221,11 @@ if (title.value) {
   width: clamp(8px, 2.5vw, 13px);
 }
 
+.sort {
+  padding: 0 40px 16px 0;
+  margin-left: auto;
+}
+
 .product-filter {
   display: flex;
   gap: 6px;
@@ -257,6 +267,17 @@ if (title.value) {
 
   .product {
     flex-direction: column;
+  }
+
+  .sort {
+    padding: 0;
+    margin: 0;
+  }
+
+  .product-mobi {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
   }
 }
 </style>
