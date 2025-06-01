@@ -39,15 +39,6 @@ export const useUserAddressStore = defineStore(
     const isDefaultBilling = (addressId: string | undefined): boolean =>
       addressId === defaultBillingId.value;
 
-    function updateCustomerInfo(data: Partial<Customer>): void {
-      if (!customer.value) return;
-
-      customer.value = {
-        ...customer.value,
-        ...data,
-      };
-    }
-
     async function updateAddressActions(
       actions: CustomerUpdateAction[],
     ): Promise<Customer> {
@@ -75,7 +66,6 @@ export const useUserAddressStore = defineStore(
       defaultBillingId,
       isDefaultShipping,
       isDefaultBilling,
-      updateCustomerInfo,
       updateAddressActions,
     };
   },

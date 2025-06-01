@@ -12,13 +12,14 @@ import type { CountryOption } from "@/types/interfaces.ts";
 import { storeToRefs } from "pinia";
 
 const userAddressStore = useUserAddressStore();
-const { shippingAddresses, billingAddresses } = storeToRefs(userAddressStore);
 const {
-  updateAddressActions,
-  isDefaultShipping,
-  isDefaultBilling,
-  updateCustomerInfo,
-} = userAddressStore;
+  shippingAddresses,
+  billingAddresses,
+  defaultShippingId,
+  defaultBillingId,
+} = storeToRefs(userAddressStore);
+const { updateAddressActions, isDefaultShipping, isDefaultBilling } =
+  userAddressStore;
 
 const { modalState, openModal, closeModal } = useModal();
 const defaultAddress: UIAddress = {
@@ -33,18 +34,52 @@ const addressToEdit = ref<UIAddress>({ ...defaultAddress });
 
 const countries = ref<CountryOption[]>([{ title: "RU", value: "Россия" }]); //нужно брать из комерзтоолс наверно
 
-const toggleDefaultShipping = (id: string): void => {
-  const current = userAddressStore.defaultShippingId;
-  userAddressStore.updateCustomerInfo({
-    defaultShippingAddressId: current === id ? undefined : id,
-  });
+const toggleDefaultShipping = async (id: string): Promise<void> => {
+  const isDefault = defaultShippingId.value === id;
+  const newDefaultId = isDefault ? undefined : id;
+
+  try {
+    await updateAddressActions([
+      {
+        action: "setDefaultShippingAddress",
+        addressId: newDefaultId,
+      },
+    ]);
+    showSuccess(
+      isDefault
+        ? "Адрес снят как адрес доставки по умолчанию"
+        : "Установлен новый адрес доставки по умолчанию",
+    );
+  } catch (e) {
+    if (e instanceof Error) {
+      showError(`Не удалось изменить адрес доставки: ${e.message}`);
+    }
+  }
 };
 
-const toggleDefaultBilling = (id: string): void => {
-  const current = userAddressStore.defaultBillingId;
-  updateCustomerInfo({
-    defaultBillingAddressId: current === id ? undefined : id,
-  });
+const toggleDefaultBilling = async (id: string): Promise<void> => {
+  const isDefault = defaultBillingId.value === id;
+  const newDefaultId = isDefault ? undefined : id;
+
+  try {
+    await updateAddressActions([
+      {
+        action: "setDefaultBillingAddress",
+        addressId: newDefaultId,
+      },
+    ]);
+    showSuccess(
+      isDefault
+        ? "Адрес снят как адрес для выставления счета по умолчанию"
+        : "Установлен новый адрес для выставления счета по умолчанию",
+    );
+  } catch (e) {
+    if (e instanceof Error) {
+      showError(
+        `Не удалось изменить адрес для выставления счета: ${e.message}`,
+      );
+    }
+  }
 };
 
 const openAddShippingModal = (): void => {
@@ -163,7 +198,7 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
         v-for="address in shippingAddresses"
         :key="address.id"
         :address="toUIAddressFromPlatform(address)"
-        :is-default="isDefaultShipping"
+        :is-default="isDefaultShipping(address.id)"
         @edit="openEditAddressModal"
         @remove="onRemoveShippingAddress"
         @default-toggle="toggleDefaultShipping"
@@ -180,7 +215,7 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
         v-for="address in billingAddresses"
         :key="address.id"
         :address="toUIAddressFromPlatform(address)"
-        :is-default="isDefaultBilling"
+        :is-default="isDefaultBilling(address.id)"
         @edit="openEditAddressModal"
         @remove="onRemoveBillingAddress"
         @default-toggle="toggleDefaultBilling"
