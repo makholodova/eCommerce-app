@@ -36,51 +36,6 @@ export function buildFilterQuery(
   return filterQuery;
 }
 
-/*export async function searchProductsInCategory(
-  categoryId: string,
-  query: string,
-  filters: Record<string, string[] | number> = {},
-): Promise<ProductProjectionPagedSearchResponse> {
-  const trimmedQuery = query.trim();
-  const fuzzyLevel =
-    trimmedQuery.length <= 2 ? 0 : trimmedQuery.length === 3 ? 1 : 2;
-
-  const filterQuery = buildFilterQuery(categoryId, filters);
-
-  console.log("filterQuery search ", filterQuery);
-
-  const response = await api.get("/product-projections/search", {
-    params: {
-      "filter.query": filterQuery,
-      "text.ru": `*${trimmedQuery}*`,
-      fuzzy: true,
-      fuzzyLevel,
-    },
-  });
-  console.log("Ответ с товарами фильтр+поиск: ", response.data);
-  return response.data;
-}
-
-export async function getFilteredProducts(
-  categoryId: string,
-  filters: Record<string, string[] | number>,
-): Promise<ProductProjectionPagedSearchResponse> {
-  const filterQuery = buildFilterQuery(categoryId, filters);
-
-  console.log("filterQuery ", filterQuery);
-
-  const response = await api.get("/product-projections/search", {
-    params: {
-      "filter.query": filterQuery,
-    },
-    paramsSerializer: {
-      indexes: false,
-    },
-  });
-  console.log("Ответ с товарами: ", response.data);
-  return response.data;
-}*/
-
 function buildSortParams(sort?: string): Record<string, string> {
   if (!sort) return {};
   const params: Record<string, string> = { sort };
