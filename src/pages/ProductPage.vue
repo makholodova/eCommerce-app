@@ -29,11 +29,12 @@ const product = ref<ProductAdapter | null>(null);
 const category = computed(() => {
   return window.history.state?.category || "";
 });
-const productID = route.params.productId;
+const rawProductID = route.params.productId;
+const productID = Array.isArray(rawProductID) ? rawProductID[0] : rawProductID;
 
 onMounted(async () => {
   try {
-    const response = await api.get(`/product-projections/${productID}`);
+    const response = await api.get(`/product-projections/${rawProductID}`);
     product.value = productAdapter(response.data);
   } catch {
     router.push({ name: "notFoundPage" });
@@ -75,7 +76,7 @@ breadcrumbsRoutes.push({
   routeName: "Product",
   breadcrumbName: "Карточка товара",
   params: {
-    productId: productID[0],
+    productId: productID,
   },
 });
 </script>
