@@ -9,6 +9,7 @@ import { productAdapter } from "@/adapters/product.adapter";
 import type { ProductAdapter } from "@/types/interfaces";
 import api from "@/api/commercetools/axiosInstance";
 import { useRouter } from "vue-router";
+import BaseModal from "@/components/ui/BaseModal.vue";
 
 enum DeviceFieldRu {
   brand = "Бренд",
@@ -31,7 +32,7 @@ const category = computed(() => {
 });
 const rawProductID = route.params.productId;
 const productID = Array.isArray(rawProductID) ? rawProductID[0] : rawProductID;
-
+const isOpen = ref(false);
 onMounted(async () => {
   try {
     const response = await api.get(`/product-projections/${rawProductID}`);
@@ -49,7 +50,33 @@ const currentImage = computed(() => {
   return product.value?.images?.[currentImageIndex.value] ?? "";
 });
 
+const modalCurrentImageIndex = ref<number>(currentImageIndex.value);
+
+const setModalImage = computed(() => {
+  return product.value?.images?.[modalCurrentImageIndex.value] ?? "";
+});
+
+function showPreviousImage(): void {
+  if (modalCurrentImageIndex.value === 0) return;
+  modalCurrentImageIndex.value -= 1;
+}
+
+function showNextImage(): void {
+  if (product.value?.images) {
+    if (modalCurrentImageIndex.value === product.value?.images?.length - 1)
+      return;
+  }
+  modalCurrentImageIndex.value += 1;
+}
+
 const isDiscounted = computed(() => !!product.value?.discountedPrice);
+
+const isFirstPage = computed<boolean>(() => modalCurrentImageIndex.value === 0);
+
+const isLastPage = computed<boolean>(() => {
+  const length = product.value?.images?.length || 0;
+  return modalCurrentImageIndex.value === length - 1;
+});
 
 const breadcrumbsRoutes: breadCrumbType[] = [
   {
@@ -72,6 +99,10 @@ if (category.value) {
   });
 }
 
+const multipleImages = computed(() => {
+  return product.value?.images ? product?.value.images.length > 0 : false;
+});
+
 breadcrumbsRoutes.push({
   routeName: "Product",
   breadcrumbName: "Карточка товара",
@@ -79,16 +110,104 @@ breadcrumbsRoutes.push({
     productId: productID,
   },
 });
+
+function closeModal(): void {
+  isOpen.value = false;
+  modalCurrentImageIndex.value = currentImageIndex.value;
+}
+function openModal(): void {
+  isOpen.value = true;
+  modalCurrentImageIndex.value = currentImageIndex.value;
+}
 </script>
 
 <template>
   <div>
+    <BaseModal
+      v-if="isOpen"
+      :is-open="isOpen"
+      title=""
+      :close-btn-needed="true"
+      @close="closeModal"
+    >
+      <div
+        v-if="multipleImages"
+        class="back-arrow arrow"
+        @click="showPreviousImage"
+      >
+        <svg
+          :class="{ disabled: isFirstPage }"
+          width="40"
+          height="40"
+          viewBox="0 0 52 52"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            x="-1"
+            y="1"
+            width="50"
+            height="50"
+            rx="25"
+            transform="matrix(-1 0 0 1 50 0)"
+            stroke="#091d9e"
+            stroke-width="2"
+          />
+          <path
+            d="M32 16L20.9418 24.7544C20.4519 25.1423 20.4337 25.8795 20.904 26.291L32 36"
+            stroke="#091d9e"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+      <div
+        v-if="multipleImages"
+        class="forward-arrow arrow"
+        @click="showNextImage"
+      >
+        <svg
+          :class="{ disabled: isLastPage }"
+          width="40"
+          height="40"
+          viewBox="0 0 52 52"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            x="1"
+            y="1"
+            width="50"
+            height="50"
+            rx="25"
+            stroke="#091d9e"
+            stroke-width="2"
+          />
+          <path
+            d="M20 16L31.0582 24.7544C31.5481 25.1423 31.5663 25.8795 31.096 26.291L20 36"
+            stroke="#091d9e"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+      <div class="modal-images-wrapper">
+        <transition name="fade" mode="out-in">
+          <img
+            v-if="setModalImage"
+            :key="setModalImage"
+            :src="setModalImage"
+            alt="product image"
+          />
+        </transition>
+      </div>
+    </BaseModal>
     <BaseSpinner v-if="!product" />
     <div v-else class="product-page">
       <BaseBreadcrumbs :breadcrumbs="breadcrumbsRoutes" />
       <div class="product-card-wrapper">
         <div class="image-block">
-          <div class="image-wrapper">
+          <div class="image-wrapper" @click="openModal">
             <transition name="fade" mode="out-in">
               <img
                 v-if="currentImage"
@@ -154,6 +273,54 @@ breadcrumbsRoutes.push({
     background-color: var(--grey-dark);
     transform: background-color 0.4s;
   }
+}
+.back-arrow {
+  left: 0;
+}
+.forward-arrow {
+  right: 0;
+}
+.arrow {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: 40px;
+  height: auto;
+  z-index: 1000;
+}
+.arrow img {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+}
+
+svg.disabled path,
+svg.disabled rect {
+  stroke: var(--grey-light);
+}
+.disabled {
+  pointer-events: none;
+}
+
+.modal-images-wrapper {
+  max-width: 550px;
+  width: 100%;
+  /* aspect-ratio: 4 / 3; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  position: relative;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  z-index: 100;
+}
+.modal-images-wrapper img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
 }
 .price-block {
   width: 267px;
