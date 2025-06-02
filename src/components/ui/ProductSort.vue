@@ -10,6 +10,10 @@ const sortTitles = [
   { name: "alphabetically", label: "По наименованию" },
 ];
 
+const emit = defineEmits<{
+  (e: "update:sortType", value: string): void;
+}>();
+
 const selectedSort = ref<string>("");
 console.log("selectedSort ", selectedSort);
 const isSortOpen = ref<boolean>(false);
@@ -22,7 +26,7 @@ function cancelSort(): void {
   console.log("Отменить");
 }
 function applySort(): void {
-  console.log("Применить");
+  emit("update:sortType", selectedSort.value);
 }
 </script>
 

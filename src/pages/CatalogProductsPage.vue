@@ -24,12 +24,14 @@ import { MOBILE_FILTER_BREAKPOINT } from "@/utils/constants";
 import { useFilterStore } from "@/store/useProductFilterStore";
 import { getDataFiltersForApi } from "@/utils/filters/filters";
 import ProductSort from "@/components/ui/ProductSort.vue";
+import { sortApiMap } from "@/utils/filters/filters";
 
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
 const searchQuery = ref<string>("");
 const isLoaded = ref(false);
 const filters = ref<Record<string, string[] | number>>({});
+const sortType = ref<string>("");
 const isMobile = ref(window.innerWidth <= MOBILE_FILTER_BREAKPOINT);
 
 const { modalState, openModal, closeModal } = useModal();
@@ -107,7 +109,7 @@ watch(searchQuery, async (newQuery) => {
   if (newQuery === "") await loadInitialProducts();
 });
 
-watch(filters, async (newFilters) => {
+/*watch(filters, async (newFilters) => {
   isLoaded.value = false;
   const productsResult = await getCategoryId((categoryId) => {
     if (searchQuery.value.trim()) {
@@ -122,7 +124,33 @@ watch(filters, async (newFilters) => {
   });
   products.value = productsResult?.results ?? [];
   isLoaded.value = true;
+});*/
+
+watch([filters, sortType], async ([newFilters, newSort]) => {
+  isLoaded.value = false;
+  const sortParam = newSort ? sortApiMap[newSort] : "";
+  const productsResult = await getCategoryId((categoryId) => {
+    if (searchQuery.value.trim()) {
+      return searchProductsInCategory(
+        categoryId,
+        searchQuery.value,
+        newFilters,
+        sortParam,
+      );
+    } else {
+      return getFilteredProducts(categoryId, newFilters, sortParam);
+    }
+  });
+
+  products.value = productsResult?.results ?? [];
+  isLoaded.value = true;
 });
+
+/*watch(sortType, async (newSort) => {
+  console.log(newSort);
+  const sortParam = newSort ? sortApiMap[newSort] : "";
+  console.log(sortParam);
+});*/
 
 useEventListener("resize", () => {
   isMobile.value = window.innerWidth <= MOBILE_FILTER_BREAKPOINT;
@@ -150,7 +178,11 @@ onMounted(() => {
       </div>
       <SearchInput v-model="searchQuery" @search="handleSearchClick" />
     </div>
-    <ProductSort v-if="!isMobile" class="sort" />
+    <ProductSort
+      v-if="!isMobile"
+      class="sort"
+      @update:sort-type="sortType = $event"
+    />
     <div class="product">
       <ProductFilter
         v-if="!isMobile"
@@ -230,7 +262,6 @@ onMounted(() => {
   gap: 6px;
   cursor: pointer;
   align-items: center;
-  /*margin-left: auto;*/
 }
 
 .filter-icon {

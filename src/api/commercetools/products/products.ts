@@ -36,7 +36,7 @@ export function buildFilterQuery(
   return filterQuery;
 }
 
-export async function searchProductsInCategory(
+/*export async function searchProductsInCategory(
   categoryId: string,
   query: string,
   filters: Record<string, string[] | number> = {},
@@ -78,5 +78,63 @@ export async function getFilteredProducts(
     },
   });
   console.log("Ответ с товарами: ", response.data);
+  return response.data;
+}*/
+
+function buildSortParams(sort?: string): Record<string, string> {
+  if (!sort) return {};
+  const params: Record<string, string> = { sort };
+  if (sort.startsWith("price")) {
+    params.priceCurrency = "RUB";
+    params.priceCountry = "RU";
+  }
+  return params;
+}
+
+export async function searchProductsInCategory(
+  categoryId: string,
+  query: string,
+  filters: Record<string, string[] | number> = {},
+  sort?: string,
+): Promise<ProductProjectionPagedSearchResponse> {
+  const trimmedQuery = query.trim();
+  const fuzzyLevel =
+    trimmedQuery.length <= 2 ? 0 : trimmedQuery.length === 3 ? 1 : 2;
+
+  const filterQuery = buildFilterQuery(categoryId, filters);
+
+  console.log("filterQuery search ", filterQuery);
+
+  const response = await api.get("/product-projections/search", {
+    params: {
+      "filter.query": filterQuery,
+      "text.ru": `*${trimmedQuery}*`,
+      fuzzy: true,
+      fuzzyLevel,
+      ...buildSortParams(sort),
+    },
+  });
+
+  console.log("ответ searchProductsInCategory ", response.data);
+  return response.data;
+}
+
+export async function getFilteredProducts(
+  categoryId: string,
+  filters: Record<string, string[] | number>,
+  sort?: string,
+): Promise<ProductProjectionPagedSearchResponse> {
+  const filterQuery = buildFilterQuery(categoryId, filters);
+
+  console.log("filterQuery ", filterQuery);
+
+  const response = await api.get("/product-projections/search", {
+    params: {
+      "filter.query": filterQuery,
+      ...buildSortParams(sort),
+    },
+    paramsSerializer: { indexes: false },
+  });
+  console.log("ответ getFilteredProducts ", response.data);
   return response.data;
 }
