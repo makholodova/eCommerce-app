@@ -247,8 +247,8 @@ breadcrumbsRoutes.push({
 }
 .attributes-title {
   font-weight: 400;
-  font-size: clamp(16px, 1vw, 32px);
-  margin-top: 0;
+  font-size: clamp(16px, 5vw, 32px);
+  margin-top: 20px;
 }
 .attributes-block {
   flex: 1 1 0;
@@ -259,9 +259,10 @@ breadcrumbsRoutes.push({
 .attribute-wrapper {
   display: flex;
   gap: 20px;
+  margin-top: 20px;
   flex-direction: column;
   font-weight: 300;
-  font-size: clamp(14px, 3vw, 18px);
+  font-size: clamp(14px, 5vw, 18px);
   color: var(--grey-dark);
   margin-top: 32px;
   max-width: 354px;
@@ -286,10 +287,15 @@ breadcrumbsRoutes.push({
   transition: background-color 0.4s;
   background-color: var(--grey-dark);
 }
-@media screen and (max-width: 350px) {
+@media screen and (max-width: 660px) {
   .product-card-wrapper {
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  h1.title {
+    text-align: center;
   }
   .price-block {
     padding: 0;
