@@ -65,9 +65,16 @@ export const authRules = {
       helpers.regex(whitespaceRegExp),
     ),
   },
-  sameAsPassword: (getNewPassword: () => string): ValidationRule =>
-    helpers.withMessage("Пароли не совпадают", sameAs(getNewPassword())),
 };
+
+export const sameAsPassword = (
+  getPassword: () => string,
+): { sameAsPassword: ValidationRule } => ({
+  sameAsPassword: helpers.withMessage(
+    "Пароли не совпадают",
+    sameAs(getPassword()),
+  ),
+});
 
 export const personalInfoRules = {
   firstName: {
