@@ -45,6 +45,8 @@ const currentImage = computed(() => {
   return product.value?.images?.[currentImageIndex.value] ?? "";
 });
 
+const isDiscounted = computed(() => !!product.value?.discountedPrice);
+
 const breadcrumbsRoutes: breadCrumbType[] = [
   {
     routeName: "Main",
@@ -77,6 +79,9 @@ const breadcrumbsRoutes: breadCrumbType[] = [
                 alt="product image"
               />
             </transition>
+            <div v-if="isDiscounted" class="card-img-discounted-icon">
+              -{{ product.discountedPercentage }}%
+            </div>
           </div>
           <div v-if="product.images.length > 0" class="toggle-wrapper">
             <span
@@ -105,7 +110,16 @@ const breadcrumbsRoutes: breadCrumbType[] = [
         </div>
 
         <div class="price-block">
-          <BaseButton />
+          <div v-if="isDiscounted" class="card-price">
+            <div class="card-current-price">{{ product.price }} ₽</div>
+            <div class="card-discounted-price">
+              {{ product.discountedPrice }} ₽
+            </div>
+          </div>
+          <div v-else class="card-price">
+            <div class="card-current-price">{{ product.price }} ₽</div>
+          </div>
+          <base-button class="cart-btn" text="В корзину"></base-button>
         </div>
       </div>
     </div>
@@ -113,14 +127,55 @@ const breadcrumbsRoutes: breadCrumbType[] = [
 </template>
 
 <style scoped>
+* {
+  padding: 0;
+  margin: 0;
+}
 @media (hover: hover) {
   .toggle:hover {
     background-color: var(--grey-dark);
     transform: background-color 0.4s;
   }
 }
-.product-card-wrapper {
-  padding: 30px 8px;
+.price-block {
+  width: 267px;
+  padding: 40px;
+  background-color: var(--grey-lighter);
+  display: flex;
+  gap: 28px;
+  height: 185px;
+  flex-direction: column;
+  border-radius: 8px;
+}
+.card-img-discounted-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 65px;
+  height: 45px;
+  background-color: #ebba1a;
+  font-weight: 400;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+.cart-btn {
+  padding: 15px 60px;
+}
+.card-current-price {
+  font-weight: 500;
+  text-align: left;
+  font-size: 24px;
+}
+.card-discounted-price {
+  font-weight: 300;
+  font-size: 14px;
+  text-decoration: line-through;
+  color: var(--grey);
+  align-self: flex-end;
+  text-align: center;
 }
 .toggle {
   width: 20px;
@@ -152,55 +207,86 @@ const breadcrumbsRoutes: breadCrumbType[] = [
   cursor: pointer;
 }
 .image-wrapper {
-  width: 411px;
+  max-width: 411px;
   min-width: 267px;
+  /* aspect-ratio: 4 / 3; */
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  height: 308px;
+  background-color: white;
+  position: relative;
+  flex: 0 0 auto;
+  border-radius: 8px;
 }
 .image-wrapper img {
   width: 100%;
   height: 100%;
-  aspect-ratio: 4 / 3;
   object-fit: contain;
+  border-radius: 8px;
   display: block;
 }
 .attributes-title {
   font-weight: 400;
-  font-size: 32px;
+  font-size: clamp(16px, 1vw, 32px);
   margin-top: 0;
 }
-.attribute-wrapper {
-  font-weight: 300;
-  font-size: 18px;
-  color: var(--grey-dark);
-  flex-shrink: 1;
+.attributes-block {
+  flex: 1 1 0;
+  min-width: 300px;
+  max-width: 360px;
 }
 
 .attribute-wrapper {
   display: flex;
   gap: 20px;
   flex-direction: column;
+  font-weight: 300;
+  font-size: clamp(14px, 3vw, 18px);
+  color: var(--grey-dark);
+  margin-top: 32px;
+  max-width: 354px;
 }
 .attribute-item {
   display: flex;
   gap: 20px;
 }
 .product-page {
-  padding-top: clamp(8px, 5vw, 30px);
+  padding-top: clamp(8px, 3vw, 30px);
 }
 .product-card-wrapper {
   display: flex;
-  gap: clamp(8px, 5vw, 110px);
+  justify-content: space-between;
+  padding: 30px 0;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .active {
   transition: background-color 0.4s;
   background-color: var(--grey-dark);
 }
-
-h1.title {
-  margin-top: 0;
+@media screen and (max-width: 350px) {
+  .product-card-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+  .price-block {
+    padding: 0;
+    background-color: transparent;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-grow: 1;
+    width: 100%;
+    height: auto;
+  }
+  .card-current-price {
+    font-size: 20px;
+  }
+  .card-price {
+    flex-grow: 1;
+  }
 }
 </style>
