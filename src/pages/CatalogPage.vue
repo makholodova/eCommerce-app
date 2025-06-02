@@ -9,6 +9,8 @@ import { checkValidSession } from "@/utils/validSession";
 import { useAuthStore } from "@/store/useAuthStore";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
 import { productErrorMessages } from "@/utils/errors/errorMessages";
+import BaseBreadcrumbs from "@/components/ui/BaseBreadcrumbs.vue";
+import type { breadCrumbType } from "@/types/user-login.types";
 
 const categories = [
   { name: "smartphones", label: "Смартфоны", image: "smartphone.png" },
@@ -53,13 +55,23 @@ const normalizedPopularProducts = computed(() =>
 onMounted(() => {
   loadInitialProducts();
 });
+
+const breadcrumbsRoutes: breadCrumbType[] = [
+  {
+    routeName: "Main",
+    breadcrumbName: "Главная",
+  },
+  {
+    routeName: "Catalog",
+    breadcrumbName: "Каталог",
+  },
+];
 </script>
 
 <template>
   <div class="container">
-    <span class="breadcrumbs">Главная/Каталог</span>
+    <BaseBreadcrumbs :breadcrumbs="breadcrumbsRoutes" />
     <div class="container-wrap">
-      <h2 class="subtitle">Каталог</h2>
       <div class="catalog">
         <router-link
           v-for="item in categories"
@@ -102,6 +114,7 @@ onMounted(() => {
 <style scoped>
 .container {
   gap: 32px;
+  padding-top: clamp(8px, 3vw, 30px);
 }
 
 .breadcrumbs {

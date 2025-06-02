@@ -49,6 +49,7 @@ const routes = [
     name: "Product",
     component: () => import("@/pages/ProductPage.vue"),
     props: true,
+    meta: { requires: "productExists" },
   },
 ];
 
@@ -57,9 +58,8 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, _, next) => {
+router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
-
   if (to.meta.requires === "unAuth" && authStore.isAuthenticated) {
     return next({ name: "Main" });
   }
@@ -67,6 +67,12 @@ router.beforeEach((to, _, next) => {
   if (to.meta.requires === "Auth" && !authStore.isAuthenticated) {
     return next({ name: "Main" });
   }
+
+  // if (to.meta.requires === "productExists") {
+  //   const productId = to.params.productId;
+  //   const response = await api.get(`products/${productId}`);
+  //   if (response.status !== 200) return next({ name: "notFoundPage" });
+  // }
 
   next();
 });

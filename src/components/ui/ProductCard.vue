@@ -9,6 +9,7 @@ const props = defineProps<{
   image?: string;
   description?: string;
   price?: number;
+  category?: string;
   discountedPrice?: number;
   discountedPercentage?: number;
 }>();
@@ -19,10 +20,11 @@ function redirectToProductPage(): void {
   router.push({
     name: "Product",
     params: { productId: props.id },
+    state: { category: props.category || "" },
   });
 }
 function addToCart(): void {
-  console.log("cart");
+  // add to card
 }
 </script>
 
@@ -60,9 +62,7 @@ function addToCart(): void {
 @media (hover: hover) and (pointer: fine) {
   .card {
     transform: scale(1);
-    transition:
-      transform 0.3s ease-in,
-      box-shadow 0.3s ease-in;
+    transition: all 0.3s ease-in;
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0);
   }
   .card:hover {

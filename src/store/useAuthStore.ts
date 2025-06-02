@@ -35,7 +35,6 @@ export const useAuthStore = defineStore("auth", () => {
         return true;
       }
     } catch {
-      console.log("не удалось обновить токен");
       return false;
     } finally {
       isRefreshing = false;
@@ -93,8 +92,6 @@ export const useAuthStore = defineStore("auth", () => {
       }
 
       const data = await response.json();
-
-      console.log(data + "новые данные");
 
       tokenStore.setTokenStore({
         token: data["access_token"],
