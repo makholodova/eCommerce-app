@@ -261,6 +261,11 @@ if (title.value) {
   gap: 10px;
   flex-wrap: wrap;
 }
+.sort {
+  padding: 0 40px 16px 0;
+  display: flex;
+  justify-content: flex-end;
+}
 
 @media (max-width: 862px) {
   .product {

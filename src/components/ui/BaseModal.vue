@@ -52,11 +52,24 @@ watch(
   border-radius: 8px;
   min-width: 320px;
   max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
 }
 
 .modal-title {
   font-weight: 500;
   text-align: center;
   font-size: 22px;
+}
+.modal-window::-webkit-scrollbar {
+  width: 8px;
+}
+.modal-window::-webkit-scrollbar-track {
+  background: transparent;
+}
+.modal-window::-webkit-scrollbar-thumb {
+  background-color: var(--grey-light);
+  border-radius: 4px;
 }
 </style>
