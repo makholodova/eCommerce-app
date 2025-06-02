@@ -73,7 +73,6 @@ async function loadProducts(query?: string): Promise<void> {
 
   const productsResult = await getCategoryId((categoryId) => {
     const filters = filterStore.getFilters(props.category);
-    console.log("filters ", filters);
     const filtersForApi = getDataFiltersForApi(filters);
 
     if (query) {
@@ -214,9 +213,6 @@ if (title.value) {
 </template>
 
 <style scoped>
-.wrapper {
-  padding-top: clamp(8px, 3vw, 30px);
-}
 .wrapper {
   padding-top: clamp(8px, 3vw, 30px);
 }

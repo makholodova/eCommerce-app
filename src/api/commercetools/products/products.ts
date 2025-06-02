@@ -58,8 +58,6 @@ export async function searchProductsInCategory(
 
   const filterQuery = buildFilterQuery(categoryId, filters);
 
-  console.log("filterQuery search ", filterQuery);
-
   const response = await api.get("/product-projections/search", {
     params: {
       "filter.query": filterQuery,
@@ -69,8 +67,6 @@ export async function searchProductsInCategory(
       ...buildSortParams(sort),
     },
   });
-
-  console.log("ответ searchProductsInCategory ", response.data);
   return response.data;
 }
 
@@ -81,8 +77,6 @@ export async function getFilteredProducts(
 ): Promise<ProductProjectionPagedSearchResponse> {
   const filterQuery = buildFilterQuery(categoryId, filters);
 
-  console.log("filterQuery ", filterQuery);
-
   const response = await api.get("/product-projections/search", {
     params: {
       "filter.query": filterQuery,
@@ -90,6 +84,5 @@ export async function getFilteredProducts(
     },
     paramsSerializer: { indexes: false },
   });
-  console.log("ответ getFilteredProducts ", response.data);
   return response.data;
 }

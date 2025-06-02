@@ -26,8 +26,6 @@ const selectedFilters = ref<Record<string, Record<string, boolean>>>({});
 const priceMin = ref<number | null>(null);
 const priceMax = ref<number | null>(null);
 
-console.log("selectedFilters ", selectedFilters);
-
 for (const [groupName, options] of Object.entries(productFilters)) {
   selectedFilters.value[groupName] = {};
   for (const option of options) {
