@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import IconSort from "@/assets/icons/icon-sort.png";
 import BaseRadio from "./BaseRadio.vue";
 import BaseButton from "./BaseButton.vue";
@@ -10,23 +10,36 @@ const sortTitles = [
   { name: "alphabetically", label: "По наименованию" },
 ];
 
+const props = defineProps<{
+  sortType: string;
+}>();
+
 const emit = defineEmits<{
   (e: "update:sortType", value: string): void;
 }>();
 
-const selectedSort = ref<string>("");
-console.log("selectedSort ", selectedSort);
+const selectedSort = ref<string>(props.sortType);
 const isSortOpen = ref<boolean>(false);
+
+watch(
+  () => props.sortType,
+  (newValue) => {
+    selectedSort.value = newValue ?? "";
+  },
+);
 
 const toggleSort = (): void => {
   isSortOpen.value = !isSortOpen.value;
 };
 
 function cancelSort(): void {
-  console.log("Отменить");
+  selectedSort.value = "";
+  emit("update:sortType", "");
+  isSortOpen.value = false;
 }
 function applySort(): void {
   emit("update:sortType", selectedSort.value);
+  isSortOpen.value = false;
 }
 </script>
 
@@ -43,6 +56,7 @@ function applySort(): void {
           v-model="selectedSort"
           :name="sort.name"
           :label="sort.label"
+          :value="sort.name"
         />
       </div>
       <div class="sort-control">

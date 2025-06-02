@@ -109,23 +109,6 @@ watch(searchQuery, async (newQuery) => {
   if (newQuery === "") await loadInitialProducts();
 });
 
-/*watch(filters, async (newFilters) => {
-  isLoaded.value = false;
-  const productsResult = await getCategoryId((categoryId) => {
-    if (searchQuery.value.trim()) {
-      return searchProductsInCategory(
-        categoryId,
-        searchQuery.value,
-        newFilters,
-      );
-    } else {
-      return getFilteredProducts(categoryId, newFilters);
-    }
-  });
-  products.value = productsResult?.results ?? [];
-  isLoaded.value = true;
-});*/
-
 watch([filters, sortType], async ([newFilters, newSort]) => {
   isLoaded.value = false;
   const sortParam = newSort ? sortApiMap[newSort] : "";
@@ -145,12 +128,6 @@ watch([filters, sortType], async ([newFilters, newSort]) => {
   products.value = productsResult?.results ?? [];
   isLoaded.value = true;
 });
-
-/*watch(sortType, async (newSort) => {
-  console.log(newSort);
-  const sortParam = newSort ? sortApiMap[newSort] : "";
-  console.log(sortParam);
-});*/
 
 useEventListener("resize", () => {
   isMobile.value = window.innerWidth <= MOBILE_FILTER_BREAKPOINT;
@@ -181,6 +158,7 @@ onMounted(() => {
     <ProductSort
       v-if="!isMobile"
       class="sort"
+      :sort-type="sortType"
       @update:sort-type="sortType = $event"
     />
     <div class="product">
@@ -194,7 +172,11 @@ onMounted(() => {
           <img :src="IconFilter" alt="filter" class="filter-icon" />
           <span>Фильтры</span>
         </div>
-        <ProductSort class="sort" />
+        <ProductSort
+          class="sort"
+          :sort-type="sortType"
+          @update:sort-type="sortType = $event"
+        />
       </div>
       <BaseModal
         v-if="isMobile && modalState === 'filter'"
