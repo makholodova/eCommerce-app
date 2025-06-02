@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 type ButtonProps = {
   text: string;
-  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  size?: "xs-s" | "xs" | "sm" | "md" | "lg" | "xl";
   type?: "button" | "submit";
   disabled?: boolean;
   isLoading?: boolean;
@@ -75,6 +75,12 @@ const {
 .size-xs {
   max-width: 96px;
   height: 34px;
+  font-size: 14px;
+}
+
+.size-xs-s {
+  max-width: 80px;
+  height: 30px;
   font-size: 12px;
 }
 

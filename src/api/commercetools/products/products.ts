@@ -36,10 +36,21 @@ export function buildFilterQuery(
   return filterQuery;
 }
 
+function buildSortParams(sort?: string): Record<string, string> {
+  if (!sort) return {};
+  const params: Record<string, string> = { sort };
+  if (sort.startsWith("price")) {
+    params.priceCurrency = "RUB";
+    params.priceCountry = "RU";
+  }
+  return params;
+}
+
 export async function searchProductsInCategory(
   categoryId: string,
   query: string,
   filters: Record<string, string[] | number> = {},
+  sort?: string,
 ): Promise<ProductProjectionPagedSearchResponse> {
   const trimmedQuery = query.trim();
   const fuzzyLevel =
@@ -47,36 +58,31 @@ export async function searchProductsInCategory(
 
   const filterQuery = buildFilterQuery(categoryId, filters);
 
-  console.log("filterQuery search ", filterQuery);
-
   const response = await api.get("/product-projections/search", {
     params: {
       "filter.query": filterQuery,
       "text.ru": `*${trimmedQuery}*`,
       fuzzy: true,
       fuzzyLevel,
+      ...buildSortParams(sort),
     },
   });
-  console.log("Ответ с товарами фильтр+поиск: ", response.data);
   return response.data;
 }
 
 export async function getFilteredProducts(
   categoryId: string,
   filters: Record<string, string[] | number>,
+  sort?: string,
 ): Promise<ProductProjectionPagedSearchResponse> {
   const filterQuery = buildFilterQuery(categoryId, filters);
-
-  console.log("filterQuery ", filterQuery);
 
   const response = await api.get("/product-projections/search", {
     params: {
       "filter.query": filterQuery,
+      ...buildSortParams(sort),
     },
-    paramsSerializer: {
-      indexes: false,
-    },
+    paramsSerializer: { indexes: false },
   });
-  console.log("Ответ с товарами: ", response.data);
   return response.data;
 }

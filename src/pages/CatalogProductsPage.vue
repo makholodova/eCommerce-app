@@ -23,12 +23,15 @@ import { useModal } from "@/composables/useModal";
 import { MOBILE_FILTER_BREAKPOINT } from "@/utils/constants";
 import { useFilterStore } from "@/store/useProductFilterStore";
 import { getDataFiltersForApi } from "@/utils/filters/filters";
+import ProductSort from "@/components/ui/ProductSort.vue";
+import { sortApiMap } from "@/utils/filters/filters";
 
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
 const searchQuery = ref<string>("");
 const isLoaded = ref(false);
 const filters = ref<Record<string, string[] | number>>({});
+const sortType = ref<string>("");
 const isMobile = ref(window.innerWidth <= MOBILE_FILTER_BREAKPOINT);
 
 const { modalState, openModal, closeModal } = useModal();
@@ -79,7 +82,6 @@ async function loadProducts(query?: string): Promise<void> {
 
   const productsResult = await getCategoryId((categoryId) => {
     const filters = filterStore.getFilters(props.category);
-    console.log("filters ", filters);
     const filtersForApi = getDataFiltersForApi(filters);
 
     if (query) {
@@ -106,19 +108,22 @@ watch(searchQuery, async (newQuery) => {
   if (newQuery === "") await loadInitialProducts();
 });
 
-watch(filters, async (newFilters) => {
+watch([filters, sortType], async ([newFilters, newSort]) => {
   isLoaded.value = false;
+  const sortParam = newSort ? sortApiMap[newSort] : "";
   const productsResult = await getCategoryId((categoryId) => {
     if (searchQuery.value.trim()) {
       return searchProductsInCategory(
         categoryId,
         searchQuery.value,
         newFilters,
+        sortParam,
       );
     } else {
-      return getFilteredProducts(categoryId, newFilters);
+      return getFilteredProducts(categoryId, newFilters, sortParam);
     }
   });
+
   products.value = productsResult?.results ?? [];
   isLoaded.value = true;
 });
@@ -135,7 +140,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <div class="container-products">
     <span class="breadcrumbs">Главная/Каталог/Смартфоны</span>
     <div class="toolbar">
       <div class="toolbar-nav">
@@ -149,15 +154,28 @@ onMounted(() => {
       </div>
       <SearchInput v-model="searchQuery" @search="handleSearchClick" />
     </div>
+    <ProductSort
+      v-if="!isMobile"
+      class="sort"
+      :sort-type="sortType"
+      @update:sort-type="sortType = $event"
+    />
     <div class="product">
       <ProductFilter
         v-if="!isMobile"
         :category="props.category"
         @update:filters="filters = $event"
       />
-      <div v-if="isMobile" class="product-filter" @click="openModal('filter')">
-        <img :src="IconFilter" alt="filter" class="filter-icon" />
-        <span>Фильтры</span>
+      <div v-if="isMobile" class="product-mobi">
+        <div class="product-filter" @click="openModal('filter')">
+          <img :src="IconFilter" alt="filter" class="filter-icon" />
+          <span>Фильтры</span>
+        </div>
+        <ProductSort
+          class="sort"
+          :sort-type="sortType"
+          @update:sort-type="sortType = $event"
+        />
       </div>
       <BaseModal
         v-if="isMobile && modalState === 'filter'"
@@ -192,6 +210,11 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.container-products {
+  display: flex;
+  flex-direction: column;
+}
+
 .toolbar {
   display: flex;
   gap: clamp(40px, 9vw, 140px);
@@ -210,12 +233,16 @@ onMounted(() => {
   width: clamp(8px, 2.5vw, 13px);
 }
 
+.sort {
+  padding: 0 40px 16px 0;
+  margin-left: auto;
+}
+
 .product-filter {
   display: flex;
   gap: 6px;
   cursor: pointer;
   align-items: center;
-  /*margin-left: auto;*/
 }
 
 .filter-icon {
@@ -251,6 +278,17 @@ onMounted(() => {
 
   .product {
     flex-direction: column;
+  }
+
+  .sort {
+    padding: 0;
+    margin: 0;
+  }
+
+  .product-mobi {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
   }
 }
 </style>

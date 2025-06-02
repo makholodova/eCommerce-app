@@ -26,8 +26,6 @@ const selectedFilters = ref<Record<string, Record<string, boolean>>>({});
 const priceMin = ref<number | null>(null);
 const priceMax = ref<number | null>(null);
 
-console.log("selectedFilters ", selectedFilters);
-
 for (const [groupName, options] of Object.entries(productFilters)) {
   selectedFilters.value[groupName] = {};
   for (const option of options) {
@@ -97,17 +95,23 @@ onMounted(() => initializeFiltersFromStore());
       <h3 class="title">Цена, ₽</h3>
       <div class="price-range">
         <input
+          id="price-min"
           v-model="priceMin"
+          name="priceMin"
           type="number"
           placeholder="от 4 500 ₽"
           class="price-input price-input-min"
+          autocomplete="off"
         />
         <div class="price-separator"></div>
         <input
+          id="price-max"
           v-model="priceMax"
+          name="priceMax"
           type="number"
           placeholder="до 300 500 ₽"
           class="price-input price-input-max"
+          autocomplete="off"
         />
       </div>
     </div>
@@ -153,6 +157,21 @@ onMounted(() => initializeFiltersFromStore());
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background-color: var(--grey-light);
+  border-radius: 4px;
 }
 
 .filter-checkbox {

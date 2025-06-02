@@ -24,10 +24,13 @@ function onSearchClick(): void {
       </button>
     </div>
     <input
+      id="search"
       v-model="inputValue"
+      name="search"
       type="text"
       placeholder="Поиск..."
       class="input-search"
+      autocomplete="off"
       @keydown.enter="onSearchClick"
     />
   </div>
