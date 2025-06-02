@@ -130,6 +130,67 @@ function openModal(): void {
       :close-btn-needed="true"
       @close="closeModal"
     >
+      <div
+        v-if="multipleImages"
+        class="back-arrow arrow"
+        @click="showPreviousImage"
+      >
+        <svg
+          :class="{ disabled: isFirstPage }"
+          width="40"
+          height="40"
+          viewBox="0 0 52 52"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            x="-1"
+            y="1"
+            width="50"
+            height="50"
+            rx="25"
+            transform="matrix(-1 0 0 1 50 0)"
+            stroke="#091d9e"
+            stroke-width="2"
+          />
+          <path
+            d="M32 16L20.9418 24.7544C20.4519 25.1423 20.4337 25.8795 20.904 26.291L32 36"
+            stroke="#091d9e"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+      <div
+        v-if="multipleImages"
+        class="forward-arrow arrow"
+        @click="showNextImage"
+      >
+        <svg
+          :class="{ disabled: isLastPage }"
+          width="40"
+          height="40"
+          viewBox="0 0 52 52"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            x="1"
+            y="1"
+            width="50"
+            height="50"
+            rx="25"
+            stroke="#091d9e"
+            stroke-width="2"
+          />
+          <path
+            d="M20 16L31.0582 24.7544C31.5481 25.1423 31.5663 25.8795 31.096 26.291L20 36"
+            stroke="#091d9e"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
       <div class="modal-images-wrapper">
         <transition name="fade" mode="out-in">
           <img
@@ -139,67 +200,6 @@ function openModal(): void {
             alt="product image"
           />
         </transition>
-        <div
-          v-if="multipleImages"
-          class="back-arrow arrow"
-          @click="showPreviousImage"
-        >
-          <svg
-            :class="{ disabled: isFirstPage }"
-            width="40"
-            height="40"
-            viewBox="0 0 52 52"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              x="-1"
-              y="1"
-              width="50"
-              height="50"
-              rx="25"
-              transform="matrix(-1 0 0 1 50 0)"
-              stroke="#091d9e"
-              stroke-width="2"
-            />
-            <path
-              d="M32 16L20.9418 24.7544C20.4519 25.1423 20.4337 25.8795 20.904 26.291L32 36"
-              stroke="#091d9e"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
-        </div>
-        <div
-          v-if="multipleImages"
-          class="forward-arrow arrow"
-          @click="showNextImage"
-        >
-          <svg
-            :class="{ disabled: isLastPage }"
-            width="40"
-            height="40"
-            viewBox="0 0 52 52"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              x="1"
-              y="1"
-              width="50"
-              height="50"
-              rx="25"
-              stroke="#091d9e"
-              stroke-width="2"
-            />
-            <path
-              d="M20 16L31.0582 24.7544C31.5481 25.1423 31.5663 25.8795 31.096 26.291L20 36"
-              stroke="#091d9e"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
-        </div>
       </div>
     </BaseModal>
     <BaseSpinner v-if="!product" />
