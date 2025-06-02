@@ -40,3 +40,9 @@ export function getDataFiltersForApi(
     ? convertFiltersToApiFormat(filterData)
     : null;
 }
+
+export const sortApiMap: Record<string, string> = {
+  ascending: "price asc",
+  descending: "price desc",
+  alphabetically: "name.ru asc",
+};
