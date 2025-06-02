@@ -129,10 +129,10 @@ breadcrumbsRoutes.push({
 
         <div class="price-block">
           <div v-if="isDiscounted" class="card-price">
-            <div class="card-current-price">{{ product.price }} ₽</div>
-            <div class="card-discounted-price">
+            <div class="card-current-price">
               {{ product.discountedPrice }} ₽
             </div>
+            <div class="card-discounted-price">{{ product.price }} ₽</div>
           </div>
           <div v-else class="card-price">
             <div class="card-current-price">{{ product.price }} ₽</div>
