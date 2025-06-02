@@ -26,11 +26,14 @@ const route = useRoute();
 const router = useRouter();
 const currentImageIndex = ref<number>(0);
 const product = ref<ProductAdapter | null>(null);
+const category = computed(() => {
+  return window.history.state?.category || "";
+});
+const productID = route.params.productId;
 
 onMounted(async () => {
   try {
-    const productUD = route.params.productId;
-    const response = await api.get(`/product-projections/${productUD}`);
+    const response = await api.get(`/product-projections/${productID}`);
     product.value = productAdapter(response.data);
   } catch {
     router.push({ name: "notFoundPage" });
@@ -56,11 +59,25 @@ const breadcrumbsRoutes: breadCrumbType[] = [
     routeName: "Catalog",
     breadcrumbName: "каталог",
   },
-  {
-    routeName: "Catalog",
-    breadcrumbName: "Карточка товара",
-  },
 ];
+
+if (category.value) {
+  breadcrumbsRoutes.push({
+    routeName: "CatalogCategory",
+    breadcrumbName: category.value,
+    params: {
+      category: category.value,
+    },
+  });
+}
+
+breadcrumbsRoutes.push({
+  routeName: "Product",
+  breadcrumbName: "Карточка товара",
+  params: {
+    productID: productID[0],
+  },
+});
 </script>
 
 <template>

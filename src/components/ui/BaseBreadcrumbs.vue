@@ -1,13 +1,23 @@
 <script lang="ts" setup>
 import arrowIcon from "@/assets/icons/icon-arrow.png";
 import type { breadCrumbType } from "@/types/user-login.types";
+import { computed } from "vue";
 
 const props = defineProps<{
   breadcrumbs: breadCrumbType[];
 }>();
 
-const previousPage =
-  props.breadcrumbs[props.breadcrumbs.length - 2] || props.breadcrumbs[0];
+const translatedCategory: Record<string, string> = {
+  tablets: "Планшеты",
+  laptops: "Ноутбуки",
+  smartphones: "Смартфоны",
+};
+
+const previousPage = computed(() => {
+  return (
+    props.breadcrumbs[props.breadcrumbs.length - 2] || props.breadcrumbs[0]
+  );
+});
 </script>
 
 <template>
@@ -16,16 +26,31 @@ const previousPage =
       <router-link
         v-for="(breadcrumbRoute, inx) in breadcrumbs"
         :key="inx"
-        :to="{ name: breadcrumbRoute.routeName }"
+        :to="
+          breadcrumbRoute.params
+            ? {
+                name: breadcrumbRoute.routeName,
+                params: breadcrumbRoute.params,
+              }
+            : { name: breadcrumbRoute.routeName }
+        "
         :class="{ 'previous-pages': inx !== breadcrumbs.length - 1 }"
         >{{
-          breadcrumbRoute.breadcrumbName +
+          (translatedCategory[breadcrumbRoute.breadcrumbName] ||
+            breadcrumbRoute.breadcrumbName) +
           `${inx !== breadcrumbs.length - 1 ? " / " : ""}`
         }}
       </router-link>
     </div>
     <router-link
-      :to="{ name: previousPage.routeName }"
+      :to="
+        previousPage.params
+          ? {
+              name: previousPage.routeName,
+              params: previousPage.params,
+            }
+          : { name: previousPage.routeName }
+      "
       class="current-page-wrapper"
     >
       <img

@@ -178,6 +178,7 @@ onMounted(() => {
           v-for="product in normalizedProducts"
           :id="product.id"
           :key="product.id"
+          :category="category"
           :title="product.title"
           :image="product.images[0]"
           :description="`${product.description} ${product.attributes.rom} ${product.attributes.color}`"

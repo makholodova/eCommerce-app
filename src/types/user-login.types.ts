@@ -16,5 +16,5 @@ export type breadCrumbType = {
     | "Register"
     | "Login";
   breadcrumbName: string;
-  params?: string;
+  params?: Record<string, string>;
 };
