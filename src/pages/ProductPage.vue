@@ -303,13 +303,12 @@ svg.disabled rect {
 }
 
 .modal-images-wrapper {
-  max-width: 90vw;
-  min-width: 70vw;
-  aspect-ratio: 4 / 3;
+  max-width: 550px;
+  width: 100%;
+  /* aspect-ratio: 4 / 3; */
   display: flex;
   align-items: center;
   justify-content: center;
-  max-height: 90vh;
   background-color: white;
   position: relative;
   flex: 0 0 auto;
@@ -318,7 +317,7 @@ svg.disabled rect {
 }
 .modal-images-wrapper img {
   width: 100%;
-  height: 100%;
+  height: auto;
   object-fit: contain;
   border-radius: 8px;
   display: block;
