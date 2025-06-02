@@ -1,6 +1,6 @@
 ﻿<script lang="ts" setup>
 import { computed, reactive } from "vue";
-import { authRules } from "@/utils/validation.ts";
+import { authRules, sameAsPassword } from "@/utils/validation.ts";
 import BaseInputField from "@/components/ui/BaseInputField.vue";
 
 import useVuelidate from "@vuelidate/core";
@@ -32,7 +32,8 @@ const rules = computed(() => ({
   newPassword: authRules.password,
   confirmPassword: {
     ...authRules.password,
-    sameAsNew: authRules.sameAsPassword(() => form.newPassword),
+    /*sameAsNew: authRules.sameAsPassword(() => form.newPassword),*/
+    ...sameAsPassword(() => form.newPassword),
   },
 }));
 
