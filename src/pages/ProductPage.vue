@@ -281,6 +281,7 @@ const breadcrumbsRoutes: breadCrumbType[] = [
     flex-grow: 1;
     width: 100%;
     height: auto;
+    flex-wrap: wrap;
   }
   .card-current-price {
     font-size: 20px;
