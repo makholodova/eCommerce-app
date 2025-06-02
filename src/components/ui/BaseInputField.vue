@@ -58,6 +58,7 @@ const errorMessage = computed(() => {
           {
             invalid: v$.inputValue.$error,
             valid: inputValue && !v$.inputValue.$error,
+            'has-password-toggle': type === 'password',
           },
         ]"
         :placeholder
@@ -70,7 +71,7 @@ const errorMessage = computed(() => {
       />
     </span>
     <span
-      v-if="showError"
+      v-show="showError"
       :class="{ visible: v$.inputValue.$error }"
       class="error-text"
       >{{ errorMessage }}</span
@@ -132,10 +133,13 @@ input[type="date"].base-input {
   padding-right: 34px;
 }
 
+.base-input.has-password-toggle {
+  padding-right: 68px;
+}
 .error-text {
   color: var(--red);
   font-size: 0.7rem;
-  min-height: 1rem;
+  min-height: 2rem;
   transition: opacity 0.2s ease;
   opacity: 0;
 }

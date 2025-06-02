@@ -28,8 +28,6 @@ export function convertFiltersToApiFormat(
   if (filters.priceMin !== null) filtersForApi.priceMin = filters.priceMin;
   if (filters.priceMax !== null) filtersForApi.priceMax = filters.priceMax;
 
-  console.log("filtersForApi ", filtersForApi);
-
   return filtersForApi;
 }
 

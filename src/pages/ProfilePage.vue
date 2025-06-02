@@ -1,15 +1,15 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-import ProfileTabs from "@/components/profile/ProfileTabs.vue";
-import PersonalInfo from "@/components/profile/PersonalInfo.vue";
-import UserAddresses from "@/components/profile/UserAddresses.vue";
 import { TabKey } from "@/types/enums.ts";
+import ProfileTabs from "@/components/profile/ui/ProfileTabs.vue";
+import UserProfileInfo from "@/components/profile/info/UserProfileInfo.vue";
+import UserAddresses from "@/components/profile/info/UserAddresses.vue";
 
 const currentTab = ref<TabKey>(TabKey.Account);
 
 const tabComponentsMap = {
-  Account: PersonalInfo,
+  Account: UserProfileInfo,
   Address: UserAddresses,
 };
 </script>

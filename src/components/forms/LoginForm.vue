@@ -5,10 +5,10 @@ import useVuelidate from "@vuelidate/core";
 import { authRules } from "@/utils/validation";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { login } from "@/api/commercetools/login";
-import { getUserProfile } from "@/api/commercetools/customer/profile";
 import { loginErrorMessages } from "@/utils/errors/errorMessages";
 import { showError } from "@/utils/toast.ts";
 import router from "@/router";
+import { sharedCustomer } from "@/store/sharedCustomer.ts";
 
 const form = reactive({
   email: "",
@@ -31,12 +31,9 @@ async function handleSubmit(): Promise<void> {
   };
 
   try {
-    const createdCustomer = await login(loginData);
-    console.log("Вход выполнен успешно:", createdCustomer.customer.firstName);
+    const result = await login(loginData);
 
-    //временная проверка, выводит профиль созданного пользователя
-    const userData = await getUserProfile();
-    console.log("Профиль пользователя:", userData);
+    sharedCustomer.value = result.customer;
 
     await router.replace({ name: "Main" });
   } catch (error) {
