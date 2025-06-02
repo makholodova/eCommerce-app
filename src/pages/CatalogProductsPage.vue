@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, computed, watch } from "vue";
 import { useEventListener } from "@vueuse/core";
-import { useRouter } from "vue-router";
 import type { ProductProjection } from "@commercetools/platform-sdk";
 import ProductCard from "@/components/ui/ProductCard.vue";
 import { getCategoryByKey } from "@/api/commercetools/products/categories";
@@ -12,7 +11,6 @@ import {
 } from "@/api/commercetools/products/products";
 import { productAdapter } from "@/adapters/product.adapter";
 import { useAuthStore } from "@/store/useAuthStore";
-import IconArrow from "@/assets/icons/icon-arrow.png";
 import IconFilter from "@/assets/icons/icon-filter.png";
 import SearchInput from "@/components/ui/SearchInput.vue";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
@@ -23,6 +21,8 @@ import { useModal } from "@/composables/useModal";
 import { MOBILE_FILTER_BREAKPOINT } from "@/utils/constants";
 import { useFilterStore } from "@/store/useProductFilterStore";
 import { getDataFiltersForApi } from "@/utils/filters/filters";
+import type { breadCrumbType } from "@/types/user-login.types";
+import BaseBreadcrumbs from "@/components/ui/BaseBreadcrumbs.vue";
 
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
@@ -47,15 +47,6 @@ const title = computed(
 const isSearchWord = computed(() => products.value.length > 0);
 
 const auth = useAuthStore();
-const router = useRouter();
-
-function goBackToCatalogPage(): void {
-  if (window.history.length > 1) {
-    router.back();
-  } else {
-    router.push({ name: "Catalog" });
-  }
-}
 
 async function getCategoryId<T>(
   fn: (categoryId: string) => Promise<T>,
@@ -132,21 +123,32 @@ const normalizedProducts = computed(() => products.value.map(productAdapter));
 onMounted(() => {
   loadInitialProducts();
 });
+
+const breadcrumbsRoutes: breadCrumbType[] = [
+  {
+    routeName: "Main",
+    breadcrumbName: "Главная",
+  },
+  {
+    routeName: "Catalog",
+    breadcrumbName: "Каталог",
+  },
+];
+if (title.value) {
+  breadcrumbsRoutes.push({
+    routeName: "CatalogCategory",
+    breadcrumbName: title.value,
+    params: {
+      category: title.value,
+    },
+  });
+}
 </script>
 
 <template>
-  <div>
-    <span class="breadcrumbs">Главная/Каталог/Смартфоны</span>
+  <div class="wrapper">
+    <BaseBreadcrumbs :breadcrumbs="breadcrumbsRoutes" />
     <div class="toolbar">
-      <div class="toolbar-nav">
-        <img
-          :src="IconArrow"
-          alt="arrow"
-          class="arrow"
-          @click="goBackToCatalogPage"
-        />
-        <h1 class="subtitle">{{ title }}</h1>
-      </div>
       <SearchInput v-model="searchQuery" @search="handleSearchClick" />
     </div>
     <div class="product">
@@ -193,6 +195,9 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.wrapper {
+  padding-top: clamp(8px, 3vw, 30px);
+}
 .toolbar {
   display: flex;
   gap: clamp(40px, 9vw, 140px);
