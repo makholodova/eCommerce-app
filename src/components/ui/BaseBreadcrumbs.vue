@@ -23,24 +23,38 @@ const previousPage = computed(() => {
 <template>
   <div class="breadcrumbs-wrapper">
     <div class="breadcrumbs">
-      <router-link
-        v-for="(breadcrumbRoute, inx) in breadcrumbs"
-        :key="inx"
-        :to="
-          breadcrumbRoute.params
-            ? {
-                name: breadcrumbRoute.routeName,
-                params: breadcrumbRoute.params,
-              }
-            : { name: breadcrumbRoute.routeName }
-        "
-        :class="{ 'previous-pages': inx !== breadcrumbs.length - 1 }"
-        >{{
-          (translatedCategory[breadcrumbRoute.breadcrumbName] ||
-            breadcrumbRoute.breadcrumbName) +
-          `${inx !== breadcrumbs.length - 1 ? " / " : ""}`
+      <div v-if="breadcrumbs.length > 0">
+        <router-link
+          v-for="(breadcrumbRoute, inx) in breadcrumbs.slice(0, -1)"
+          :key="inx"
+          :to="
+            breadcrumbRoute.params
+              ? {
+                  name: breadcrumbRoute.routeName,
+                  params: breadcrumbRoute.params,
+                }
+              : { name: breadcrumbRoute.routeName }
+          "
+          class="previous-pages"
+          >{{
+            translatedCategory[breadcrumbRoute.breadcrumbName] ||
+            breadcrumbRoute.breadcrumbName
+          }}
+          /
+        </router-link>
+        <span class="current-page">
+          {{
+            translatedCategory[breadcrumbs.at(-1)?.breadcrumbName ?? ""] ||
+            breadcrumbs.at(-1)?.breadcrumbName
+          }}
+        </span>
+      </div>
+      <span v-else class="current-page">
+        {{
+          translatedCategory[breadcrumbs.at(-1)?.breadcrumbName ?? ""] ||
+          breadcrumbs.at(-1)?.breadcrumbName
         }}
-      </router-link>
+      </span>
     </div>
     <router-link
       :to="
@@ -91,5 +105,10 @@ a {
 .current-page-wrapper img {
   width: clamp(8px, 5vw, 13px);
   height: clamp(16px, 5vw, 26px);
+}
+
+.breadcrumbs {
+  display: flex;
+  justify-content: flex-start;
 }
 </style>
