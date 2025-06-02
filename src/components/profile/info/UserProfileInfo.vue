@@ -12,8 +12,8 @@ import { storeToRefs } from "pinia";
 import { changeCustomerPassword } from "@/api/commercetools/customer/changeCustomerPassword.ts";
 import { useAuthStore } from "@/store/useAuthStore.ts";
 import { login } from "@/api/commercetools/login.ts";
-import { useUserAddressStore } from "@/store/useUserAddressStore.ts";
 import { passwordErrorMessages } from "@/utils/errors/errorMessages.ts";
+import { sharedCustomer } from "@/store/sharedCustomer.ts";
 
 const authStore = useAuthStore();
 
@@ -23,6 +23,9 @@ const { customer, firstName, lastName, email, dateOfBirth } =
 const { updatePersonalInfo } = userProfileStore;
 
 const { modalState, openModal, closeModal } = useModal();
+
+const isPasswordSubmitting = ref(false);
+const isProfileSubmitting = ref(false);
 
 const personalInfo = computed(() => ({
   Имя: firstName.value,
@@ -49,15 +52,18 @@ const openProfileEditModal = (): void => {
 };
 
 const submitProfileChanges = async (): Promise<void> => {
+  isProfileSubmitting.value = true;
+
   try {
     await updatePersonalInfo(editableUser.value);
     showSuccess("Профиль успешно обновлён");
+    closeModal();
   } catch (e) {
     if (e instanceof Error) {
       showError(e.message);
     }
   } finally {
-    closeModal();
+    isProfileSubmitting.value = false;
   }
 };
 
@@ -73,7 +79,7 @@ const submitPasswordChange = async (
     showError("Не удалось получить данные пользователя");
     return;
   }
-
+  isPasswordSubmitting.value = true;
   try {
     await changeCustomerPassword({
       version: customer.value.version,
@@ -88,8 +94,7 @@ const submitPasswordChange = async (
       password: newPassword,
     });
 
-    userProfileStore.setCustomer(result.customer);
-    useUserAddressStore().setCustomer(result.customer);
+    sharedCustomer.value = result.customer;
 
     showSuccess("Пароль успешно обновлён");
     closeModal();
@@ -103,6 +108,8 @@ const submitPasswordChange = async (
     } else {
       showError("Произошла неизвестная ошибка. Попробуйте позже.");
     }
+  } finally {
+    isPasswordSubmitting.value = false;
   }
 };
 </script>
@@ -135,6 +142,7 @@ const submitPasswordChange = async (
     >
       <UserProfileForm
         v-model="editableUser"
+        :is-loading="isProfileSubmitting"
         @submit="submitProfileChanges"
         @close="closeModal"
       />
@@ -146,7 +154,11 @@ const submitPasswordChange = async (
       :is-open="true"
       @close="closeModal"
     >
-      <UserPasswordForm @submit="submitPasswordChange" @close="closeModal" />
+      <UserPasswordForm
+        :is-loading="isPasswordSubmitting"
+        @submit="submitPasswordChange"
+        @close="closeModal"
+      />
     </BaseModal>
   </div>
 </template>

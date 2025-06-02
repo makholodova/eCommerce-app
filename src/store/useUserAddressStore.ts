@@ -1,7 +1,11 @@
 ﻿import { computed } from "vue";
 import { defineStore } from "pinia";
-import type { Customer } from "@commercetools/platform-sdk";
+import type {
+  Customer,
+  CustomerUpdateAction,
+} from "@commercetools/platform-sdk";
 import { sharedCustomer } from "@/store/sharedCustomer.ts";
+import { updateCustomerProfile } from "@/api/commercetools/customer/updateCustomerProfile.ts";
 
 export const useUserAddressStore = defineStore(
   "userAddress",
@@ -35,17 +39,17 @@ export const useUserAddressStore = defineStore(
     const isDefaultBilling = (addressId: string | undefined): boolean =>
       addressId === defaultBillingId.value;
 
-    function updateCustomerInfo(data: Partial<Customer>): void {
-      if (!customer.value) return;
+    async function updateAddressActions(
+      actions: CustomerUpdateAction[],
+    ): Promise<Customer> {
+      if (!customer.value) throw new Error("Нет данных пользователя");
 
-      customer.value = {
-        ...customer.value,
-        ...data,
-      };
-    }
-
-    function setCustomer(data: Customer): void {
-      customer.value = data;
+      const response = await updateCustomerProfile(
+        customer.value.version,
+        actions,
+      );
+      customer.value = response;
+      return response;
     }
 
     return {
@@ -57,8 +61,7 @@ export const useUserAddressStore = defineStore(
       defaultBillingId,
       isDefaultShipping,
       isDefaultBilling,
-      updateCustomerInfo,
-      setCustomer,
+      updateAddressActions,
     };
   },
   {
