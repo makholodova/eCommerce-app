@@ -99,6 +99,10 @@ if (category.value) {
   });
 }
 
+const multipleImages = computed(() => {
+  return product.value?.images ? product?.value.images.length > 0 : false;
+});
+
 breadcrumbsRoutes.push({
   routeName: "Product",
   breadcrumbName: "Карточка товара",
@@ -135,7 +139,11 @@ function openModal(): void {
             alt="product image"
           />
         </transition>
-        <div class="back-arrow arrow" @click="showPreviousImage">
+        <div
+          v-if="multipleImages"
+          class="back-arrow arrow"
+          @click="showPreviousImage"
+        >
           <svg
             :class="{ disabled: isFirstPage }"
             width="40"
@@ -162,7 +170,11 @@ function openModal(): void {
             />
           </svg>
         </div>
-        <div class="forward-arrow arrow" @click="showNextImage">
+        <div
+          v-if="multipleImages"
+          class="forward-arrow arrow"
+          @click="showNextImage"
+        >
           <svg
             :class="{ disabled: isLastPage }"
             width="40"
