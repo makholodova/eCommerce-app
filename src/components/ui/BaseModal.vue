@@ -1,10 +1,12 @@
 ﻿<script lang="ts" setup>
 import { watch } from "vue";
 import { useScrollLock } from "@vueuse/core";
+import closeBtnIcon from "@/assets/icons/close-modal-btn.svg";
 
 const props = defineProps<{
   title: string;
   isOpen: boolean;
+  closeBtnNeeded?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -26,6 +28,9 @@ watch(
   <teleport to="body">
     <div v-if="isOpen" class="modal-overlay" @click.self="emit('close')">
       <div class="modal-window">
+        <div v-if="closeBtnNeeded" class="close-btn" @click="emit('close')">
+          <img :src="closeBtnIcon" alt="close button" />
+        </div>
         <h2 class="modal-title">{{ title }}</h2>
         <div class="modal-content">
           <slot />
@@ -36,6 +41,18 @@ watch(
 </template>
 
 <style scoped>
+.close-btn {
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.close-btn img {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+}
 .modal-overlay {
   position: fixed;
   inset: 0;

@@ -10,7 +10,6 @@ import type { ProductAdapter } from "@/types/interfaces";
 import api from "@/api/commercetools/axiosInstance";
 import { useRouter } from "vue-router";
 import BaseModal from "@/components/ui/BaseModal.vue";
-import closeBtnIcon from "@/assets/icons/close-modal-btn.svg";
 
 enum DeviceFieldRu {
   brand = "Бренд",
@@ -120,10 +119,13 @@ function openModal(): void {
 
 <template>
   <div>
-    <BaseModal v-if="isOpen" :is-open="isOpen" title="" @close="closeModal">
-      <div class="close-btn" @click="closeModal">
-        <img :src="closeBtnIcon" alt="close button" />
-      </div>
+    <BaseModal
+      v-if="isOpen"
+      :is-open="isOpen"
+      title=""
+      :close-btn-needed="true"
+      @close="closeModal"
+    >
       <div class="modal-images-wrapper">
         <transition name="fade" mode="out-in">
           <img
@@ -279,14 +281,7 @@ function openModal(): void {
   width: 100%;
   height: 100%;
 }
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-}
+
 svg.disabled path,
 svg.disabled rect {
   stroke: var(--grey-light);
@@ -294,11 +289,7 @@ svg.disabled rect {
 .disabled {
   pointer-events: none;
 }
-.close-btn img {
-  object-fit: contain;
-  width: 100%;
-  height: 100%;
-}
+
 .modal-images-wrapper {
   max-width: 90vw;
   min-width: 70vw;
