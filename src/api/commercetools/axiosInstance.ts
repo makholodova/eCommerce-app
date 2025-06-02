@@ -37,14 +37,10 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response.status === 401 && !originalRequest._retry) {
-      console.log("попали на 401 ошибку");
-
       originalRequest._retry = true;
       if (userToken.value) {
-        console.log("попали на то что истек юзер токен");
         try {
           await authStore.refreshToken();
-          console.log("новый токен получен" + tokenStore.token);
 
           originalRequest.headers["Authorization"] =
             `Bearer ${tokenStore.token}`;
