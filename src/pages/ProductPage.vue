@@ -102,7 +102,7 @@ breadcrumbsRoutes.push({
           </div>
           <div v-if="product.images.length > 0" class="toggle-wrapper">
             <span
-              v-for="(image, index) in product.images"
+              v-for="(_, index) in product.images"
               :key="index"
               class="toggle"
               :class="{ active: currentImageIndex === index }"
