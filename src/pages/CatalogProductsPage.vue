@@ -25,6 +25,8 @@ import type { breadCrumbType } from "@/types/user-login.types";
 import BaseBreadcrumbs from "@/components/ui/BaseBreadcrumbs.vue";
 import ProductSort from "@/components/ui/ProductSort.vue";
 import { sortApiMap } from "@/utils/filters/filters";
+import type { breadCrumbType } from "@/types/user-login.types";
+import BaseBreadcrumbs from "@/components/ui/BaseBreadcrumbs.vue";
 
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
@@ -149,9 +151,31 @@ if (title.value) {
     },
   });
 }
+
+const breadcrumbsRoutes: breadCrumbType[] = [
+  {
+    routeName: "Main",
+    breadcrumbName: "Главная",
+  },
+  {
+    routeName: "Catalog",
+    breadcrumbName: "Каталог",
+  },
+];
+if (title.value) {
+  breadcrumbsRoutes.push({
+    routeName: "CatalogCategory",
+    breadcrumbName: title.value,
+    params: {
+      category: title.value,
+    },
+  });
+}
 </script>
 
 <template>
+  <div class="wrapper">
+    <BaseBreadcrumbs :breadcrumbs="breadcrumbsRoutes" />
   <div class="wrapper">
     <BaseBreadcrumbs :breadcrumbs="breadcrumbsRoutes" />
     <div class="toolbar">
@@ -214,6 +238,9 @@ if (title.value) {
 </template>
 
 <style scoped>
+.wrapper {
+  padding-top: clamp(8px, 3vw, 30px);
+}
 .wrapper {
   padding-top: clamp(8px, 3vw, 30px);
 }
