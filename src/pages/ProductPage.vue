@@ -75,7 +75,7 @@ breadcrumbsRoutes.push({
   routeName: "Product",
   breadcrumbName: "Карточка товара",
   params: {
-    productID: productID[0],
+    productId: productID[0],
   },
 });
 </script>
