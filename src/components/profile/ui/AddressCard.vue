@@ -1,16 +1,42 @@
 ﻿<script lang="ts" setup>
 import type { UIAddress } from "@/types/types.ts";
+import { useDebounceFn } from "@vueuse/core";
+import { onMounted, ref } from "vue";
 
-defineProps<{
+const props = defineProps<{
   address: UIAddress;
   isDefault?: boolean;
 }>();
 
+let oldInputVal: boolean = false;
+const inputValue = ref<boolean>(false);
+
 const emit = defineEmits<{
-  (e: "default-toggle", id: string): void;
+  (e: "default-set", checked: boolean, addressId: string): void;
   (e: "edit", address: UIAddress): void;
   (e: "remove", id: string): void;
 }>();
+
+function onChangeCheckbox(e: Event, addressId: string): void {
+  const target = e.target;
+  if (target instanceof HTMLInputElement) {
+    const { checked } = target;
+    if (checked !== oldInputVal) {
+      oldInputVal = checked;
+      emit("default-set", checked, addressId);
+    }
+  }
+}
+const onChange = useDebounceFn(onChangeCheckbox, 500);
+
+function setInitialInputVal(): void {
+  inputValue.value = props.isDefault;
+  oldInputVal = props.isDefault;
+}
+
+onMounted(() => {
+  setInitialInputVal();
+});
 </script>
 
 <template>
@@ -18,9 +44,9 @@ const emit = defineEmits<{
     <div class="checkbox-wrapper">
       <label class="address-card__checkbox">
         <input
-          :checked="isDefault"
+          v-model="inputValue"
           type="checkbox"
-          @change="emit('default-toggle', address.id)"
+          @change="onChange($event, address.id)"
         />
         <span class="checkmark"></span>
       </label>
