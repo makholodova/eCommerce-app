@@ -12,7 +12,12 @@ import type { CountryOption } from "@/types/interfaces.ts";
 import { storeToRefs } from "pinia";
 
 const userAddressStore = useUserAddressStore();
-const { shippingAddresses, billingAddresses } = storeToRefs(userAddressStore);
+const {
+  shippingAddresses,
+  billingAddresses,
+  defaultShippingId,
+  defaultBillingId,
+} = storeToRefs(userAddressStore);
 const { updateAddressActions, isDefaultShipping, isDefaultBilling } =
   userAddressStore;
 
@@ -30,11 +35,9 @@ const addressToEdit = ref<UIAddress>({ ...defaultAddress });
 
 const countries = ref<CountryOption[]>([{ title: "RU", value: "Россия" }]); //нужно брать из комерзтоолс наверно
 
-const setDefaultShipping = async (
-  isDefault: boolean,
-  id: string,
-): Promise<void> => {
-  const newDefaultId = isDefault ? id : undefined;
+const toggleDefaultShipping = async (id: string): Promise<void> => {
+  const isDefault = defaultShippingId.value === id;
+  const newDefaultId = isDefault ? undefined : id;
 
   try {
     await updateAddressActions([
@@ -45,8 +48,8 @@ const setDefaultShipping = async (
     ]);
     showSuccess(
       isDefault
-        ? "Установлен новый адрес доставки по умолчанию"
-        : "Адрес снят как адрес доставки по умолчанию",
+        ? "Адрес снят как адрес доставки по умолчанию"
+        : "Установлен новый адрес доставки по умолчанию",
     );
   } catch (e) {
     if (e instanceof Error) {
@@ -55,11 +58,9 @@ const setDefaultShipping = async (
   }
 };
 
-const setDefaultBilling = async (
-  isDefault: boolean,
-  id: string,
-): Promise<void> => {
-  const newDefaultId = isDefault ? id : undefined;
+const toggleDefaultBilling = async (id: string): Promise<void> => {
+  const isDefault = defaultBillingId.value === id;
+  const newDefaultId = isDefault ? undefined : id;
 
   try {
     await updateAddressActions([
@@ -70,8 +71,8 @@ const setDefaultBilling = async (
     ]);
     showSuccess(
       isDefault
-        ? "Установлен новый адрес для выставления счета по умолчанию"
-        : "Адрес снят как адрес для выставления счета по умолчанию",
+        ? "Адрес снят как адрес для выставления счета по умолчанию"
+        : "Установлен новый адрес для выставления счета по умолчанию",
     );
   } catch (e) {
     if (e instanceof Error) {
@@ -208,7 +209,7 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
         :is-default="isDefaultShipping(address.id)"
         @edit="openEditAddressModal"
         @remove="onRemoveShippingAddress"
-        @default-set="setDefaultShipping"
+        @default-toggle="toggleDefaultShipping"
       />
     </div>
 
@@ -225,7 +226,7 @@ const onRemoveBillingAddress = async (id: string): Promise<void> => {
         :is-default="isDefaultBilling(address.id)"
         @edit="openEditAddressModal"
         @remove="onRemoveBillingAddress"
-        @default-set="setDefaultBilling"
+        @default-toggle="toggleDefaultBilling"
       />
     </div>
 
