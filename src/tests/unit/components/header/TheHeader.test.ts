@@ -3,6 +3,7 @@ import type { VueWrapper } from "@vue/test-utils";
 import { mount } from "@vue/test-utils";
 import TheHeader from "@/components/header/TheHeader.vue";
 import { h, type VNode } from "vue";
+import { createPinia } from "pinia";
 
 type TokenStore = {
   isAuthenticated: boolean;
@@ -52,7 +53,11 @@ describe("<TheHeader />", () => {
   let wrapper: VueWrapper<InstanceType<typeof TheHeader>>;
 
   const createWrapper = (): void => {
-    wrapper = mount(TheHeader);
+    wrapper = mount(TheHeader, {
+      global: {
+        plugins: [createPinia()],
+      },
+    });
   };
 
   afterEach((): void => {
