@@ -220,7 +220,7 @@ function openModal(): void {
               -{{ product.discountedPercentage }}%
             </div>
           </div>
-          <div v-if="product.images.length > 0" class="toggle-wrapper">
+          <div v-show="product.images.length > 1" class="toggle-wrapper">
             <span
               v-for="(_, index) in product.images"
               :key="index"
