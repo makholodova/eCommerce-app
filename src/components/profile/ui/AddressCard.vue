@@ -1,5 +1,6 @@
 ﻿<script lang="ts" setup>
 import type { UIAddress } from "@/types/types.ts";
+import { useDebounceFn } from "@vueuse/core";
 
 defineProps<{
   address: UIAddress;
@@ -11,6 +12,10 @@ const emit = defineEmits<{
   (e: "edit", address: UIAddress): void;
   (e: "remove", id: string): void;
 }>();
+
+const onToggleDefault = useDebounceFn((id: string) => {
+  emit("default-toggle", id);
+}, 500);
 </script>
 
 <template>
@@ -20,7 +25,7 @@ const emit = defineEmits<{
         <input
           :checked="isDefault"
           type="checkbox"
-          @change="emit('default-toggle', address.id)"
+          @change="onToggleDefault(address.id)"
         />
         <span class="checkmark"></span>
       </label>
