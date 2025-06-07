@@ -1,10 +1,8 @@
-import type { VueWrapper } from "@vue/test-utils";
 import { mount } from "@vue/test-utils";
 import { describe, it, expect } from "vitest";
 import ProductCard from "@/components/ui/ProductCard.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import router from "@/router";
-import type { ComponentPublicInstance } from "vue";
 
 type Props = {
   id: string;
@@ -18,29 +16,14 @@ type Props = {
 };
 
 describe("ProductCard.vue", () => {
-  let wrapper: VueWrapper<
-    ComponentPublicInstance & { isDiscounted: boolean } & Props
-  >;
-
-  const mountCard = (
-    propsData: Props,
-  ): VueWrapper<
-    ComponentPublicInstance & { isDiscounted: boolean } & Props
-  > => {
-    return mount<ComponentPublicInstance & { isDiscounted: boolean } & Props>(
-      ProductCard,
-      {
-        global: {
-          plugins: [router],
-          stubs: { BaseButton },
-        },
-        props: propsData,
-      },
-    );
-  };
+  const mountCard = (props: Props): ReturnType<typeof mount> =>
+    mount(ProductCard, {
+      global: { plugins: [router], stubs: { BaseButton } },
+      props,
+    });
 
   it("renders title, image and description", () => {
-    wrapper = mountCard({
+    const wrapper = mountCard({
       id: "1",
       title: "Test",
       image: "img.png",
@@ -52,34 +35,27 @@ describe("ProductCard.vue", () => {
     expect(wrapper.find(".card-description").text()).toBe("Desc");
   });
 
-  it("correctly computes isDiscounted based on props", () => {
-    wrapper = mountCard({ id: "1", title: "P", price: 50 });
-    expect(wrapper.vm.isDiscounted).toBe(false);
-    wrapper = mountCard({
+  it("does not render discount badge when no discount props", () => {
+    const wrapper = mountCard({ id: "1", title: "P", price: 50 });
+    expect(wrapper.find(".card-img-discounted-icon").exists()).toBe(false);
+    expect(wrapper.find(".card-discounted-price").exists()).toBe(false);
+  });
+
+  it("renders correct discount badge and prices when discounted", () => {
+    const wrapper = mountCard({
       id: "1",
       title: "P",
       price: 50,
       discountedPrice: 40,
       discountedPercentage: 20,
     });
-    expect(wrapper.vm.isDiscounted).toBe(true);
+    expect(wrapper.find(".card-img-discounted-icon").text()).toBe("-20%");
+    expect(wrapper.get(".card-current-price").text()).toBe("40 ₽");
+    expect(wrapper.get(".card-discounted-price").text()).toBe("50 ₽");
   });
 
-  it("displays discount badge and prices when discounted", () => {
-    wrapper = mountCard({
-      id: "1",
-      title: "P",
-      price: 200,
-      discountedPrice: 150,
-      discountedPercentage: 25,
-    });
-    expect(wrapper.find(".card-img-discounted-icon").exists()).toBe(true);
-    expect(wrapper.get(".card-current-price").text()).toBe("150 ₽");
-    expect(wrapper.get(".card-discounted-price").text()).toBe("200 ₽");
-  });
-
-  it("hides discount elements when not discounted", () => {
-    wrapper = mountCard({ id: "1", title: "P", price: 200 });
+  it("hides discount elements when only price provided", () => {
+    const wrapper = mountCard({ id: "1", title: "P", price: 200 });
     expect(wrapper.find(".card-img-discounted-icon").exists()).toBe(false);
     expect(wrapper.get(".card-current-price").text()).toBe("200 ₽");
     expect(wrapper.find(".card-discounted-price").exists()).toBe(false);
