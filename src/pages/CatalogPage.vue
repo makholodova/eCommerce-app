@@ -5,7 +5,6 @@ import type { ProductProjection } from "@commercetools/platform-sdk";
 import { productAdapter } from "@/adapters/product.adapter";
 import { getCategoryByKey } from "@/api/commercetools/products/categories";
 import { getProductsCategory } from "@/api/commercetools/products/products";
-import { checkValidSession } from "@/utils/validSession";
 import { useAuthStore } from "@/store/useAuthStore";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
 import { productErrorMessages } from "@/utils/errors/errorMessages";
@@ -30,7 +29,6 @@ async function loadInitialProducts(): Promise<void> {
 
   try {
     await auth.updateTokenIfExpired();
-    await checkValidSession();
 
     const category = await getCategoryByKey("popular");
     const productsResult = await getProductsCategory(category.id);
