@@ -10,6 +10,7 @@ import TogglePassword from "@/components/ui/TogglePassword.vue";
 
 const props = defineProps<{
   id: string;
+  name: string;
   label: string;
   type: string;
   vuelidateRules?: Record<
@@ -18,6 +19,7 @@ const props = defineProps<{
   >;
   placeholder?: string;
   showError?: boolean;
+  autocomplete?: string;
 }>();
 
 const isPasswordVisible = ref(false);
@@ -50,15 +52,18 @@ const errorMessage = computed(() => {
       <input
         :id
         v-model="inputValue"
+        :name="name"
         :class="[
           'base-input',
           {
             invalid: v$.inputValue.$error,
             valid: inputValue && !v$.inputValue.$error,
+            'has-password-toggle': type === 'password',
           },
         ]"
         :placeholder
         :type="isPasswordVisible && type === 'password' ? 'text' : type"
+        :autocomplete="autocomplete"
       />
       <TogglePassword
         v-if="type === 'password'"
@@ -66,7 +71,7 @@ const errorMessage = computed(() => {
       />
     </span>
     <span
-      v-if="showError"
+      v-show="showError"
       :class="{ visible: v$.inputValue.$error }"
       class="error-text"
       >{{ errorMessage }}</span
@@ -88,7 +93,7 @@ const errorMessage = computed(() => {
 .base-input {
   border: 1px solid var(--grey-not-active);
   border-radius: 8px;
-  padding: 11px 8px 11px 16px;
+  padding: 11px 35px 11px 16px;
   width: 100%;
 
   font-size: 1rem;
@@ -128,10 +133,13 @@ input[type="date"].base-input {
   padding-right: 34px;
 }
 
+.base-input.has-password-toggle {
+  padding-right: 68px;
+}
 .error-text {
   color: var(--red);
   font-size: 0.7rem;
-  min-height: 1rem;
+  min-height: 2rem;
   transition: opacity 0.2s ease;
   opacity: 0;
 }

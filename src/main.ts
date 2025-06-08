@@ -2,23 +2,20 @@ import { createApp } from "vue";
 import "@/assets/styles/normalize.css";
 import "@/assets/styles/global.css";
 import App from "./App.vue";
-import router from "./router";
 import pinia from "./store";
-import { useTokenStore } from "./store/useTokenStore";
+import router from "./router";
+import { checkValidSession } from "./utils/validSession";
 
-const app = createApp(App);
-app.use(pinia);
-app.use(router);
+(async (): Promise<void> => {
+  const app = createApp(App);
+  app.use(pinia);
+  app.use(router);
 
-app.mount("#app");
-
-router.beforeEach(async (to, _, next): Promise<void> => {
-  const store = useTokenStore();
-  store.checkIfUserIsAuthorized();
-
-  if (to.meta.requires === "unAuth" && store.isAuthenticated) {
-    return next({ name: "Main" });
+  try {
+    await checkValidSession();
+  } catch (error) {
+    console.error("Ошибка при инициализации сессии", error);
   }
 
-  next();
-});
+  app.mount("#app");
+})();

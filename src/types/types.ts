@@ -10,3 +10,21 @@ export type FormRules<T> = {
     ValidatorFn | ValidationRuleWithoutParams | ValidationRuleWithParams
   >;
 };
+
+export type UIAddress = {
+  id: string;
+  country: string;
+  city?: string;
+  streetName?: string;
+  postalCode?: string;
+};
+
+export type FilterData = {
+  selectedFilters: Record<string, Record<string, boolean>>;
+  priceMin: number | null;
+  priceMax: number | null;
+};
+
+export type FilterMap = {
+  [categoryKey: string]: FilterData;
+};

@@ -18,7 +18,8 @@ import BaseCheckbox from "@/components/ui/BaseCheckbox.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { registrationErrorMessages } from "@/utils/errors/errorMessages.ts";
 import { login } from "@/api/commercetools/login.ts";
-import { getUserProfile } from "@/api/commercetools/customer/profile.ts";
+
+import { sharedCustomer } from "@/store/sharedCustomer.ts";
 
 const auth = reactive({
   email: "",
@@ -58,6 +59,7 @@ const rules = computed(() => ({
   shippingAddress: addressRules,
   billingAddress: useSameAddress.value ? {} : addressRules,
 }));
+
 const v$ = useVuelidate(
   rules,
   { auth, personal, shippingAddress, billingAddress },
@@ -107,15 +109,13 @@ async function handleSubmit(): Promise<void> {
 
   try {
     await signUp(dateCustomerRequest);
+
     const loginResult = await login(loginData);
-    console.log("Вход выполнен успешно:", loginResult.customer.firstName);
+
+    sharedCustomer.value = loginResult.customer;
 
     isRegistered.value = true;
     isLoading.value = false;
-
-    //временная проверка, выводит профиль созданного пользователя
-    const userData = await getUserProfile();
-    console.log("Профиль пользователя:", userData);
 
     showSuccess(
       `Аккаунт успешно создан! Добро пожаловать, ${loginResult.customer.firstName}!`,
@@ -162,12 +162,16 @@ const isFormValid = computed(() => !v$.value.$invalid);
         :is-loading="isLoading || isRegistered"
       />
       <BaseCheckbox
+        id="is-default-shipping"
         v-model="isDefaultShipping"
+        name="isDefaultShipping"
         label="Использовать по умолчанию для доставки"
       />
 
       <BaseCheckbox
+        id="use-same-address"
         v-model="useSameAddress"
+        name="useSameAddress"
         label="Использовать адрес доставки для выставления счета"
       />
 
@@ -184,7 +188,9 @@ const isFormValid = computed(() => !v$.value.$invalid);
 
       <BaseCheckbox
         v-show="!useSameAddress"
+        id="is-default-billing"
         v-model="isDefaultBilling"
+        name="isDefaultBilling"
         label="Использовать по умолчанию для выставления счета"
       />
     </fieldset>

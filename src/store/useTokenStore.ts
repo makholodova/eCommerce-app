@@ -1,51 +1,42 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 
-export const useTokenStore = defineStore("token", () => {
-  const token = ref<string>("");
-  const refreshToken = ref<string>("");
-  const expirationTime = ref<number>(0);
-  const isAuthenticated = ref<boolean>(false);
+export const useTokenStore = defineStore(
+  "token",
+  () => {
+    const token = ref<string>("");
+    const refreshToken = ref<string>("");
+    const expirationTime = ref<number>(0);
 
-  function checkIfUserIsAuthorized(): void {
-    try {
-      const data = localStorage.getItem("user");
-      if (!data) {
-        isAuthenticated.value = false;
-      } else {
-        const user = JSON.parse(data);
-        isAuthenticated.value = user.isAuthenticated ?? false;
-      }
-    } catch {
-      isAuthenticated.value = false;
+    function reset(): void {
+      token.value = "";
+      refreshToken.value = "";
+      expirationTime.value = 0;
     }
-  }
 
-  function setTokenStore(newToken: {
-    token: string;
-    refreshToken?: string;
-    expirationTime?: number;
-  }): void {
-    token.value = newToken.token;
-    refreshToken.value = newToken.refreshToken ?? "";
-    expirationTime.value = newToken.expirationTime ?? 0;
-  }
+    function setTokenStore(newToken: {
+      token: string;
+      refreshToken?: string;
+      expirationTime?: number;
+    }): void {
+      token.value = newToken.token;
+      refreshToken.value = newToken.refreshToken ?? refreshToken.value;
+      if (newToken.expirationTime !== 0 && newToken.expirationTime) {
+        expirationTime.value = Date.now() + newToken.expirationTime * 1000;
+      } else {
+        expirationTime.value = 0;
+      }
+    }
 
-  function logout(): void {
-    localStorage.removeItem("user");
-    token.value = "";
-    refreshToken.value = "";
-    expirationTime.value = 0;
-    isAuthenticated.value = false;
-  }
-
-  return {
-    token,
-    refreshToken,
-    expirationTime,
-    setTokenStore,
-    logout,
-    isAuthenticated,
-    checkIfUserIsAuthorized,
-  };
-});
+    return {
+      token,
+      refreshToken,
+      expirationTime,
+      setTokenStore,
+      reset,
+    };
+  },
+  {
+    persist: true,
+  },
+);

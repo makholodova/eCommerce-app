@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 type ButtonProps = {
   text: string;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "xs-s" | "xs" | "sm" | "md" | "lg" | "xl";
   type?: "button" | "submit";
   disabled?: boolean;
   isLoading?: boolean;
+  variant?: "primary" | "secondary";
 };
 
 const {
@@ -12,19 +13,15 @@ const {
   type = "button",
   text,
   disabled,
+  variant = "primary",
 } = defineProps<ButtonProps>();
-
-const emit = defineEmits<{
-  (e: "click"): void;
-}>();
 </script>
 
 <template>
   <button
     :type
     :disabled="disabled || isLoading"
-    :class="['button', `size-${size}`]"
-    @click="emit('click')"
+    :class="['button', `size-${size}`, `variant-${variant}`]"
   >
     <span v-if="isLoading" class="spinner" />
     <span v-else
@@ -40,15 +37,9 @@ const emit = defineEmits<{
   cursor: pointer;
   width: 100%;
   font-weight: 500;
-  background-color: var(--blue);
-  color: var(--white);
   transition:
     background 0.2s ease,
     color 0.2s ease;
-}
-
-.button:hover {
-  background-color: var(--blue-hover);
 }
 
 .button:disabled {
@@ -80,6 +71,35 @@ const emit = defineEmits<{
   height: 44px;
   font-size: 14px;
 }
+
+.size-xs {
+  max-width: 96px;
+  height: 34px;
+  font-size: 14px;
+}
+
+.size-xs-s {
+  max-width: 80px;
+  height: 30px;
+  font-size: 12px;
+}
+
+.variant-primary {
+  background-color: var(--blue);
+  color: var(--white);
+}
+.variant-primary:hover {
+  background-color: var(--blue-hover);
+}
+
+.variant-secondary {
+  background-color: var(--grey);
+  color: var(--white);
+}
+.variant-secondary:hover {
+  background-color: var(--grey-dark);
+}
+
 .spinner {
   width: 18px;
   height: 18px;
