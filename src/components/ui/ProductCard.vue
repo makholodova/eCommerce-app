@@ -33,7 +33,7 @@ function addToCart(): void {
     productData: {
       title: props.title,
       description: props.description,
-      images: props.image,
+      image: props.image,
       price: props.price,
       discountedPrice: props.discountedPrice,
       discountedPercentage: props.discountedPercentage,
@@ -41,6 +41,7 @@ function addToCart(): void {
   };
 
   cartStore.setShoppingCart(cartItem);
+  console.log(cartStore.totalItems);
 }
 </script>
 

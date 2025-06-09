@@ -10,6 +10,7 @@ import type { ProductAdapter } from "@/types/interfaces";
 import api from "@/api/commercetools/axiosInstance";
 import { useRouter } from "vue-router";
 import BaseModal from "@/components/ui/BaseModal.vue";
+import { useCartStore } from "@/store/useCartStore";
 
 enum DeviceFieldRu {
   brand = "Бренд",
@@ -23,6 +24,7 @@ enum DeviceFieldRu {
   weight = "Вес",
 }
 
+const cartStore = useCartStore();
 const route = useRoute();
 const router = useRouter();
 const currentImageIndex = ref<number>(0);
@@ -118,6 +120,25 @@ function closeModal(): void {
 function openModal(): void {
   isOpen.value = true;
   modalCurrentImageIndex.value = currentImageIndex.value;
+}
+
+function addToCart(): void {
+  const fullDescription = `${product.value?.description} ${product.value?.attributes?.rom} ${product.value?.attributes?.color}`;
+
+  const cartItem = {
+    productId: productID,
+    quantity: 1,
+    productData: {
+      title: product.value?.title ?? "",
+      description: fullDescription ?? "",
+      image: product.value?.images?.[0],
+      price: product.value?.price ?? 0,
+      discountedPrice: product.value?.discountedPrice ?? undefined,
+      discountedPercentage: product.value?.discountedPercentage ?? undefined,
+    },
+  };
+
+  cartStore.setShoppingCart(cartItem);
 }
 </script>
 
@@ -256,7 +277,11 @@ function openModal(): void {
           <div v-else class="card-price">
             <div class="card-current-price">{{ product.price }} ₽</div>
           </div>
-          <base-button class="cart-btn" text="В корзину"></base-button>
+          <base-button
+            class="cart-btn"
+            text="В корзину"
+            @click="addToCart"
+          ></base-button>
         </div>
       </div>
     </div>

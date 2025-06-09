@@ -1,11 +1,15 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import type { ShoppingCartItem } from "@/types/interfaces";
 
 export const useCartStore = defineStore(
   "shopping-cart",
   () => {
     const shoppingCart = ref<ShoppingCartItem[]>([]);
+
+    const totalItems = computed(() =>
+      shoppingCart.value.reduce((sum, item) => sum + item.quantity, 0),
+    );
 
     function setShoppingCart(cartItem: ShoppingCartItem): void {
       const availableProduct = shoppingCart.value.find(
@@ -29,6 +33,7 @@ export const useCartStore = defineStore(
 
     return {
       shoppingCart,
+      totalItems,
       setShoppingCart,
       getShoppingCart,
       removeFromCart,

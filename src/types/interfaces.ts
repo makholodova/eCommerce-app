@@ -57,7 +57,7 @@ export interface ShoppingCartItem {
   productData: {
     title: string;
     description?: string;
-    images?: string;
+    image?: string;
     price?: number;
     discountedPrice?: number;
     discountedPercentage?: number;
