@@ -53,7 +53,7 @@ const routes = [
   {
     path: "/about",
     name: "About",
-    component: () => import("@/pages/AboutUs.vue"),
+    component: () => import("@/pages/AboutUsPage.vue"),
     props: true,
   },
   {
