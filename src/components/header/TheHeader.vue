@@ -63,6 +63,16 @@ function logout(): void {
                 <p class="icon-description">Профиль</p>
               </div>
             </router-link>
+            <router-link :to="{ name: 'About' }">
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/about-us.png"
+                  alt="about us"
+                  class="icon"
+                />
+                <p class="icon-description">О нас</p>
+              </div>
+            </router-link>
             <router-link :to="{ name: 'Catalog' }">
               <div class="link-wrapper">
                 <img
