@@ -41,7 +41,6 @@ function addToCart(): void {
   };
 
   cartStore.setShoppingCart(cartItem);
-  console.log(cartStore.totalItems);
 }
 </script>
 
