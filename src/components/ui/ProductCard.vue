@@ -48,13 +48,13 @@ function addToCart(): void {
       <div v-else class="card-price">
         <div class="card-current-price">{{ price }} ₽</div>
       </div>
-      <base-button
-        size="sm"
-        class="card-btn"
-        text="В корзину"
-        @click.prevent.stop="addToCart"
-      ></base-button>
     </div>
+    <base-button
+      size="sm"
+      class="card-btn"
+      text="В корзину"
+      @click.prevent.stop="addToCart"
+    ></base-button>
   </div>
 </template>
 
@@ -77,7 +77,7 @@ a {
 }
 .card {
   border-radius: 8px;
-  max-width: 217px;
+  width: 217px;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -94,6 +94,7 @@ a {
   justify-content: center;
   align-items: center;
   gap: 20px;
+  flex: 1 0 auto;
 }
 .card-img-discounted-icon {
   position: absolute;
@@ -117,6 +118,7 @@ a {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  flex: 0 0 216px;
 }
 .card-img {
   width: 100%;
@@ -158,14 +160,13 @@ a {
     width: 100%;
     flex-direction: row;
     padding: 24px 16px;
+    flex-wrap: wrap;
   }
   .card-img-wrapper {
     align-self: flex-start;
-    flex-shrink: 1;
-    max-width: 101px;
-    max-height: 139px;
-    width: 100%;
-    height: 100%;
+    /* flex-shrink: 1; */
+    width: 101px;
+    height: 139px;
   }
   .card-information {
     flex: 1;
