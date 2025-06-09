@@ -37,7 +37,6 @@ export interface ProductAdapter {
   id: string;
   title: string;
   description: string;
-  //image?: string;
   images: string[];
   price: number | null;
   discountedPrice: number | null;
@@ -50,4 +49,17 @@ export interface UserFormModel {
   lastName: string;
   dateOfBirth: string;
   email: string;
+}
+
+export interface ShoppingCartItem {
+  productId: string;
+  quantity: number;
+  productData: {
+    title: string;
+    description?: string;
+    image?: string;
+    price?: number;
+    discountedPrice?: number;
+    discountedPercentage?: number;
+  };
 }
