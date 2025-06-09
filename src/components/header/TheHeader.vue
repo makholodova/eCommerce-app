@@ -33,82 +33,110 @@ function logout(): void {
       <router-link :to="{ name: 'Main' }" class="logo">
         <img src="@/assets/icons/header-icons/logo.png" alt="logo" />
       </router-link>
-      <nav>
-        <input
-          id="burger-checkbox"
-          v-model="isChecked"
-          type="checkbox"
-          class="burger-checkbox"
-        />
-        <label for="burger-checkbox" class="burger"></label>
-        <ul class="navigation">
-          <router-link v-if="isAuthenticated" :to="{ name: 'User' }">
-            <div class="link-wrapper">
-              <img
-                src="@/assets/icons/header-icons/profile.png"
-                alt="user profile"
-                class="icon"
-              />
-              <p class="icon-description">Профиль</p>
-            </div>
-          </router-link>
-          <router-link :to="{ name: 'Catalog' }">
-            <div class="link-wrapper">
-              <img
-                src="@/assets/icons/header-icons/catalog.png"
-                alt="catalog"
-                class="icon"
-              />
-              <p class="icon-description">Каталог</p>
-            </div>
-          </router-link>
-          <router-link
-            v-if="isAuthenticated"
-            :to="{ name: 'Main' }"
-            @click="logout"
-          >
-            <div class="link-wrapper">
-              <img
-                src="@/assets/icons/header-icons/logout.png"
-                alt="login"
-                class="icon"
-              />
-              <p class="icon-description">Выход</p>
-            </div>
-          </router-link>
-          <router-link
-            v-if="!isAuthenticated && route.name !== 'Login'"
-            :to="{ name: 'Login' }"
-          >
-            <div class="link-wrapper">
-              <img
-                src="@/assets/icons/header-icons/login.png"
-                alt="login"
-                class="icon"
-              />
-              <p class="icon-description">Вход</p>
-            </div>
-          </router-link>
-          <router-link
-            v-if="!isAuthenticated && route.name !== 'Register'"
-            :to="{ name: 'Register' }"
-          >
-            <div class="link-wrapper">
-              <img
-                src="@/assets/icons/header-icons/signup.png"
-                alt="register"
-                class="icon"
-              />
-              <p class="icon-description">Регистрация</p>
-            </div>
-          </router-link>
-        </ul>
-      </nav>
+      <div class="menu-wrapper">
+        <router-link :to="{ name: 'Cart' }">
+          <div class="link-wrapper">
+            <img
+              src="@/assets/icons/header-icons/cart.png"
+              alt="cart"
+              class="icon"
+            />
+            <p class="icon-description">Корзина</p>
+          </div>
+        </router-link>
+        <nav>
+          <input
+            id="burger-checkbox"
+            v-model="isChecked"
+            type="checkbox"
+            class="burger-checkbox"
+          />
+          <label for="burger-checkbox" class="burger"></label>
+          <ul class="navigation">
+            <router-link v-if="isAuthenticated" :to="{ name: 'User' }">
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/profile.png"
+                  alt="user profile"
+                  class="icon"
+                />
+                <p class="icon-description">Профиль</p>
+              </div>
+            </router-link>
+            <router-link :to="{ name: 'About' }">
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/about-us.png"
+                  alt="about us"
+                  class="icon"
+                />
+                <p class="icon-description">О нас</p>
+              </div>
+            </router-link>
+            <router-link :to="{ name: 'Catalog' }">
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/catalog.png"
+                  alt="catalog"
+                  class="icon"
+                />
+                <p class="icon-description">Каталог</p>
+              </div>
+            </router-link>
+            <router-link
+              v-if="isAuthenticated"
+              :to="{ name: 'Main' }"
+              @click="logout"
+            >
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/logout.png"
+                  alt="login"
+                  class="icon"
+                />
+                <p class="icon-description">Выход</p>
+              </div>
+            </router-link>
+            <router-link
+              v-if="!isAuthenticated && route.name !== 'Login'"
+              :to="{ name: 'Login' }"
+            >
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/login.png"
+                  alt="login"
+                  class="icon"
+                />
+                <p class="icon-description">Вход</p>
+              </div>
+            </router-link>
+            <router-link
+              v-if="!isAuthenticated && route.name !== 'Register'"
+              :to="{ name: 'Register' }"
+            >
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/signup.png"
+                  alt="register"
+                  class="icon"
+                />
+                <p class="icon-description">Регистрация</p>
+              </div>
+            </router-link>
+          </ul>
+        </nav>
+      </div>
     </BaseContainer>
   </header>
 </template>
 
 <style scoped>
+.menu-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+}
 .burger-checkbox {
   display: none;
 }
