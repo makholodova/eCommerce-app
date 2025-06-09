@@ -2,6 +2,9 @@
 import BaseButton from "@/components/ui/BaseButton.vue";
 import router from "@/router";
 import { computed } from "vue";
+import { useCartStore } from "@/store/useCartStore";
+
+const cartStore = useCartStore();
 
 const props = defineProps<{
   id: string;
@@ -24,7 +27,20 @@ function redirectToProductPage(): void {
   });
 }
 function addToCart(): void {
-  // add to card
+  const cartItem = {
+    productId: props.id,
+    quantity: 1,
+    productData: {
+      title: props.title,
+      description: props.description,
+      image: props.image,
+      price: props.price,
+      discountedPrice: props.discountedPrice,
+      discountedPercentage: props.discountedPercentage,
+    },
+  };
+
+  cartStore.setShoppingCart(cartItem);
 }
 </script>
 
