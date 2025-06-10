@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import laptopImg from "@/assets/images/laptop.png";
-import smartphoneImg from "@/assets/images/smartphone.png";
 import CartProductItem from "@/components/cart/CartProductItem.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { ref } from "vue";
+import { getMyCart } from "@/api/commercetools/cart/cart";
+import { onMounted } from "vue";
 
-//временное решение
 interface MockLineItem {
   id: string;
   name: { ru: string };
@@ -22,49 +21,33 @@ interface MockLineItem {
     }[];
   };
 }
-//временное решение заменить на LineItem
-const items = ref<MockLineItem[]>([
-  {
-    id: "1",
-    name: { ru: "Смартфон Apple iPhone 12 64GB" },
-    quantity: 1250,
-    price: {
-      value: {
-        centAmount: 599999,
-        currencyCode: "RUB",
-      },
-    },
-    variant: {
-      images: [{ url: laptopImg }],
-    },
-  },
-  {
-    id: "2",
-    name: { ru: "Смартфон Apple iPhone 14 128GB" },
-    quantity: 1,
-    price: {
-      value: {
-        centAmount: 5999,
-        currencyCode: "RUB",
-      },
-    },
-    variant: {
-      images: [{ url: smartphoneImg }],
-    },
-  },
-]);
+const items = ref<MockLineItem[]>();
 
-//временное решение
-/*onMounted(async () => {
+onMounted(async () => {
   try {
     const cart = await getMyCart();
-    if (cart?.lineItems) {
-      items.value = cart.lineItems;
+    if (cart) {
+      items.value = items.value = cart.lineItems.map((lineItem) => ({
+        id: lineItem.id,
+        name: {
+          ru: lineItem.name["ru"] ?? "Без названия",
+        },
+        quantity: lineItem.quantity,
+        price: {
+          value: {
+            centAmount: lineItem.price.value.centAmount,
+            currencyCode: lineItem.price.value.currencyCode,
+          },
+        },
+        variant: {
+          images: lineItem.variant.images || [],
+        },
+      }));
     }
   } catch (error) {
     console.error("Ошибка загрузки корзины", error);
   }
-});*/
+});
 
 function increaseQuantity(): void {
   console.log("Увеличиваем количество товара");
@@ -81,7 +64,7 @@ function removeItemFromCart(): void {
 
 <template>
   <div class="cart-wrapper">
-    <div v-if="items.length" class="cart">
+    <div v-if="items?.length" class="cart">
       <h1 class="cart-title">Корзина</h1>
       <ul>
         <CartProductItem
