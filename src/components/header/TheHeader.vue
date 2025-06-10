@@ -5,6 +5,7 @@ import { computed } from "vue";
 import BaseContainer from "@/components/ui/BaseContainer.vue";
 import { useAuthStore } from "@/store/useAuthStore";
 import { ref, watch } from "vue";
+import { checkValidSession } from "@/utils/validSession";
 
 const route = useRoute();
 const authStore = useAuthStore();
@@ -21,8 +22,15 @@ watch(
   },
 );
 
-function logout(): void {
+async function logout(): Promise<void> {
   authStore.logout();
+
+  try {
+    await checkValidSession();
+  } catch (error) {
+    console.error(error);
+  }
+
   router.push({ name: "Main" });
 }
 </script>
