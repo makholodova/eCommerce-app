@@ -31,7 +31,7 @@ function addToCart(): void {
 <template>
   <div class="card" @click="redirectToProductPage">
     <div class="card-img-wrapper">
-      <img :src="image" alt="card-image" class="card-img" />
+      <img :src="image" alt="card-image" class="card-img" loading="lazy" />
       <div v-if="isDiscounted" class="card-img-discounted-icon">
         -{{ discountedPercentage }}%
       </div>
