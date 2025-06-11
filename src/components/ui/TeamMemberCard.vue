@@ -81,6 +81,42 @@ defineProps<{
   flex-direction: row-reverse;
 }
 
+.team-member__name {
+  font-weight: 500;
+  font-size: 24px;
+  margin: 10px 0;
+}
+.team-member__role {
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--grey-dark);
+  margin: 10px 0;
+}
+.team-member__bio {
+  font-weight: 400;
+  font-size: 16px;
+}
+
+.team-member__tasks {
+  margin-top: 1rem;
+  padding-left: 1.5rem;
+  list-style-type: none;
+}
+
+.team-member__task {
+  font-size: 15px;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.team-member__task::before {
+  content: "★";
+  color: var(--blue);
+  font-weight: bold;
+  display: inline-block;
+  width: 1.5rem;
+}
+
 .photo-wrapper {
   display: flex;
   align-items: center;
