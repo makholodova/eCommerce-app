@@ -1,6 +1,7 @@
 ﻿import type { Cart } from "@commercetools/platform-sdk";
 import api from "@/api/commercetools/axiosInstance.ts";
 import { useAnonymousTokenStore } from "@/store/useAnonymousTokenStore";
+import type { CartUpdateAction } from "@commercetools/platform-sdk";
 
 const anonymousId = useAnonymousTokenStore().anonymousId;
 
@@ -66,4 +67,30 @@ export async function isProductInCart(productId: string): Promise<boolean> {
   return cart
     ? !!cart.lineItems.find((li) => li.productId === productId)
     : false;
+}
+
+export async function removeProduct(
+  lineItemID: string,
+): Promise<CartUpdateAction | null> {
+  try {
+    const cart: Cart | null = await getActiveCart();
+    if (cart) {
+      const cartID = cart.id;
+      const version = cart.version;
+      const response = await api.post(`/me/carts/${cartID}`, {
+        version: version,
+        actions: [
+          {
+            action: "removeLineItem",
+            lineItemId: lineItemID,
+          },
+        ],
+      });
+      return response.data;
+    }
+  } catch (error) {
+    console.log("не удалось удалить продукт" + error);
+    throw new Error("не удалось удалить продукт");
+  }
+  return null;
 }
