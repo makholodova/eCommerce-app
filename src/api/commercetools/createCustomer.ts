@@ -7,6 +7,7 @@ import { createApiBuilderFromCtpClient } from "@commercetools/platform-sdk";
 import type { ByProjectKeyRequestBuilder } from "@commercetools/platform-sdk";
 import { useTokenStore } from "@/store/useTokenStore";
 import { storeToRefs } from "pinia";
+import { useAnonymousTokenStore } from "@/store/useAnonymousTokenStore";
 
 const projectKey = import.meta.env.VITE_PROJECT_KEY;
 const clientId = import.meta.env.VITE_CLIENT_ID;
@@ -14,6 +15,19 @@ const clientSecret = import.meta.env.VITE_CLIENT_SECRET;
 const authUrl = import.meta.env.VITE_AUTH_URL;
 const apiUrl = import.meta.env.VITE_API_URL;
 const scopesCustomer = import.meta.env.VITE_SCOPES_CUSTOMER.split(" ");
+
+const anonymousId = useAnonymousTokenStore().anonymousId;
+
+const customFetch: typeof fetch = async (url, options) => {
+  const modifiedUrl =
+    typeof url === "string" ? new URL(url, apiUrl) : new URL(url.toString());
+
+  if (anonymousId) {
+    modifiedUrl.searchParams.set("anonymous_id", anonymousId);
+  }
+
+  return fetch(modifiedUrl.toString(), options);
+};
 
 export function createCustomerApiRoot(
   email: string,
@@ -34,7 +48,7 @@ export function createCustomerApiRoot(
       },
     },
     scopes: scopesCustomer,
-    fetch: globalThis.fetch,
+    fetch: customFetch,
     tokenCache: {
       get: () => ({
         token: token.value,
@@ -49,7 +63,7 @@ export function createCustomerApiRoot(
 
   const httpOptions: HttpMiddlewareOptions = {
     host: apiUrl,
-    fetch: globalThis.fetch,
+    fetch: customFetch,
   };
 
   const customerClient = new ClientBuilder()

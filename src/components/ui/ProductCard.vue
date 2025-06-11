@@ -2,14 +2,10 @@
 import BaseButton from "@/components/ui/BaseButton.vue";
 import router from "@/router";
 import { computed, ref } from "vue";
-// import { useCartStore } from "@/store/useCartStore";
 import {
-  getActiveCart,
-  createCart,
   addProductToCard,
   isProductInCart,
 } from "@/api/commercetools/cart/cart.ts";
-import type { Cart } from "@commercetools/platform-sdk";
 import BaseSpinner from "./BaseSpinner.vue";
 
 // const cartStore = useCartStore();
@@ -48,39 +44,17 @@ function redirectToProductPage(): void {
     state: { category: props.category || "" },
   });
 }
-let cart: Cart | null;
+
 async function addToCart(): Promise<void> {
   isLoading.value = true;
-  cart = await getActiveCart();
-  if (cart === null) {
-    cart = await createCart();
-  }
-  const cartID = cart.id;
-  const cartVersion = cart.version;
-  console.log("корзина" + JSON.stringify(cart));
   try {
-    console.log(cartID, cartVersion, props.id);
-    await addProductToCard(cartID, cartVersion, props.id);
+    await addProductToCard(props.id);
     btnText.value = "Товар в корзине";
     isDisabled.value = true;
   } catch (error) {
     console.log("не удалось добавить товар в корзину" + error);
   }
   isLoading.value = false;
-
-  // const cartItem = {
-  //   productId: props.id,
-  //   quantity: 1,
-  //   productData: {
-  //     title: props.title,
-  //     description: props.description,
-  //     image: props.image,
-  //     price: props.price,
-  //     discountedPrice: props.discountedPrice,
-  //     discountedPercentage: props.discountedPercentage,
-  //   },
-  // };
-  // cartStore.setShoppingCart(cartItem);
 }
 </script>
 
