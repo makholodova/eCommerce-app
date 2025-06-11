@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import type { AttributeDefinition } from "@commercetools/platform-sdk";
+import { ref, onMounted, watch } from "vue";
 import BaseCheckbox from "./BaseCheckbox.vue";
-import {
-  productFilters,
-  filterLabels,
-} from "@/utils/filters/dataProductFilters";
 import BaseButton from "./BaseButton.vue";
 import { useFilterStore } from "@/store/useProductFilterStore";
 import IconCross from "@/assets/icons/icon-cross.svg";
 import { convertFiltersToApiFormat } from "@/utils/filters/filters";
+import { getAttributes } from "@/api/commercetools/products/attributes";
+import { adaptAttributes } from "@/adapters/type.adapter";
+import type { ProductFilterMap } from "@/types/types";
 
 const filterStore = useFilterStore();
 
@@ -25,13 +25,21 @@ const emit = defineEmits<{
 const selectedFilters = ref<Record<string, Record<string, boolean>>>({});
 const priceMin = ref<number | null>(null);
 const priceMax = ref<number | null>(null);
+const attributes = ref<AttributeDefinition[]>([]);
+const productFilters = ref<ProductFilterMap>({});
 
-for (const [groupName, options] of Object.entries(productFilters)) {
-  selectedFilters.value[groupName] = {};
-  for (const option of options) {
-    selectedFilters.value[groupName][option.key] = false;
-  }
-}
+watch(
+  () => productFilters.value,
+  (filters) => {
+    for (const [groupName, group] of Object.entries(filters)) {
+      selectedFilters.value[groupName] = {};
+      for (const option of group.options) {
+        selectedFilters.value[groupName][option.key] = false;
+      }
+    }
+  },
+  { immediate: true },
+);
 
 function initializeFiltersFromStore(): void {
   const {
@@ -43,10 +51,10 @@ function initializeFiltersFromStore(): void {
   priceMin.value = storeMin;
   priceMax.value = storeMax;
 
-  for (const [groupName, options] of Object.entries(productFilters)) {
+  for (const [groupName, group] of Object.entries(productFilters.value)) {
     const groupFromStore = storeSelected[groupName] ?? {};
 
-    for (const option of options) {
+    for (const option of group.options) {
       selectedFilters.value[groupName][option.key] =
         groupFromStore[option.key] ?? false;
     }
@@ -83,7 +91,19 @@ function applyFilters(): void {
   }
 }
 
-onMounted(() => initializeFiltersFromStore());
+async function loadAttributes(): Promise<void> {
+  try {
+    attributes.value = await getAttributes();
+    productFilters.value = adaptAttributes(attributes.value);
+  } catch (error) {
+    console.error("Ошибка при загрузке атрибутов:", error);
+  }
+}
+
+onMounted(async () => {
+  await loadAttributes();
+  initializeFiltersFromStore();
+});
 </script>
 
 <template>
@@ -116,12 +136,16 @@ onMounted(() => initializeFiltersFromStore());
       </div>
     </div>
     <div
-      v-for="(options, groupName) in productFilters"
+      v-for="(filterGroup, groupName) in productFilters"
       :key="groupName"
       class="filter-checkbox"
     >
-      <h3 class="title">{{ filterLabels[groupName] }}</h3>
-      <div v-for="option in options" :key="option.key" class="variant">
+      <h3 class="title">{{ filterGroup.title }}</h3>
+      <div
+        v-for="option in filterGroup.options"
+        :key="option.key"
+        class="variant"
+      >
         <BaseCheckbox
           :id="option.key"
           v-model="selectedFilters[groupName][option.key]"
