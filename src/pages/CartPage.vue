@@ -4,6 +4,7 @@ import BaseButton from "@/components/ui/BaseButton.vue";
 import { ref } from "vue";
 import { getMyCart } from "@/api/commercetools/cart/cart";
 import { onMounted } from "vue";
+import { removeProduct } from "@/api/commercetools/cart/cart";
 
 interface MockLineItem {
   id: string;
@@ -57,8 +58,14 @@ function decreaseQuantity(): void {
   console.log("Уменьшаем количество товара");
 }
 
-function removeItemFromCart(): void {
-  console.log("Удалить товар из корзины ");
+async function removeItemFromCart(lineItemId: string): Promise<void> {
+  try {
+    const result = await removeProduct(lineItemId);
+    items.value = items.value?.filter((item) => item.id !== lineItemId);
+    console.log(result);
+  } catch (error) {
+    console.error("Ошибка при удалении товара из корзины", error);
+  }
 }
 </script>
 
@@ -77,7 +84,7 @@ function removeItemFromCart(): void {
           :total-price="item.price.value.centAmount * item.quantity"
           @increase="increaseQuantity"
           @decrease="decreaseQuantity"
-          @remove="removeItemFromCart"
+          @remove="removeItemFromCart(item.id)"
         />
       </ul>
     </div>
