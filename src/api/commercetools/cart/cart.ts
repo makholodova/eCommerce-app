@@ -1,9 +1,6 @@
 ﻿import type { Cart } from "@commercetools/platform-sdk";
 import api from "@/api/commercetools/axiosInstance.ts";
-import { useAnonymousTokenStore } from "@/store/useAnonymousTokenStore";
 import type { CartUpdateAction } from "@commercetools/platform-sdk";
-
-const anonymousId = useAnonymousTokenStore().anonymousId;
 
 export async function getMyCart(): Promise<Cart | null> {
   const response = await api.get("/me/carts");
@@ -26,7 +23,6 @@ export async function createCart(): Promise<Cart> {
   try {
     const newCart = await api.post("me/carts", {
       currency: "RUB",
-      anonymousId,
     });
     return newCart.data;
   } catch (error) {

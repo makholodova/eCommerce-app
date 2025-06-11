@@ -8,8 +8,6 @@ import {
 } from "@/api/commercetools/cart/cart.ts";
 import BaseSpinner from "./BaseSpinner.vue";
 
-// const cartStore = useCartStore();
-
 const props = defineProps<{
   id: string;
   title: string;
