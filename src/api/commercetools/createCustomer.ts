@@ -18,7 +18,7 @@ const scopesCustomer = import.meta.env.VITE_SCOPES_CUSTOMER.split(" ");
 
 const anonymousId = useAnonymousTokenStore().anonymousId;
 
-const customFetch: typeof fetch = async (url, options) => {
+/*const customFetch: typeof fetch = async (url, options) => {
   const modifiedUrl =
     typeof url === "string" ? new URL(url, apiUrl) : new URL(url.toString());
 
@@ -27,8 +27,39 @@ const customFetch: typeof fetch = async (url, options) => {
   }
 
   return fetch(modifiedUrl.toString(), options);
-};
+};*/
 
+function isHeaderRecord(
+  headers: HeadersInit,
+): headers is Record<string, string> {
+  return (
+    typeof headers === "object" && headers !== null && !("forEach" in headers)
+  );
+}
+
+const customFetch: typeof fetch = async (url, options) => {
+  if (
+    options?.body &&
+    typeof options.body === "string" &&
+    options.headers &&
+    isHeaderRecord(options.headers) &&
+    options.headers["Content-Type"] === "application/x-www-form-urlencoded"
+  ) {
+    const params = new URLSearchParams(options.body);
+    if (anonymousId) {
+      params.set("anonymous_id", anonymousId);
+    }
+
+    const modifiedOptions: RequestInit = {
+      ...options,
+      body: params.toString(),
+    };
+
+    return fetch(url.toString(), modifiedOptions);
+  }
+
+  return fetch(url.toString(), options);
+};
 export function createCustomerApiRoot(
   email: string,
   password: string,
