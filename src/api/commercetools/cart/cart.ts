@@ -8,7 +8,9 @@ const cartStore = useCartStore();
 export async function getMyCart(): Promise<Cart | null> {
   const response = await api.get("/me/carts");
   const carts = response.data.results;
-  cartStore.setShoppingCart(response.data.results[0].lineItems);
+  if (response.data.results[0].lineItems) {
+    cartStore.setShoppingCart(response.data.results[0].lineItems);
+  }
   return carts.length > 0 ? carts[0] : null;
 }
 

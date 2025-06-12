@@ -40,10 +40,13 @@ export const useCartStore = defineStore(
     }
 
     function removeFromCart(lineItemID: string): void {
-      console.log(shoppingCart.value);
       shoppingCart.value = shoppingCart.value.filter(
         (item) => item.id !== lineItemID,
       );
+    }
+
+    function cleanCart(): void {
+      shoppingCart.value = [];
     }
 
     return {
@@ -53,6 +56,7 @@ export const useCartStore = defineStore(
       getShoppingCart,
       removeFromCart,
       addToCart,
+      cleanCart,
     };
   },
   {
