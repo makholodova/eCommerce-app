@@ -1,10 +1,14 @@
 ﻿import type { Cart } from "@commercetools/platform-sdk";
 import api from "@/api/commercetools/axiosInstance.ts";
 import type { CartUpdateAction } from "@commercetools/platform-sdk";
+import { useCartStore } from "@/store/useCartStore";
+
+const cartStore = useCartStore();
 
 export async function getMyCart(): Promise<Cart | null> {
   const response = await api.get("/me/carts");
   const carts = response.data.results;
+  cartStore.setShoppingCart(response.data.results[0].lineItems);
   return carts.length > 0 ? carts[0] : null;
 }
 
@@ -39,9 +43,8 @@ export async function addProductToCard(productId: string): Promise<void> {
   }
   const cartID = cart.id;
   const version = cart.version;
-  console.log("корзина" + JSON.stringify(cart));
   try {
-    await api.post(`me/carts/${cartID}`, {
+    const response = await api.post(`me/carts/${cartID}`, {
       version,
       actions: [
         {
@@ -52,6 +55,8 @@ export async function addProductToCard(productId: string): Promise<void> {
         },
       ],
     });
+    cartStore.addToCart(response.data.lineItems[0]);
+    console.log("элемент добавлен" + cartStore.totalItems);
   } catch (error) {
     console.log(error);
     throw new Error("не удалось добавить товар в корзину");
@@ -82,6 +87,8 @@ export async function removeProduct(
           },
         ],
       });
+      cartStore.removeFromCart(lineItemID);
+      console.log("элемент удален" + cartStore.totalItems);
       return response.data;
     }
   } catch (error) {
