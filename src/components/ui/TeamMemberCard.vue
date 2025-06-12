@@ -70,7 +70,6 @@ defineProps<{
   align-items: center;
   gap: 1.5rem;
   background-color: var(--blue-lighter);
-  /* border: 1px solid var(--blue);*/
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);

@@ -58,7 +58,20 @@ const teamMembers = [
 </script>
 <template>
   <div class="about-us-page">
-    <h1 class="about-us-title">Наша команда</h1>
+    <h1 class="about-us-title">О нас</h1>
+    <p class="about-us-text">
+      Мы — <span>Team after 200</span> , команда, которая разработала
+      интернет-магазин <span> ZHMT-shop</span>. Вместе мы учились, ошибались,
+      поддерживали друг друга и преодолевали трудности. Этот проект стал не
+      просто учебной задачей, а настоящим вызовом, который мы приняли и успешно
+      реализовали. Проект zhmt-shop стал результатом слаженного взаимодействия
+      команды. Общие цели и взаимоподдержка помогли выстроить эффективную
+      коммуникацию: каждый шаг обсуждался в чате и на митингах. Чёткое
+      распределение ответственности между участницами позволило избежать
+      дублирования и конфликтов, а активный code review обеспечил высокое
+      качество кода. В результате мы успешно реализовали все требования проекта
+      в срок — с удовольствием, гордостью и чувством команды.
+    </p>
     <div class="about-us-content">
       <TeamMemberCard
         v-for="(member, index) in teamMembers"
@@ -90,6 +103,25 @@ h1 {
   margin: 0 auto;
   width: 100%;
 }
+
+.about-us-text {
+  text-align: center;
+  background-color: var(--blue-lighter);
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  color: var(--grey-dark);
+  font-size: 16px;
+  line-height: 1.6;
+  /* border-bottom: 2px solid var(--blue-light);*/
+}
+
+.about-us-text span {
+  color: var(--blue);
+}
+
 .about-us-content {
   display: flex;
   flex-direction: column;
