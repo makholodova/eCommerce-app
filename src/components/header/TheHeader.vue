@@ -164,17 +164,16 @@ async function logout(): Promise<void> {
   position: absolute;
   top: -1px;
   right: -10px;
-  border-radius: 8px;
   width: 15px;
   height: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid black;
   color: red;
   padding: 5px;
   z-index: 1000;
-  font-size: 14px;
+  font-size: 18px;
+  font-weight: bold;
 }
 @media (hover: hover) and (pointer: fine) {
   a:not(.logo):hover {

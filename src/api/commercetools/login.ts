@@ -2,6 +2,7 @@ import { createCustomerApiRoot } from "./createCustomer";
 import type { UserLoginData } from "@/types/user-login.types";
 import type { CustomerSignInResult } from "@commercetools/platform-sdk";
 import { useAnonymousTokenStore } from "@/store/useAnonymousTokenStore";
+import { getMyCart } from "./cart/cart";
 
 export async function login(
   loginData: UserLoginData,
@@ -44,6 +45,7 @@ export async function login(
 
     const apiRoot = createCustomerApiRoot(loginData.email, loginData.password);
     await apiRoot.me().get().execute();
+    await getMyCart();
 
     return result;
   } catch (error) {

@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import { useTokenStore } from "./useTokenStore";
 import { useAnonymousTokenStore } from "./useAnonymousTokenStore";
 import { getAnonymousId } from "@/utils/anonymousId";
+import { useCartStore } from "./useCartStore";
 
 const clientId = import.meta.env.VITE_CLIENT_ID;
 const clientSecret = import.meta.env.VITE_CLIENT_SECRET;
@@ -18,6 +19,7 @@ export const useAuthStore = defineStore("auth", () => {
   let isRefreshing = false;
 
   const tokenStore = useTokenStore();
+  const cartStore = useCartStore();
 
   const isAuthenticated = computed(() => {
     return !!tokenStore.token;
@@ -129,6 +131,7 @@ export const useAuthStore = defineStore("auth", () => {
   function logout(): void {
     if (refreshTimer !== null) clearTimeout(refreshTimer);
     tokenStore.reset();
+    cartStore.cleanCart();
   }
 
   return {

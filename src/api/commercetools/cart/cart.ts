@@ -8,8 +8,9 @@ const cartStore = useCartStore();
 export async function getMyCart(): Promise<Cart | null> {
   const response = await api.get("/me/carts");
   const carts = response.data.results;
-  if (response.data.results[0].lineItems) {
-    cartStore.setShoppingCart(response.data.results[0].lineItems);
+  if (carts) {
+    const lineItems = response.data.results[0]?.lineItems || [];
+    cartStore.setShoppingCart(lineItems);
   }
   return carts.length > 0 ? carts[0] : null;
 }
@@ -68,7 +69,7 @@ export async function addProductToCard(productId: string): Promise<void> {
 export async function isProductInCart(productId: string): Promise<boolean> {
   const cart = await getMyCart();
   return cart
-    ? !!cart.lineItems.find((li) => li.productId === productId)
+    ? !!cart?.lineItems.find((li) => li.productId === productId)
     : false;
 }
 

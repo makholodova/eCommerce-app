@@ -25,15 +25,20 @@ const btnText = ref<string>("В корзину");
 const isDisabled = ref<boolean>(false);
 
 async function setBtnText(): Promise<void> {
-  const result = await isProductInCart(props.id);
-  if (result === true) {
-    btnText.value = "Товар в корзине";
-    isDisabled.value = true;
-  } else {
-    btnText.value = "В корзину";
-    isDisabled.value = false;
+  try {
+    const result = await isProductInCart(props.id);
+    if (result === true) {
+      btnText.value = "Товар в корзине";
+      isDisabled.value = true;
+    } else {
+      btnText.value = "В корзину";
+      isDisabled.value = false;
+    }
+  } catch (error) {
+    console.log("ошибка определения, в корзине ли товар" + error);
   }
 }
+
 setBtnText();
 function redirectToProductPage(): void {
   router.push({
