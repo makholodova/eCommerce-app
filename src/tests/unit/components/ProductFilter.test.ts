@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { describe, it, expect, vi } from "vitest";
 import ProductFilter from "@/components/ui/ProductFilter.vue";
 import BaseCheckbox from "@/components/ui/BaseCheckbox.vue";
@@ -53,6 +53,35 @@ vi.mock("@/utils/filters/filters", () => ({
   })),
 }));
 
+vi.mock("@/api/commercetools/products/attributes", () => ({
+  getAttributes: vi.fn(() =>
+    Promise.resolve([
+      {
+        name: { en: "Brand" },
+        type: { name: "lenum" },
+        attributeConstraint: "None",
+        isRequired: false,
+        isSearchable: true,
+        inputHint: "SingleLine",
+        displayGroup: "Other",
+        label: { en: "Brand" },
+      },
+    ]),
+  ),
+}));
+
+vi.mock("@/adapters/type.adapter", () => ({
+  adaptAttributes: vi.fn(() => ({
+    brand: {
+      title: "Бренд",
+      options: [
+        { key: "apple", name: "Apple" },
+        { key: "samsung", name: "Samsung" },
+      ],
+    },
+  })),
+}));
+
 describe("ProductFilter.vue", () => {
   it("displays filters and emits when applied", async () => {
     const wrapper = mount(ProductFilter, {
@@ -64,6 +93,8 @@ describe("ProductFilter.vue", () => {
         stubs: { BaseCheckbox, BaseButton },
       },
     });
+
+    await flushPromises();
 
     expect(wrapper.text()).toContain("Бренд");
     expect(wrapper.findComponent(BaseCheckbox).exists()).toBe(true);
