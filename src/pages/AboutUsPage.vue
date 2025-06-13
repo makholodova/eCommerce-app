@@ -36,7 +36,7 @@ const teamMembers = [
     ],
   },
   {
-    name: "Холодова Марина",
+    name: "Марина Холодова",
     role: "Frontend Developer",
     github: "https://github.com/makholodova",
     githubUsername: "makholodova",
