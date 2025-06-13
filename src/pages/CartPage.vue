@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import CartProductItem from "@/components/cart/CartProductItem.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { getMyCart } from "@/api/commercetools/cart/cart";
 import { onMounted } from "vue";
-import { removeProduct } from "@/api/commercetools/cart/cart";
+import {
+  removeProduct,
+  changeItemQuantity,
+} from "@/api/commercetools/cart/cart";
+import BaseSpinner from "@/components/ui/BaseSpinner.vue";
 
 interface MockLineItem {
   id: string;
@@ -15,14 +19,17 @@ interface MockLineItem {
       centAmount: number;
       currencyCode: string;
     };
+    discountedPrice?: number;
   };
+  totalPrice: number;
   variant: {
     images: {
       url: string;
     }[];
   };
 }
-const items = ref<MockLineItem[]>();
+const items = ref<MockLineItem[]>([]);
+const isLoaded = ref(false);
 
 onMounted(async () => {
   try {
@@ -39,7 +46,10 @@ onMounted(async () => {
             centAmount: lineItem.price.value.centAmount,
             currencyCode: lineItem.price.value.currencyCode,
           },
+          discountedPrice:
+            lineItem.price.discounted?.value.centAmount ?? undefined,
         },
+        totalPrice: lineItem.price.value.centAmount * lineItem.quantity,
         variant: {
           images: lineItem.variant.images || [],
         },
@@ -47,15 +57,44 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error("Ошибка загрузки корзины", error);
+  } finally {
+    isLoaded.value = true;
   }
 });
 
-function increaseQuantity(): void {
-  console.log("Увеличиваем количество товара");
+async function updateLocalQuantity(
+  lineItemId: string,
+  newQuantity: number,
+): Promise<void> {
+  const updatedItem = await changeItemQuantity(lineItemId, newQuantity);
+  const item = items.value?.find((item) => item.id === lineItemId);
+  if (item && typeof updatedItem?.quantity === "number") {
+    item.quantity = updatedItem.quantity;
+  }
 }
 
-function decreaseQuantity(): void {
-  console.log("Уменьшаем количество товара");
+async function increaseQuantity(
+  lineItemId: string,
+  quantity: number,
+): Promise<void> {
+  try {
+    await updateLocalQuantity(lineItemId, quantity + 1);
+  } catch (error) {
+    console.error("Ошибка при увеличении товара в корзине", error);
+  }
+}
+
+async function decreaseQuantity(
+  lineItemId: string,
+  quantity: number,
+): Promise<void> {
+  try {
+    if (quantity > 1) {
+      await updateLocalQuantity(lineItemId, quantity - 1);
+    }
+  } catch (error) {
+    console.error("Ошибка при увеличении товара в корзине", error);
+  }
 }
 
 async function removeItemFromCart(lineItemId: string): Promise<void> {
@@ -67,11 +106,25 @@ async function removeItemFromCart(lineItemId: string): Promise<void> {
     console.error("Ошибка при удалении товара из корзины", error);
   }
 }
+
+const totalWithDiscount = computed(() => {
+  return items.value.reduce((sum, item) => {
+    const price = item.price.discountedPrice ?? item.price.value.centAmount;
+    return sum + price * item.quantity;
+  }, 0);
+});
+
+const totalWithoutDiscount = computed(() => {
+  return items.value.reduce((sum, item) => {
+    return sum + item.price.value.centAmount * item.quantity;
+  }, 0);
+});
 </script>
 
 <template>
   <div class="cart-wrapper">
-    <div v-if="items?.length" class="cart">
+    <BaseSpinner v-if="!isLoaded" />
+    <div v-else-if="items.length" class="cart">
       <h1 class="cart-title">Корзина</h1>
       <ul>
         <CartProductItem
@@ -81,12 +134,27 @@ async function removeItemFromCart(lineItemId: string): Promise<void> {
           :image="item.variant.images?.[0]?.url || ''"
           :unit-price="item.price.value.centAmount"
           :quantity="item.quantity"
+          :discounted-price="item.price.discountedPrice"
           :total-price="item.price.value.centAmount * item.quantity"
-          @increase="increaseQuantity"
-          @decrease="decreaseQuantity"
+          :total-price-discounted="
+            item.price.discountedPrice
+              ? item.price.discountedPrice * item.quantity
+              : undefined
+          "
+          @increase="increaseQuantity(item.id, item.quantity)"
+          @decrease="decreaseQuantity(item.id, item.quantity)"
           @remove="removeItemFromCart(item.id)"
         />
       </ul>
+      <div v-if="totalWithDiscount !== totalWithoutDiscount" class="card-total">
+        Итого: {{ totalWithDiscount.toFixed(2) }} ₽
+        <span class="card-total-discounted-price">
+          {{ totalWithoutDiscount.toFixed(2) }} ₽
+        </span>
+      </div>
+      <div v-else class="card-total">
+        Итого: {{ totalWithDiscount.toFixed(2) }} ₽
+      </div>
     </div>
     <div v-else class="cart-empty">
       <h2 class="cart-empty__title">Ваша корзина пуста</h2>
@@ -142,5 +210,29 @@ async function removeItemFromCart(lineItemId: string): Promise<void> {
   margin: 0 auto;
   margin-top: 20px;
   display: block;
+}
+
+.card-total {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  gap: 8px;
+  font-size: 22px;
+  font-weight: 500;
+}
+.card-total-discounted-price {
+  font-weight: 300;
+  font-size: 18px;
+  text-decoration: line-through;
+  color: var(--grey);
+  align-self: flex-end;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  ul {
+    padding: 0;
+  }
 }
 </style>
