@@ -123,7 +123,6 @@ export async function changeItemQuantity(
     (item: LineItem) => item.id === lineItemId,
   );
 
-  console.log("response ", response.data.lineItems);
   cartStore.setShoppingCart(response.data.lineItems);
 
   return updatedItem;

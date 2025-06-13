@@ -104,9 +104,6 @@ onMounted(async () => {
   await loadAttributes();
   initializeFiltersFromStore();
 });
-
-//<img :src="IconCross" alt="cross" class="icon-cross" />
-// /<IconCross alt="cross" class="icon-cross" />
 </script>
 
 <template>

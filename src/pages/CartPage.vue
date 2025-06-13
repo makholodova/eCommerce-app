@@ -8,6 +8,7 @@ import {
   removeProduct,
   changeItemQuantity,
 } from "@/api/commercetools/cart/cart";
+import BaseSpinner from "@/components/ui/BaseSpinner.vue";
 
 interface MockLineItem {
   id: string;
@@ -28,6 +29,7 @@ interface MockLineItem {
   };
 }
 const items = ref<MockLineItem[]>([]);
+const isLoaded = ref(false);
 
 onMounted(async () => {
   try {
@@ -55,23 +57,28 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error("Ошибка загрузки корзины", error);
+  } finally {
+    isLoaded.value = true;
   }
 });
+
+async function updateLocalQuantity(
+  lineItemId: string,
+  newQuantity: number,
+): Promise<void> {
+  const updatedItem = await changeItemQuantity(lineItemId, newQuantity);
+  const item = items.value?.find((item) => item.id === lineItemId);
+  if (item && typeof updatedItem?.quantity === "number") {
+    item.quantity = updatedItem.quantity;
+  }
+}
 
 async function increaseQuantity(
   lineItemId: string,
   quantity: number,
 ): Promise<void> {
-  console.log("Увеличиваем количество товара");
-
   try {
-    const updatedItem = await changeItemQuantity(lineItemId, quantity + 1);
-    console.log("updatedItem ", updatedItem);
-    const newQuantity = updatedItem?.quantity;
-    const item = items.value?.find((item) => item.id === lineItemId);
-    if (item && typeof newQuantity === "number") {
-      item.quantity = newQuantity;
-    }
+    await updateLocalQuantity(lineItemId, quantity + 1);
   } catch (error) {
     console.error("Ошибка при увеличении товара в корзине", error);
   }
@@ -81,17 +88,9 @@ async function decreaseQuantity(
   lineItemId: string,
   quantity: number,
 ): Promise<void> {
-  console.log("Уменьшаем количество товара");
-
   try {
     if (quantity > 1) {
-      const updatedItem = await changeItemQuantity(lineItemId, quantity - 1);
-      console.log("updatedItem ", updatedItem);
-      const newQuantity = updatedItem?.quantity;
-      const item = items.value?.find((item) => item.id === lineItemId);
-      if (item && typeof newQuantity === "number") {
-        item.quantity = newQuantity;
-      }
+      await updateLocalQuantity(lineItemId, quantity - 1);
     }
   } catch (error) {
     console.error("Ошибка при увеличении товара в корзине", error);
@@ -124,7 +123,8 @@ const totalWithoutDiscount = computed(() => {
 
 <template>
   <div class="cart-wrapper">
-    <div v-if="items?.length" class="cart">
+    <BaseSpinner v-if="!isLoaded" />
+    <div v-else-if="items.length" class="cart">
       <h1 class="cart-title">Корзина</h1>
       <ul>
         <CartProductItem
