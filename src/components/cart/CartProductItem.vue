@@ -8,7 +8,9 @@ defineProps<{
   image: string;
   unitPrice: number;
   quantity: number;
+  discountedPrice?: number;
   totalPrice: number;
+  totalPriceDiscounted?: number;
 }>();
 
 const emit = defineEmits<{
@@ -26,7 +28,15 @@ const emit = defineEmits<{
 
     <h3 class="cart-item__title">{{ title }}</h3>
 
-    <p class="cart-item__unit-price">{{ unitPrice.toFixed(2) }} ₽</p>
+    <div v-if="discountedPrice" class="card-price">
+      <div class="cart-item__unit-price">
+        {{ discountedPrice.toFixed(2) }} ₽
+      </div>
+      <div class="card-discounted-price">{{ unitPrice.toFixed(2) }} ₽</div>
+    </div>
+    <div v-else class="card-price">
+      <div class="cart-item__unit-price">{{ unitPrice.toFixed(2) }} ₽</div>
+    </div>
 
     <div class="cart-item__quantity-control">
       <button
@@ -47,7 +57,15 @@ const emit = defineEmits<{
       </button>
     </div>
 
-    <div class="cart-item__total-price">{{ totalPrice.toFixed(2) }} ₽</div>
+    <div v-if="totalPriceDiscounted" class="card-price">
+      <div class="cart-item__total-price">
+        {{ totalPriceDiscounted.toFixed(2) }} ₽
+      </div>
+      <div class="card-discounted-price">{{ totalPrice.toFixed(2) }} ₽</div>
+    </div>
+    <div v-else class="card-price">
+      <div class="cart-item__total-price">{{ totalPrice.toFixed(2) }} ₽</div>
+    </div>
 
     <button
       class="cart-item__quantity-button"
@@ -155,6 +173,22 @@ const emit = defineEmits<{
   color: var(--grey-light);
 }
 
+.card-price {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 2px;
+  font-size: 18px;
+  font-weight: 500;
+}
+.card-discounted-price {
+  font-weight: 300;
+  font-size: 14px;
+  text-decoration: line-through;
+  color: var(--grey);
+  text-align: center;
+}
+
 @media (max-width: 880px) {
   .cart-item {
     grid-template-columns: 80px 1fr auto;
@@ -167,6 +201,9 @@ const emit = defineEmits<{
     justify-items: start;
     row-gap: 15px;
     column-gap: 25px;
+  }
+  .card-price {
+    align-items: start;
   }
 }
 </style>

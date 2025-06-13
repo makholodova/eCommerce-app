@@ -1,6 +1,6 @@
 ﻿import type { Cart } from "@commercetools/platform-sdk";
 import api from "@/api/commercetools/axiosInstance.ts";
-import type { CartUpdateAction } from "@commercetools/platform-sdk";
+import type { CartUpdateAction, LineItem } from "@commercetools/platform-sdk";
 import { useCartStore } from "@/store/useCartStore";
 
 const cartStore = useCartStore();
@@ -99,4 +99,32 @@ export async function removeProduct(
     throw new Error("не удалось удалить продукт");
   }
   return null;
+}
+
+export async function changeItemQuantity(
+  lineItemId: string,
+  quantity: number,
+): Promise<LineItem | undefined> {
+  const cart = await getActiveCart();
+  if (!cart) throw new Error("Нет активной корзины");
+
+  const response = await api.post(`/me/carts/${cart.id}`, {
+    version: cart.version,
+    actions: [
+      {
+        action: "changeLineItemQuantity",
+        lineItemId,
+        quantity,
+      },
+    ],
+  });
+
+  const updatedItem = response.data.lineItems.find(
+    (item: LineItem) => item.id === lineItemId,
+  );
+
+  console.log("response ", response.data.lineItems);
+  cartStore.setShoppingCart(response.data.lineItems);
+
+  return updatedItem;
 }
