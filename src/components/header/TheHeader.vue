@@ -6,10 +6,12 @@ import BaseContainer from "@/components/ui/BaseContainer.vue";
 import { useAuthStore } from "@/store/useAuthStore";
 import { ref, watch } from "vue";
 import { checkValidSession } from "@/utils/validSession";
+import { useCartStore } from "@/store/useCartStore";
 
 const route = useRoute();
 const authStore = useAuthStore();
 const router = useRouter();
+const cartStore = useCartStore();
 
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 
@@ -44,11 +46,17 @@ async function logout(): Promise<void> {
       <div class="menu-wrapper">
         <router-link :to="{ name: 'Cart' }">
           <div class="link-wrapper">
-            <img
-              src="@/assets/icons/header-icons/cart.png"
-              alt="cart"
-              class="icon"
-            />
+            <div class="cart-icon-wrapper">
+              <img
+                src="@/assets/icons/header-icons/cart.png"
+                alt="cart"
+                class="icon"
+              />
+              <div v-if="cartStore.totalItems > 0" class="cart-total-counter">
+                {{ cartStore.totalItems }}
+              </div>
+            </div>
+
             <p class="icon-description">Корзина</p>
           </div>
         </router-link>
@@ -147,6 +155,25 @@ async function logout(): Promise<void> {
 }
 .burger-checkbox {
   display: none;
+}
+.cart-icon-wrapper {
+  position: relative;
+  z-index: 100;
+}
+.cart-total-counter {
+  position: absolute;
+  top: -1px;
+  right: -10px;
+  width: 15px;
+  height: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: red;
+  padding: 5px;
+  z-index: 1000;
+  font-size: 18px;
+  font-weight: bold;
 }
 @media (hover: hover) and (pointer: fine) {
   a:not(.logo):hover {

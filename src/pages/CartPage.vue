@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import laptopImg from "@/assets/images/laptop.png";
-import smartphoneImg from "@/assets/images/smartphone.png";
 import CartProductItem from "@/components/cart/CartProductItem.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { ref } from "vue";
+import { getMyCart } from "@/api/commercetools/cart/cart";
+import { onMounted } from "vue";
+import { removeProduct } from "@/api/commercetools/cart/cart";
 
-//временное решение
 interface MockLineItem {
   id: string;
   name: { ru: string };
@@ -22,49 +22,33 @@ interface MockLineItem {
     }[];
   };
 }
-//временное решение заменить на LineItem
-const items = ref<MockLineItem[]>([
-  {
-    id: "1",
-    name: { ru: "Смартфон Apple iPhone 12 64GB" },
-    quantity: 1250,
-    price: {
-      value: {
-        centAmount: 599999,
-        currencyCode: "RUB",
-      },
-    },
-    variant: {
-      images: [{ url: laptopImg }],
-    },
-  },
-  {
-    id: "2",
-    name: { ru: "Смартфон Apple iPhone 14 128GB" },
-    quantity: 1,
-    price: {
-      value: {
-        centAmount: 5999,
-        currencyCode: "RUB",
-      },
-    },
-    variant: {
-      images: [{ url: smartphoneImg }],
-    },
-  },
-]);
+const items = ref<MockLineItem[]>();
 
-//временное решение
-/*onMounted(async () => {
+onMounted(async () => {
   try {
     const cart = await getMyCart();
-    if (cart?.lineItems) {
-      items.value = cart.lineItems;
+    if (cart) {
+      items.value = items.value = cart.lineItems.map((lineItem) => ({
+        id: lineItem.id,
+        name: {
+          ru: lineItem.name["ru"] ?? "Без названия",
+        },
+        quantity: lineItem.quantity,
+        price: {
+          value: {
+            centAmount: lineItem.price.value.centAmount,
+            currencyCode: lineItem.price.value.currencyCode,
+          },
+        },
+        variant: {
+          images: lineItem.variant.images || [],
+        },
+      }));
     }
   } catch (error) {
     console.error("Ошибка загрузки корзины", error);
   }
-});*/
+});
 
 function increaseQuantity(): void {
   console.log("Увеличиваем количество товара");
@@ -74,14 +58,20 @@ function decreaseQuantity(): void {
   console.log("Уменьшаем количество товара");
 }
 
-function removeItemFromCart(): void {
-  console.log("Удалить товар из корзины ");
+async function removeItemFromCart(lineItemId: string): Promise<void> {
+  try {
+    const result = await removeProduct(lineItemId);
+    items.value = items.value?.filter((item) => item.id !== lineItemId);
+    console.log(result);
+  } catch (error) {
+    console.error("Ошибка при удалении товара из корзины", error);
+  }
 }
 </script>
 
 <template>
   <div class="cart-wrapper">
-    <div v-if="items.length" class="cart">
+    <div v-if="items?.length" class="cart">
       <h1 class="cart-title">Корзина</h1>
       <ul>
         <CartProductItem
@@ -94,7 +84,7 @@ function removeItemFromCart(): void {
           :total-price="item.price.value.centAmount * item.quantity"
           @increase="increaseQuantity"
           @decrease="decreaseQuantity"
-          @remove="removeItemFromCart"
+          @remove="removeItemFromCart(item.id)"
         />
       </ul>
     </div>
