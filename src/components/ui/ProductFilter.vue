@@ -104,12 +104,15 @@ onMounted(async () => {
   await loadAttributes();
   initializeFiltersFromStore();
 });
+
+//<img :src="IconCross" alt="cross" class="icon-cross" />
+// /<IconCross alt="cross" class="icon-cross" />
 </script>
 
 <template>
   <div class="container">
     <button v-if="isMobile" type="button" class="button-cross" @click="onClose">
-      <img :src="IconCross" alt="cross" class="icon-cross" />
+      <IconCross alt="cross" class="icon-cross" />
     </button>
     <div class="filter-price">
       <h3 class="title">Цена, ₽</h3>
@@ -238,5 +241,6 @@ onMounted(async () => {
 
 .icon-cross {
   width: 36px;
+  height: 36px;
 }
 </style>
