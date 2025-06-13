@@ -39,14 +39,4 @@ describe("toast utils", () => {
       onClose,
     });
   });
-
-  /*it("should return a random UUID string", () => {
-		const mockUUID = "123e4567-e89b-12d3-a456-426614174000";
-		vi.spyOn(crypto, "randomUUID").mockReturnValue(mockUUID);
-
-		const result = toast();
-
-		expect(result).toBe(mockUUID);
-		expect(crypto.randomUUID).toHaveBeenCalled();
-	});*/
 });
