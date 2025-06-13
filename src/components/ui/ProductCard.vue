@@ -6,7 +6,6 @@ import {
   addProductToCard,
   isProductInCart,
 } from "@/api/commercetools/cart/cart.ts";
-import BaseSpinner from "./BaseSpinner.vue";
 
 const props = defineProps<{
   id: string;
@@ -63,7 +62,6 @@ async function addToCart(): Promise<void> {
 
 <template>
   <div class="card" @click="redirectToProductPage">
-    <BaseSpinner v-if="isLoading" class="spinner" />
     <div class="card-img-wrapper">
       <img :src="image" alt="card-image" class="card-img" loading="lazy" />
       <div v-if="isDiscounted" class="card-img-discounted-icon">
@@ -88,6 +86,7 @@ async function addToCart(): Promise<void> {
       class="card-btn"
       :text="btnText"
       :disabled="isDisabled"
+      :is-loading="isLoading"
       @click.prevent.stop="addToCart"
     ></base-button>
   </div>

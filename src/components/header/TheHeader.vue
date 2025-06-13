@@ -192,7 +192,7 @@ header {
 }
 .header {
   position: relative;
-  padding: 0 clamp(16px, 5vw, 80px);
+  padding: 10px clamp(16px, 5vw, 80px);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -229,6 +229,7 @@ header {
 .link-wrapper img {
   width: 20px;
   height: 20px;
+  margin-bottom: 5px;
 }
 a {
   text-decoration: none;
@@ -236,7 +237,7 @@ a {
   display: block;
   text-transform: none;
 }
-@media (max-width: 600px) {
+@media (max-width: 650px) {
   .burger-checkbox {
     position: absolute;
     visibility: hidden;
@@ -246,7 +247,6 @@ a {
     z-index: 1;
     cursor: pointer;
     display: block;
-    position: relative;
     border: none;
     background: transparent;
 
@@ -308,7 +308,6 @@ a {
     background: var(--blue-light);
     list-style-type: none;
     transform: translateX(100%);
-    display: none;
     transition: 0.3s;
   }
   .navigation a {
