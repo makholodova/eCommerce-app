@@ -28,3 +28,16 @@ export type FilterData = {
 export type FilterMap = {
   [categoryKey: string]: FilterData;
 };
+
+export type FilterOption = {
+  key: string;
+  name: string;
+};
+
+export type ProductFilterMap = Record<
+  string,
+  {
+    title: string;
+    options: FilterOption[];
+  }
+>;
