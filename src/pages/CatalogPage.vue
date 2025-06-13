@@ -159,5 +159,6 @@ const breadcrumbsRoutes: breadCrumbType[] = [
   justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
+  width: 100%;
 }
 </style>
