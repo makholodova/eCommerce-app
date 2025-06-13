@@ -162,17 +162,18 @@ async function logout(): Promise<void> {
 }
 .cart-total-counter {
   position: absolute;
-  top: -1px;
-  right: -10px;
-  width: 15px;
-  height: 15px;
+  top: -8px;
+  right: -12px;
   display: flex;
   justify-content: center;
+  background-color: var(--blue);
   align-items: center;
-  color: red;
+  padding: 2px;
+  color: white;
+  border-radius: 50%;
   padding: 5px;
   z-index: 1000;
-  font-size: 18px;
+  font-size: 8px;
   font-weight: bold;
 }
 @media (hover: hover) and (pointer: fine) {
