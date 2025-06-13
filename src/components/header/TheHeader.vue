@@ -234,6 +234,7 @@ a {
   text-decoration: none;
   border-radius: 10px;
   display: block;
+  text-transform: none;
 }
 @media (max-width: 600px) {
   .burger-checkbox {
