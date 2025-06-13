@@ -125,7 +125,22 @@ const totalWithoutDiscount = computed(() => {
   <div class="cart-wrapper">
     <BaseSpinner v-if="!isLoaded" />
     <div v-else-if="items.length" class="cart">
-      <h1 class="cart-title">Корзина</h1>
+      <h1 class="cart-title subtitle">Корзина</h1>
+      <div class="cart-footer">
+        <BaseButton text="Очистить корзину" size="sm"> </BaseButton>
+        <div
+          v-if="totalWithDiscount !== totalWithoutDiscount"
+          class="card-total"
+        >
+          Итого: {{ totalWithDiscount.toFixed(2) }} ₽
+          <span class="card-total-discounted-price">
+            {{ totalWithoutDiscount.toFixed(2) }} ₽
+          </span>
+        </div>
+        <div v-else class="card-total">
+          Итого: {{ totalWithDiscount.toFixed(2) }} ₽
+        </div>
+      </div>
       <ul>
         <CartProductItem
           v-for="item in items"
@@ -146,15 +161,6 @@ const totalWithoutDiscount = computed(() => {
           @remove="removeItemFromCart(item.id)"
         />
       </ul>
-      <div v-if="totalWithDiscount !== totalWithoutDiscount" class="card-total">
-        Итого: {{ totalWithDiscount.toFixed(2) }} ₽
-        <span class="card-total-discounted-price">
-          {{ totalWithoutDiscount.toFixed(2) }} ₽
-        </span>
-      </div>
-      <div v-else class="card-total">
-        Итого: {{ totalWithDiscount.toFixed(2) }} ₽
-      </div>
     </div>
     <div v-else class="cart-empty">
       <h2 class="cart-empty__title">Ваша корзина пуста</h2>
@@ -180,8 +186,6 @@ const totalWithoutDiscount = computed(() => {
   padding: 24px;
 }
 .cart-title {
-  font-weight: 400;
-  font-size: 28px;
   margin: 0;
 }
 .cart-empty {
@@ -213,7 +217,6 @@ const totalWithoutDiscount = computed(() => {
 }
 
 .card-total {
-  margin-top: 30px;
   display: flex;
   justify-content: flex-end;
   width: 100%;
@@ -230,9 +233,22 @@ const totalWithoutDiscount = computed(() => {
   text-align: center;
 }
 
-@media (max-width: 600px) {
+.cart-footer {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 680px) {
   ul {
     padding: 0;
+  }
+  .cart-footer {
+    padding: 0;
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-start;
   }
 }
 </style>
