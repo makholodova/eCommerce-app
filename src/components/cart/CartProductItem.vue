@@ -57,13 +57,13 @@ const emit = defineEmits<{
       </button>
     </div>
 
-    <div v-if="totalPriceDiscounted" class="card-price">
+    <div v-if="totalPriceDiscounted" class="card-price cart-item__total-price">
       <div class="cart-item__total-price">
         {{ totalPriceDiscounted.toFixed(2) }} ₽
       </div>
       <div class="card-discounted-price">{{ totalPrice.toFixed(2) }} ₽</div>
     </div>
-    <div v-else class="card-price">
+    <div v-else class="card-price cart-item__total-price">
       <div class="cart-item__total-price">{{ totalPrice.toFixed(2) }} ₽</div>
     </div>
 
@@ -178,8 +178,6 @@ const emit = defineEmits<{
   flex-direction: column;
   width: 100%;
   gap: 2px;
-  font-size: 18px;
-  font-weight: 500;
 }
 .card-discounted-price {
   font-weight: 300;
