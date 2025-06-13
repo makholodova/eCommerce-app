@@ -170,6 +170,8 @@ async function logout(): Promise<void> {
   align-items: center;
   padding: 2px;
   color: white;
+  min-width: 20px;
+  min-height: 20px;
   border-radius: 50%;
   padding: 5px;
   z-index: 1000;
