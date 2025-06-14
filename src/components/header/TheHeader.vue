@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import { computed } from "vue";
 import BaseContainer from "@/components/ui/BaseContainer.vue";
 import { useAuthStore } from "@/store/useAuthStore";
-import { ref, watch } from "vue";
+import { ref, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { checkValidSession } from "@/utils/validSession";
 import { useCartStore } from "@/store/useCartStore";
 
@@ -12,10 +12,28 @@ const route = useRoute();
 const authStore = useAuthStore();
 const router = useRouter();
 const cartStore = useCartStore();
-
 const isAuthenticated = computed(() => authStore.isAuthenticated);
-
 const isChecked = ref(false);
+const headerRef = ref<HTMLElement | null>(null);
+
+function updateHeaderHeightCSSVar(): void {
+  if (headerRef.value) {
+    const height = headerRef.value.getBoundingClientRect().height;
+    document.documentElement.style.setProperty(
+      "--dynamic-header-height",
+      `${height}px`,
+    );
+  }
+}
+
+onMounted(async () => {
+  await nextTick();
+  updateHeaderHeightCSSVar();
+  window.addEventListener("resize", updateHeaderHeightCSSVar);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateHeaderHeightCSSVar);
+});
 
 watch(
   () => route.fullPath,
@@ -38,7 +56,7 @@ async function logout(): Promise<void> {
 </script>
 
 <template>
-  <header>
+  <header ref="headerRef">
     <BaseContainer class="header">
       <router-link :to="{ name: 'Main' }" class="logo">
         <img src="@/assets/icons/header-icons/logo.png" alt="logo" />
@@ -68,80 +86,78 @@ async function logout(): Promise<void> {
             class="burger-checkbox"
           />
           <label for="burger-checkbox" class="burger"></label>
-          <transition name="slide-menu">
-            <ul v-if="isChecked" class="navigation">
-              <router-link v-if="isAuthenticated" :to="{ name: 'User' }">
-                <div class="link-wrapper">
-                  <img
-                    src="@/assets/icons/header-icons/profile.png"
-                    alt="user profile"
-                    class="icon"
-                  />
-                  <p class="icon-description">Профиль</p>
-                </div>
-              </router-link>
-              <router-link :to="{ name: 'About' }">
-                <div class="link-wrapper">
-                  <img
-                    src="@/assets/icons/header-icons/about-us.png"
-                    alt="about us"
-                    class="icon"
-                  />
-                  <p class="icon-description">О нас</p>
-                </div>
-              </router-link>
-              <router-link :to="{ name: 'Catalog' }">
-                <div class="link-wrapper">
-                  <img
-                    src="@/assets/icons/header-icons/catalog.png"
-                    alt="catalog"
-                    class="icon"
-                  />
-                  <p class="icon-description">Каталог</p>
-                </div>
-              </router-link>
-              <router-link
-                v-if="isAuthenticated"
-                :to="{ name: 'Main' }"
-                @click="logout"
-              >
-                <div class="link-wrapper">
-                  <img
-                    src="@/assets/icons/header-icons/logout.png"
-                    alt="login"
-                    class="icon"
-                  />
-                  <p class="icon-description">Выход</p>
-                </div>
-              </router-link>
-              <router-link
-                v-if="!isAuthenticated && route.name !== 'Login'"
-                :to="{ name: 'Login' }"
-              >
-                <div class="link-wrapper">
-                  <img
-                    src="@/assets/icons/header-icons/login.png"
-                    alt="login"
-                    class="icon"
-                  />
-                  <p class="icon-description">Вход</p>
-                </div>
-              </router-link>
-              <router-link
-                v-if="!isAuthenticated && route.name !== 'Register'"
-                :to="{ name: 'Register' }"
-              >
-                <div class="link-wrapper">
-                  <img
-                    src="@/assets/icons/header-icons/signup.png"
-                    alt="register"
-                    class="icon"
-                  />
-                  <p class="icon-description">Регистрация</p>
-                </div>
-              </router-link>
-            </ul>
-          </transition>
+          <ul class="navigation">
+            <router-link v-if="isAuthenticated" :to="{ name: 'User' }">
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/profile.png"
+                  alt="user profile"
+                  class="icon"
+                />
+                <p class="icon-description">Профиль</p>
+              </div>
+            </router-link>
+            <router-link :to="{ name: 'About' }">
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/about-us.png"
+                  alt="about us"
+                  class="icon"
+                />
+                <p class="icon-description">О нас</p>
+              </div>
+            </router-link>
+            <router-link :to="{ name: 'Catalog' }">
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/catalog.png"
+                  alt="catalog"
+                  class="icon"
+                />
+                <p class="icon-description">Каталог</p>
+              </div>
+            </router-link>
+            <router-link
+              v-if="isAuthenticated"
+              :to="{ name: 'Main' }"
+              @click="logout"
+            >
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/logout.png"
+                  alt="login"
+                  class="icon"
+                />
+                <p class="icon-description">Выход</p>
+              </div>
+            </router-link>
+            <router-link
+              v-if="!isAuthenticated && route.name !== 'Login'"
+              :to="{ name: 'Login' }"
+            >
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/login.png"
+                  alt="login"
+                  class="icon"
+                />
+                <p class="icon-description">Вход</p>
+              </div>
+            </router-link>
+            <router-link
+              v-if="!isAuthenticated && route.name !== 'Register'"
+              :to="{ name: 'Register' }"
+            >
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/signup.png"
+                  alt="register"
+                  class="icon"
+                />
+                <p class="icon-description">Регистрация</p>
+              </div>
+            </router-link>
+          </ul>
         </nav>
       </div>
     </BaseContainer>
@@ -301,17 +317,24 @@ a {
   }
   .navigation {
     position: absolute;
-    top: 100%;
     right: 0;
+    top: var(--dynamic-header-height);
+    height: calc(100vh - var(--dynamic-header-height));
     width: 100vw;
-    height: 100vh;
-    background: var(--blue-light);
-    pointer-events: none;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 24px;
+    justify-content: center;
+    align-items: center;
+    background: var(--blue-light);
     z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    transform: translateX(-100%);
+  }
+
+  .burger-checkbox:checked ~ .navigation {
+    opacity: 1;
+    transform: translateX(0);
   }
   .navigation a {
     padding: 8px;
@@ -320,24 +343,7 @@ a {
     text-align: center;
     text-decoration: none;
   }
-  .slide-menu-enter-active,
-  .slide-menu-leave-active {
-    transition:
-      transform 0.3s ease,
-      opacity 0.3s ease;
-  }
 
-  .slide-menu-enter-from,
-  .slide-menu-leave-to {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-
-  .slide-menu-enter-to,
-  .slide-menu-leave-from {
-    transform: translateX(0%);
-    opacity: 1;
-  }
   .navigation a:hover {
     background: var(--blue-lighter);
   }
