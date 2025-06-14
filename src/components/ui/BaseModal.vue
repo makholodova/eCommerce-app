@@ -29,7 +29,7 @@ watch(
     <div v-if="isOpen" class="modal-overlay" @click.self="emit('close')">
       <div class="modal-window">
         <div v-if="closeBtnNeeded" class="close-btn" @click="emit('close')">
-          <img :src="closeBtnIcon" alt="close button" />
+          <closeBtnIcon alt="close button" class="close-btn-img" />
         </div>
         <h2 class="modal-title">{{ title }}</h2>
         <div class="modal-content">
@@ -42,13 +42,15 @@ watch(
 
 <style scoped>
 .close-btn {
+  position: absolute;
   top: 10px;
   right: 10px;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   cursor: pointer;
+  z-index: 1;
 }
-.close-btn img {
+.close-btn-img {
   object-fit: contain;
   width: 100%;
   height: 100%;

@@ -117,7 +117,7 @@ const emit = defineEmits<{
   margin: 0;
   text-align: center;
   font-weight: 500;
-  font-size: clamp(16px, 4vw, 18px);
+  font-size: clamp(18px, 4vw, 20px);
 }
 
 .cart-item__unit-price {
