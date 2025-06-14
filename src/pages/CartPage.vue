@@ -221,12 +221,12 @@ const totalWithoutDiscount = computed(() => {
   justify-content: flex-end;
   width: 100%;
   gap: 8px;
-  font-size: 22px;
+  font-size: clamp(20px, 5vw, 22px);
   font-weight: 500;
 }
 .card-total-discounted-price {
   font-weight: 300;
-  font-size: 18px;
+  font-size: clamp(16px, 5vw, 18px);
   text-decoration: line-through;
   color: var(--grey);
   align-self: flex-end;
