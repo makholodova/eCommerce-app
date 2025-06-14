@@ -8,7 +8,10 @@ const teamMembers = [
     role: "Frontend Developer",
     github: "https://github.com/zhannaivashova",
     githubUsername: "zhannaivashova",
-    photo: new URL("@/assets/images/smartphone.png", import.meta.url).href,
+    photo: new URL(
+      "@/assets/images/team_member/zhannaivashova.png",
+      import.meta.url,
+    ).href,
     bio: "Я Жанна, живу в Тбилиси. Мой путь в разработку начался около двух лет назад из любопытства, которое стало настоящим увлечением. Чтобы развить навыки, я поступила на курс JS/Frontend в RS School. Вне учёбы обожаю хайкинг, природу и, конечно, животных. В будущем хочу создавать продукты, которые приносят людям пользу и удовольствие.",
     contributions: [
       "Разработка страницы входа",
@@ -24,7 +27,10 @@ const teamMembers = [
     github: "https://github.com/tatiankaba",
     githubUsername: "tatiankaba",
 
-    photo: new URL("@/assets/images/tablet.png", import.meta.url).href,
+    photo: new URL(
+      "@/assets/images/team_member/tatiankaba.png",
+      import.meta.url,
+    ).href,
     bio: "Я Татьяна, frontend-разработчик. Живу в Загребе, но планирую переезд в Испанию. Начала с Python, но по-настоящему увлеклась JavaScript и frontend. Образование в тестировании дало мне понимание качества и внимательность к деталям. Интересуюсь нейропсихологией и люблю спорт. Стремлюсь делать продукты, полезные и удобные для людей.",
     contributions: [
       "Роль тимлида в командном проекте",
