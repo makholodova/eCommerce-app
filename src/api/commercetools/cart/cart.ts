@@ -38,7 +38,7 @@ export async function createCart(): Promise<Cart> {
   }
 }
 
-export async function addProductToCard(productId: string): Promise<void> {
+export async function addProductToCard(productId: string): Promise<Cart> {
   let cart: Cart | null;
   cart = await getActiveCart();
   if (cart === null) {
@@ -59,7 +59,7 @@ export async function addProductToCard(productId: string): Promise<void> {
       ],
     });
     cartStore.addToCart(response.data.lineItems[0]);
-    console.log("элемент добавлен" + cartStore.totalItems);
+    return response.data.lineItems[0];
   } catch (error) {
     console.log(error);
     throw new Error("не удалось добавить товар в корзину");
@@ -91,7 +91,6 @@ export async function removeProduct(
         ],
       });
       cartStore.removeFromCart(lineItemID);
-      console.log("элемент удален" + cartStore.totalItems);
       return response.data;
     }
   } catch (error) {
