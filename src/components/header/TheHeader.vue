@@ -68,78 +68,80 @@ async function logout(): Promise<void> {
             class="burger-checkbox"
           />
           <label for="burger-checkbox" class="burger"></label>
-          <ul class="navigation">
-            <router-link v-if="isAuthenticated" :to="{ name: 'User' }">
-              <div class="link-wrapper">
-                <img
-                  src="@/assets/icons/header-icons/profile.png"
-                  alt="user profile"
-                  class="icon"
-                />
-                <p class="icon-description">Профиль</p>
-              </div>
-            </router-link>
-            <router-link :to="{ name: 'About' }">
-              <div class="link-wrapper">
-                <img
-                  src="@/assets/icons/header-icons/about-us.png"
-                  alt="about us"
-                  class="icon"
-                />
-                <p class="icon-description">О нас</p>
-              </div>
-            </router-link>
-            <router-link :to="{ name: 'Catalog' }">
-              <div class="link-wrapper">
-                <img
-                  src="@/assets/icons/header-icons/catalog.png"
-                  alt="catalog"
-                  class="icon"
-                />
-                <p class="icon-description">Каталог</p>
-              </div>
-            </router-link>
-            <router-link
-              v-if="isAuthenticated"
-              :to="{ name: 'Main' }"
-              @click="logout"
-            >
-              <div class="link-wrapper">
-                <img
-                  src="@/assets/icons/header-icons/logout.png"
-                  alt="login"
-                  class="icon"
-                />
-                <p class="icon-description">Выход</p>
-              </div>
-            </router-link>
-            <router-link
-              v-if="!isAuthenticated && route.name !== 'Login'"
-              :to="{ name: 'Login' }"
-            >
-              <div class="link-wrapper">
-                <img
-                  src="@/assets/icons/header-icons/login.png"
-                  alt="login"
-                  class="icon"
-                />
-                <p class="icon-description">Вход</p>
-              </div>
-            </router-link>
-            <router-link
-              v-if="!isAuthenticated && route.name !== 'Register'"
-              :to="{ name: 'Register' }"
-            >
-              <div class="link-wrapper">
-                <img
-                  src="@/assets/icons/header-icons/signup.png"
-                  alt="register"
-                  class="icon"
-                />
-                <p class="icon-description">Регистрация</p>
-              </div>
-            </router-link>
-          </ul>
+          <transition name="slide-menu">
+            <ul v-if="isChecked" class="navigation">
+              <router-link v-if="isAuthenticated" :to="{ name: 'User' }">
+                <div class="link-wrapper">
+                  <img
+                    src="@/assets/icons/header-icons/profile.png"
+                    alt="user profile"
+                    class="icon"
+                  />
+                  <p class="icon-description">Профиль</p>
+                </div>
+              </router-link>
+              <router-link :to="{ name: 'About' }">
+                <div class="link-wrapper">
+                  <img
+                    src="@/assets/icons/header-icons/about-us.png"
+                    alt="about us"
+                    class="icon"
+                  />
+                  <p class="icon-description">О нас</p>
+                </div>
+              </router-link>
+              <router-link :to="{ name: 'Catalog' }">
+                <div class="link-wrapper">
+                  <img
+                    src="@/assets/icons/header-icons/catalog.png"
+                    alt="catalog"
+                    class="icon"
+                  />
+                  <p class="icon-description">Каталог</p>
+                </div>
+              </router-link>
+              <router-link
+                v-if="isAuthenticated"
+                :to="{ name: 'Main' }"
+                @click="logout"
+              >
+                <div class="link-wrapper">
+                  <img
+                    src="@/assets/icons/header-icons/logout.png"
+                    alt="login"
+                    class="icon"
+                  />
+                  <p class="icon-description">Выход</p>
+                </div>
+              </router-link>
+              <router-link
+                v-if="!isAuthenticated && route.name !== 'Login'"
+                :to="{ name: 'Login' }"
+              >
+                <div class="link-wrapper">
+                  <img
+                    src="@/assets/icons/header-icons/login.png"
+                    alt="login"
+                    class="icon"
+                  />
+                  <p class="icon-description">Вход</p>
+                </div>
+              </router-link>
+              <router-link
+                v-if="!isAuthenticated && route.name !== 'Register'"
+                :to="{ name: 'Register' }"
+              >
+                <div class="link-wrapper">
+                  <img
+                    src="@/assets/icons/header-icons/signup.png"
+                    alt="register"
+                    class="icon"
+                  />
+                  <p class="icon-description">Регистрация</p>
+                </div>
+              </router-link>
+            </ul>
+          </transition>
         </nav>
       </div>
     </BaseContainer>
@@ -298,36 +300,46 @@ a {
       transform 0.3s 0.15s;
   }
   .navigation {
+    position: absolute;
     top: 100%;
     right: 0;
-    position: absolute;
-    display: grid;
-    gap: 12px;
-    padding: 42px 0;
-    margin: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 100000;
     background: var(--blue-light);
-    list-style-type: none;
-    transform: translateX(100%);
-    transition: 0.3s;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px;
+    z-index: 1000;
   }
   .navigation a {
-    display: block;
     padding: 8px;
     color: white;
     font-size: 18px;
     text-align: center;
     text-decoration: none;
   }
+  .slide-menu-enter-active,
+  .slide-menu-leave-active {
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+  }
+
+  .slide-menu-enter-from,
+  .slide-menu-leave-to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  .slide-menu-enter-to,
+  .slide-menu-leave-from {
+    transform: translateX(0%);
+    opacity: 1;
+  }
   .navigation a:hover {
     background: var(--blue-lighter);
-  }
-  .burger-checkbox:checked ~ .navigation {
-    transform: translateX(0);
-    display: flex;
-    flex-direction: column;
   }
   .header {
     padding: 5px 8px;
