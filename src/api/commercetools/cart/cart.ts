@@ -113,13 +113,6 @@ export async function removeProduct(lineItemID: string): Promise<Cart | null> {
         ],
       });
       cartStore.removeFromCart(lineItemID);
-      console.log(
-        "в корзине удалился продукт " +
-          lineItemID +
-          "со следующем lineItem" +
-          JSON.stringify(response.data),
-      );
-
       return response.data;
     }
   } catch (error) {

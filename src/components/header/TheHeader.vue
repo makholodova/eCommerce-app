@@ -17,6 +17,7 @@ const promocodeStore = usePromocodeStore();
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const isChecked = ref(false);
 const headerRef = ref<HTMLElement | null>(null);
+const { totalItems } = storeToRefs(cartStore);
 
 function updateHeaderHeightCSSVar(): void {
   if (headerRef.value) {
@@ -73,8 +74,8 @@ async function logout(): Promise<void> {
                 alt="cart"
                 class="icon"
               />
-              <div v-if="cartStore.totalItems > 0" class="cart-total-counter">
-                {{ cartStore.totalItems }}
+              <div v-if="totalItems > 0" class="cart-total-counter">
+                {{ totalItems }}
               </div>
             </div>
 
