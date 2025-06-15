@@ -117,7 +117,7 @@ const emit = defineEmits<{
   margin: 0;
   text-align: center;
   font-weight: 500;
-  font-size: 20px;
+  font-size: clamp(18px, 4vw, 20px);
 }
 
 .cart-item__unit-price {
@@ -140,7 +140,7 @@ const emit = defineEmits<{
 
 .cart-item__quantity {
   font-weight: 400;
-  font-size: 20px;
+  font-size: clamp(18px, 4.5vw, 20px);
 }
 .cart-item__quantity-button {
   display: flex;
@@ -181,7 +181,7 @@ const emit = defineEmits<{
 }
 .card-discounted-price {
   font-weight: 300;
-  font-size: 14px;
+  font-size: clamp(12px, 4vw, 14px);
   text-decoration: line-through;
   color: var(--grey);
   text-align: center;
@@ -197,11 +197,19 @@ const emit = defineEmits<{
       "image total delete ";
     align-items: start;
     justify-items: start;
-    row-gap: 15px;
-    column-gap: 25px;
+    row-gap: clamp(10px, 2vw, 15px);
+    column-gap: clamp(18px, 4vw, 25px);
   }
   .card-price {
     align-items: start;
+  }
+
+  .cart-item__quantity-control {
+    gap: 8px;
+  }
+
+  .cart-item__quantity-control {
+    max-height: 32px;
   }
 }
 </style>

@@ -7,8 +7,11 @@ import { onMounted } from "vue";
 import {
   removeProduct,
   changeItemQuantity,
+  clearCard,
 } from "@/api/commercetools/cart/cart";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
+import BaseModal from "@/components/ui/BaseModal.vue";
+import { useModal } from "@/composables/useModal";
 
 interface MockLineItem {
   id: string;
@@ -30,6 +33,8 @@ interface MockLineItem {
 }
 const items = ref<MockLineItem[]>([]);
 const isLoaded = ref(false);
+const isClearCardConfirmation = ref(false);
+const { modalState, openModal, closeModal } = useModal();
 
 onMounted(async () => {
   try {
@@ -119,13 +124,49 @@ const totalWithoutDiscount = computed(() => {
     return sum + item.price.value.centAmount * item.quantity;
   }, 0);
 });
+
+function handleClearCartConfirmation(): void {
+  openModal("clearCart");
+  isClearCardConfirmation.value = true;
+}
+
+async function handleClearCart(): Promise<void> {
+  isClearCardConfirmation.value = false;
+  try {
+    await clearCard();
+    items.value = [];
+    closeModal();
+  } catch (error) {
+    console.error("Ошибка при очистке корзины", error);
+  }
+}
 </script>
 
 <template>
   <div class="cart-wrapper">
     <BaseSpinner v-if="!isLoaded" />
     <div v-else-if="items.length" class="cart">
-      <h1 class="cart-title">Корзина</h1>
+      <h1 class="cart-title subtitle">Корзина</h1>
+      <div class="cart-footer">
+        <BaseButton
+          text="Очистить корзину"
+          size="sm"
+          class="cart-footer-btn"
+          @click="handleClearCartConfirmation"
+        />
+        <div
+          v-if="totalWithDiscount !== totalWithoutDiscount"
+          class="card-total"
+        >
+          Итого: {{ totalWithDiscount.toFixed(2) }} ₽
+          <span class="card-total-discounted-price">
+            {{ totalWithoutDiscount.toFixed(2) }} ₽
+          </span>
+        </div>
+        <div v-else class="card-total">
+          Итого: {{ totalWithDiscount.toFixed(2) }} ₽
+        </div>
+      </div>
       <ul>
         <CartProductItem
           v-for="item in items"
@@ -146,15 +187,18 @@ const totalWithoutDiscount = computed(() => {
           @remove="removeItemFromCart(item.id)"
         />
       </ul>
-      <div v-if="totalWithDiscount !== totalWithoutDiscount" class="card-total">
-        Итого: {{ totalWithDiscount.toFixed(2) }} ₽
-        <span class="card-total-discounted-price">
-          {{ totalWithoutDiscount.toFixed(2) }} ₽
-        </span>
-      </div>
-      <div v-else class="card-total">
-        Итого: {{ totalWithDiscount.toFixed(2) }} ₽
-      </div>
+      <BaseModal
+        v-if="isClearCardConfirmation && modalState === 'clearCart'"
+        title="Подтверждение"
+        :is-open="true"
+        :close-btn-needed="true"
+        @close="closeModal"
+      >
+        <div class="modal-confirm">
+          <p>Вы уверены, что хотите очистить корзину?</p>
+          <BaseButton text="Подтвердить" size="sm" @click="handleClearCart" />
+        </div>
+      </BaseModal>
     </div>
     <div v-else class="cart-empty">
       <h2 class="cart-empty__title">Ваша корзина пуста</h2>
@@ -169,8 +213,7 @@ const totalWithoutDiscount = computed(() => {
           text="Перейти в каталог"
           size="xl"
           class="cart-empty__button"
-        >
-        </BaseButton>
+        />
       </router-link>
     </div>
   </div>
@@ -180,8 +223,6 @@ const totalWithoutDiscount = computed(() => {
   padding: 24px;
 }
 .cart-title {
-  font-weight: 400;
-  font-size: 28px;
   margin: 0;
 }
 .cart-empty {
@@ -213,26 +254,65 @@ const totalWithoutDiscount = computed(() => {
 }
 
 .card-total {
-  margin-top: 30px;
   display: flex;
   justify-content: flex-end;
   width: 100%;
   gap: 8px;
-  font-size: 22px;
+  font-size: clamp(20px, 5vw, 22px);
   font-weight: 500;
+  margin-right: 40px;
 }
+
 .card-total-discounted-price {
   font-weight: 300;
-  font-size: 18px;
+  font-size: clamp(16px, 5vw, 18px);
   text-decoration: line-through;
   color: var(--grey);
   align-self: flex-end;
   text-align: center;
 }
 
-@media (max-width: 600px) {
+.cart-footer {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.button-cross {
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: auto;
+}
+.icon-cross {
+  width: 36px;
+  height: 36px;
+}
+.modal-confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 680px) {
   ul {
     padding: 0;
+  }
+  .cart-footer {
+    padding: 0;
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .cart-footer-btn {
+    width: 126px;
+    font-size: 12px;
+    height: 36px;
   }
 }
 </style>

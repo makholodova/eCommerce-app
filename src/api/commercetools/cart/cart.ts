@@ -126,3 +126,28 @@ export async function changeItemQuantity(
 
   return updatedItem;
 }
+
+export async function clearCard(): Promise<void> {
+  const cart = await getActiveCart();
+  if (!cart) throw new Error("Нет активной корзины");
+
+  const cartID = cart.id;
+  const version = cart.version;
+
+  const actions = cart.lineItems.map((item) => ({
+    action: "removeLineItem",
+    lineItemId: item.id,
+  }));
+
+  if (actions.length === 0) return;
+  try {
+    await api.post(`/me/carts/${cartID}`, {
+      version,
+      actions,
+    });
+    cartStore.cleanCart();
+  } catch (error) {
+    console.error("Ошибка при очистке корзины", error);
+    throw new Error("Ошибка при очистке корзины");
+  }
+}
