@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Cart } from "@commercetools/platform-sdk";
 import CartProductItem from "@/components/cart/CartProductItem.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { ref, computed } from "vue";
@@ -8,10 +9,14 @@ import {
   removeProduct,
   changeItemQuantity,
   clearCard,
+  applyDiscountCode,
+  getActiveCart,
 } from "@/api/commercetools/cart/cart";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
 import { useModal } from "@/composables/useModal";
+import CartPromocode from "@/components/cart/CartPromocode.vue";
+import { usePromocodeStore } from "@/store/usePromocodeStore";
 
 interface MockLineItem {
   id: string;
@@ -35,30 +40,40 @@ const items = ref<MockLineItem[]>([]);
 const isLoaded = ref(false);
 const isClearCardConfirmation = ref(false);
 const { modalState, openModal, closeModal } = useModal();
+const promocodeStore = usePromocodeStore();
+
+function mapCartLineItems(lineItems: Cart["lineItems"]): MockLineItem[] {
+  return lineItems.map((lineItem) => ({
+    id: lineItem.id,
+    name: {
+      ru: lineItem.name["ru"] ?? "Без названия",
+    },
+    quantity: lineItem.quantity,
+    price: {
+      value: {
+        centAmount: lineItem.price.value.centAmount,
+        currencyCode: lineItem.price.value.currencyCode,
+      },
+      discountedPrice: lineItem.price.discounted?.value.centAmount ?? undefined,
+    },
+    totalPrice: lineItem.price.value.centAmount * lineItem.quantity,
+    variant: {
+      images: lineItem.variant.images || [],
+    },
+  }));
+}
+
+function updatePromocodeStoreFromCart(cart: Cart): void {
+  promocodeStore.totalPrice = cart.totalPrice.centAmount;
+  promocodeStore.discountAmount =
+    cart.discountOnTotalPrice?.discountedAmount.centAmount ?? null;
+}
 
 onMounted(async () => {
   try {
     const cart = await getMyCart();
     if (cart) {
-      items.value = items.value = cart.lineItems.map((lineItem) => ({
-        id: lineItem.id,
-        name: {
-          ru: lineItem.name["ru"] ?? "Без названия",
-        },
-        quantity: lineItem.quantity,
-        price: {
-          value: {
-            centAmount: lineItem.price.value.centAmount,
-            currencyCode: lineItem.price.value.currencyCode,
-          },
-          discountedPrice:
-            lineItem.price.discounted?.value.centAmount ?? undefined,
-        },
-        totalPrice: lineItem.price.value.centAmount * lineItem.quantity,
-        variant: {
-          images: lineItem.variant.images || [],
-        },
-      }));
+      items.value = mapCartLineItems(cart.lineItems);
     }
   } catch (error) {
     console.error("Ошибка загрузки корзины", error);
@@ -75,6 +90,10 @@ async function updateLocalQuantity(
   const item = items.value?.find((item) => item.id === lineItemId);
   if (item && typeof updatedItem?.quantity === "number") {
     item.quantity = updatedItem.quantity;
+  }
+  const updatedCart = await getActiveCart();
+  if (updatedCart) {
+    updatePromocodeStoreFromCart(updatedCart);
   }
 }
 
@@ -104,9 +123,11 @@ async function decreaseQuantity(
 
 async function removeItemFromCart(lineItemId: string): Promise<void> {
   try {
-    const result = await removeProduct(lineItemId);
-    items.value = items.value?.filter((item) => item.id !== lineItemId);
-    console.log(result);
+    const updatedCart = await removeProduct(lineItemId);
+    if (updatedCart) {
+      items.value = mapCartLineItems(updatedCart.lineItems);
+      updatePromocodeStoreFromCart(updatedCart);
+    }
   } catch (error) {
     console.error("Ошибка при удалении товара из корзины", error);
   }
@@ -140,6 +161,17 @@ async function handleClearCart(): Promise<void> {
     console.error("Ошибка при очистке корзины", error);
   }
 }
+
+async function handleApplyPromocode(code: string): Promise<void> {
+  console.log("Пытаемся применить промокод:", code);
+
+  try {
+    const result = await applyDiscountCode(code);
+    console.log("Промокод успешно применён. Обновлённая корзина:", result);
+  } catch (error) {
+    console.error("Ошибка применения промокода", error);
+  }
+}
 </script>
 
 <template>
@@ -147,24 +179,36 @@ async function handleClearCart(): Promise<void> {
     <BaseSpinner v-if="!isLoaded" />
     <div v-else-if="items.length" class="cart">
       <h1 class="cart-title subtitle">Корзина</h1>
-      <div class="cart-footer">
+      <CartPromocode @apply="handleApplyPromocode" />
+      <div class="cart-price">
         <BaseButton
           text="Очистить корзину"
           size="sm"
-          class="cart-footer-btn"
+          class="cart-price-btn"
           @click="handleClearCartConfirmation"
         />
         <div
-          v-if="totalWithDiscount !== totalWithoutDiscount"
+          v-if="promocodeStore.totalPrice && promocodeStore.discountAmount"
           class="card-total"
         >
-          Итого: {{ totalWithDiscount.toFixed(2) }} ₽
-          <span class="card-total-discounted-price">
+          Итого по промокоду со скидкой {{ promocodeStore.discountPercent }}% :
+          {{ promocodeStore.totalPrice.toFixed(2) }} ₽
+          <span
+            v-if="totalWithDiscount !== totalWithoutDiscount"
+            class="card-total-discounted-price"
+          >
+            {{ totalWithDiscount.toFixed(2) }} ₽
+          </span>
+          <span v-else class="card-total-discounted-price">
             {{ totalWithoutDiscount.toFixed(2) }} ₽
           </span>
         </div>
+
         <div v-else class="card-total">
-          Итого: {{ totalWithDiscount.toFixed(2) }} ₽
+          <span v-if="totalWithDiscount !== totalWithoutDiscount">
+            Итого: {{ totalWithDiscount.toFixed(2) }} ₽
+          </span>
+          <span v-else> Итого: {{ totalWithoutDiscount.toFixed(2) }} ₽ </span>
         </div>
       </div>
       <ul>
@@ -267,12 +311,12 @@ async function handleClearCart(): Promise<void> {
   font-weight: 300;
   font-size: clamp(16px, 5vw, 18px);
   text-decoration: line-through;
-  color: var(--grey);
+  color: red;
   align-self: flex-end;
   text-align: center;
 }
 
-.cart-footer {
+.cart-price {
   margin-top: 30px;
   display: flex;
   justify-content: space-between;
@@ -299,17 +343,20 @@ async function handleClearCart(): Promise<void> {
   gap: 8px;
 }
 
-@media (max-width: 680px) {
-  ul {
-    padding: 0;
-  }
-  .cart-footer {
+@media (max-width: 980px) {
+  .cart-price {
     padding: 0;
     flex-direction: column;
     gap: 14px;
     align-items: flex-start;
   }
-  .cart-footer-btn {
+}
+
+@media (max-width: 680px) {
+  ul {
+    padding: 0;
+  }
+  .cart-price-btn {
     width: 126px;
     font-size: 12px;
     height: 36px;

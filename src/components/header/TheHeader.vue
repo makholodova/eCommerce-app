@@ -7,11 +7,13 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { ref, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { checkValidSession } from "@/utils/validSession";
 import { useCartStore } from "@/store/useCartStore";
+import { usePromocodeStore } from "@/store/usePromocodeStore";
 
 const route = useRoute();
 const authStore = useAuthStore();
 const router = useRouter();
 const cartStore = useCartStore();
+const promocodeStore = usePromocodeStore();
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const isChecked = ref(false);
 const headerRef = ref<HTMLElement | null>(null);
@@ -44,6 +46,7 @@ watch(
 
 async function logout(): Promise<void> {
   authStore.logout();
+  promocodeStore.clearPromocode();
 
   try {
     await checkValidSession();

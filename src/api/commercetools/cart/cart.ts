@@ -1,9 +1,11 @@
 ﻿import type { Cart } from "@commercetools/platform-sdk";
 import api from "@/api/commercetools/axiosInstance.ts";
-import type { CartUpdateAction, LineItem } from "@commercetools/platform-sdk";
+import type { LineItem } from "@commercetools/platform-sdk";
 import { useCartStore } from "@/store/useCartStore";
+import { usePromocodeStore } from "@/store/usePromocodeStore";
 
 const cartStore = useCartStore();
+const promocodeStore = usePromocodeStore();
 
 export async function getMyCart(): Promise<Cart | null> {
   const response = await api.get("/me/carts");
@@ -59,6 +61,13 @@ export async function addProductToCard(productId: string): Promise<Cart> {
       ],
     });
     cartStore.addToCart(response.data.lineItems[0]);
+
+    if (promocodeStore.code) {
+      promocodeStore.totalPrice = response.data.totalPrice.centAmount;
+      promocodeStore.discountAmount =
+        response.data.discountOnTotalPrice?.discountedAmount.centAmount ?? null;
+    }
+
     return response.data.lineItems[0];
   } catch (error) {
     console.log(error);
@@ -73,31 +82,30 @@ export async function isProductInCart(productId: string): Promise<boolean> {
     : false;
 }
 
-export async function removeProduct(
-  lineItemID: string,
-): Promise<CartUpdateAction | null> {
+export async function removeProduct(lineItemID: string): Promise<Cart | null> {
   try {
     const cart: Cart | null = await getActiveCart();
-    if (cart) {
-      const cartID = cart.id;
-      const version = cart.version;
-      const response = await api.post(`/me/carts/${cartID}`, {
-        version: version,
-        actions: [
-          {
-            action: "removeLineItem",
-            lineItemId: lineItemID,
-          },
-        ],
-      });
-      cartStore.removeFromCart(lineItemID);
-      return response.data;
-    }
+    if (!cart) return null;
+
+    const response = await api.post(`/me/carts/${cart.id}`, {
+      version: cart.version,
+      actions: [
+        {
+          action: "removeLineItem",
+          lineItemId: lineItemID,
+        },
+      ],
+    });
+
+    const updatedCart: Cart = response.data;
+
+    cartStore.setShoppingCart(updatedCart.lineItems);
+
+    return updatedCart;
   } catch (error) {
-    console.log("не удалось удалить продукт" + error);
+    console.error("не удалось удалить продукт", error);
     throw new Error("не удалось удалить продукт");
   }
-  return null;
 }
 
 export async function changeItemQuantity(
@@ -149,5 +157,30 @@ export async function clearCard(): Promise<void> {
   } catch (error) {
     console.error("Ошибка при очистке корзины", error);
     throw new Error("Ошибка при очистке корзины");
+  }
+}
+
+export async function applyDiscountCode(code: string): Promise<Cart> {
+  const cart = await getActiveCart();
+  if (!cart) throw new Error("Нет активной корзины");
+  try {
+    const response = await api.post(`/me/carts/${cart.id}`, {
+      version: cart.version,
+      actions: [
+        {
+          action: "addDiscountCode",
+          code: code,
+        },
+      ],
+    });
+    promocodeStore.applyPromocode(
+      code,
+      response.data.totalPrice.centAmount,
+      response.data.discountOnTotalPrice?.discountedAmount.centAmount ?? 0,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка применения промокода", error);
+    throw new Error("Ошибка применения промокода");
   }
 }
