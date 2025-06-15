@@ -179,8 +179,7 @@ export async function applyDiscountCode(code: string): Promise<Cart> {
       response.data.discountOnTotalPrice?.discountedAmount.centAmount ?? 0,
     );
     return response.data;
-  } catch (error) {
-    console.error("Ошибка применения промокода", error);
+  } catch {
     throw new Error("Ошибка применения промокода");
   }
 }

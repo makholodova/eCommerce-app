@@ -17,6 +17,7 @@ import BaseModal from "@/components/ui/BaseModal.vue";
 import { useModal } from "@/composables/useModal";
 import CartPromocode from "@/components/cart/CartPromocode.vue";
 import { usePromocodeStore } from "@/store/usePromocodeStore";
+import { showError } from "@/utils/toast.ts";
 
 interface MockLineItem {
   id: string;
@@ -169,7 +170,12 @@ async function handleApplyPromocode(code: string): Promise<void> {
     const result = await applyDiscountCode(code);
     console.log("Промокод успешно применён. Обновлённая корзина:", result);
   } catch (error) {
-    console.error("Ошибка применения промокода", error);
+    if (error instanceof Error) {
+      const message = "Промокод не действителен";
+      showError(message);
+    } else {
+      showError("Произошла неизвестная ошибка. Попробуйте позже.");
+    }
   }
 }
 </script>
