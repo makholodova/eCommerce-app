@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import BaseButton from "@/components/ui/BaseButton.vue";
 import router from "@/router";
-import { computed } from "vue";
-import { useCartStore } from "@/store/useCartStore";
-
-const cartStore = useCartStore();
+import { computed, ref } from "vue";
+import {
+  addProductToCard,
+  isProductInCart,
+} from "@/api/commercetools/cart/cart.ts";
 
 const props = defineProps<{
   id: string;
@@ -18,7 +19,26 @@ const props = defineProps<{
 }>();
 
 const isDiscounted = computed(() => !!props.discountedPrice);
+const isLoading = ref<boolean>(false);
+const btnText = ref<string>("В корзину");
+const isDisabled = ref<boolean>(false);
 
+async function setBtnText(): Promise<void> {
+  try {
+    const result = await isProductInCart(props.id);
+    if (result === true) {
+      btnText.value = "Товар в корзине";
+      isDisabled.value = true;
+    } else {
+      btnText.value = "В корзину";
+      isDisabled.value = false;
+    }
+  } catch (error) {
+    console.log("ошибка определения, в корзине ли товар" + error);
+  }
+}
+
+setBtnText();
 function redirectToProductPage(): void {
   router.push({
     name: "Product",
@@ -26,21 +46,17 @@ function redirectToProductPage(): void {
     state: { category: props.category || "" },
   });
 }
-function addToCart(): void {
-  const cartItem = {
-    productId: props.id,
-    quantity: 1,
-    productData: {
-      title: props.title,
-      description: props.description,
-      image: props.image,
-      price: props.price,
-      discountedPrice: props.discountedPrice,
-      discountedPercentage: props.discountedPercentage,
-    },
-  };
 
-  cartStore.setShoppingCart(cartItem);
+async function addToCart(): Promise<void> {
+  isLoading.value = true;
+  try {
+    await addProductToCard(props.id);
+    btnText.value = "Товар в корзине";
+    isDisabled.value = true;
+  } catch (error) {
+    console.log("не удалось добавить товар в корзину" + error);
+  }
+  isLoading.value = false;
 }
 </script>
 
@@ -68,13 +84,22 @@ function addToCart(): void {
     <base-button
       size="sm"
       class="card-btn"
-      text="В корзину"
+      :text="btnText"
+      :disabled="isDisabled"
+      :is-loading="isLoading"
       @click.prevent.stop="addToCart"
     ></base-button>
   </div>
 </template>
 
 <style scoped>
+.spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
 @media (hover: hover) and (pointer: fine) {
   .card {
     transform: scale(1);
@@ -92,6 +117,8 @@ a {
   color: black;
 }
 .card {
+  position: relative;
+  z-index: 100;
   border-radius: 8px;
   width: 217px;
   padding: 24px;
@@ -110,6 +137,7 @@ a {
   justify-content: center;
   align-items: center;
   gap: 20px;
+  flex: 1 0 auto;
   flex: 1 0 auto;
 }
 .card-img-discounted-icon {
@@ -180,9 +208,9 @@ a {
   }
   .card-img-wrapper {
     align-self: flex-start;
-    /* flex-shrink: 1; */
     width: 101px;
     height: 139px;
+    flex: 0 0 150px;
   }
   .card-information {
     flex: 1;
@@ -213,6 +241,25 @@ a {
   .card-img-discounted-icon {
     width: 48px;
     height: 33px;
+  }
+}
+
+@media (max-width: 360px) {
+  .card {
+    max-width: 375px;
+    width: 100%;
+    flex-direction: column;
+    padding: 24px 16px;
+    flex-wrap: wrap;
+  }
+  .card-img-wrapper {
+    align-self: center;
+    width: 101px;
+    height: 139px;
+    flex: 0 0 150px;
+  }
+  .card-information {
+    align-items: center;
   }
 }
 </style>

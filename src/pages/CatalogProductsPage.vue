@@ -299,6 +299,7 @@ async function resetList(): Promise<void> {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 .sort {
   padding: 0 40px 16px 0;

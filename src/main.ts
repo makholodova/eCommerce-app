@@ -5,6 +5,7 @@ import App from "./App.vue";
 import pinia from "./store";
 import router from "./router";
 import { checkValidSession } from "./utils/validSession";
+import { apiRoot } from "./api/commercetools/buildClient";
 
 (async (): Promise<void> => {
   const app = createApp(App);
@@ -13,6 +14,7 @@ import { checkValidSession } from "./utils/validSession";
 
   try {
     await checkValidSession();
+    await apiRoot.categories().get().execute();
   } catch (error) {
     console.error("Ошибка при инициализации сессии", error);
   }
