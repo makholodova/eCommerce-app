@@ -82,13 +82,13 @@ async function processProduct(): Promise<void> {
       if (cart) {
         const added = cart?.lineItems.find((li) => li.productId === productID);
         lineItemID.value = added ? added.id : null;
+        showSuccess("Товар успешно добавлен в корзину");
+        productInCard.value = true;
       }
-      showSuccess("Товар успешно добавлен в корзину");
-      productInCard.value = true;
     }
   } catch {
     const errorMsg =
-      "Не удалось удалить товар из корзины. Пожалуйста, попробуйте позже";
+      "Не удалось удалить или добавить товар. Пожалуйста, попробуйте позже";
     showError(errorMsg);
   } finally {
     isLoading.value = false;
