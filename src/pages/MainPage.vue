@@ -16,7 +16,7 @@ const slides = [
     code: "ZHMT-1",
   },
 ];
-let intervalId: number;
+let intervalId: ReturnType<typeof setTimeout>;
 
 onMounted(() => {
   intervalId = setInterval(() => {
@@ -52,43 +52,45 @@ function nextSlide(): void {
 </script>
 
 <template>
-  <section class="hero">
-    <div class="hero-inscription">
-      <h1>ZHMT shop</h1>
-      <p>Твой выбор электроники</p>
-    </div>
-    <div class="hero-img-wrapper">
-      <img :src="heroPhone" class="hero-img" />
-    </div>
-  </section>
-  <section class="discount">
-    <div class="carousel">
-      <div
-        class="carousel-track"
-        :style="{ transform: `translateX(-${currentSlide * 100}%)` }"
-      >
-        <div v-for="(slide, index) in slides" :key="index" class="slide">
-          <h1 class="slide-title">{{ slide.title }}</h1>
-          <div class="slide-discount-code" @click="copyCode(slide.code)">
-            {{ slide.code }}
+  <div>
+    <section class="hero">
+      <div class="hero-inscription">
+        <h1>ZHMT shop</h1>
+        <p>Твой выбор электроники</p>
+      </div>
+      <div class="hero-img-wrapper">
+        <img :src="heroPhone" class="hero-img" />
+      </div>
+    </section>
+    <section class="discount">
+      <div class="carousel">
+        <div
+          class="carousel-track"
+          :style="{ transform: `translateX(-${currentSlide * 100}%)` }"
+        >
+          <div v-for="(slide, index) in slides" :key="index" class="slide">
+            <h1 class="slide-title">{{ slide.title }}</h1>
+            <div class="slide-discount-code" @click="copyCode(slide.code)">
+              {{ slide.code }}
+            </div>
+            <div class="slide-discount-slogan">{{ slide.text }}</div>
           </div>
-          <div class="slide-discount-slogan">{{ slide.text }}</div>
         </div>
       </div>
-    </div>
-    <div class="carousel-controls">
-      <span
-        class="carousel-btn"
-        :class="{ active: currentSlide === 0 }"
-        @click="nextSlide"
-      ></span>
-      <span
-        class="carousel-btn"
-        :class="{ active: currentSlide === 1 }"
-        @click="nextSlide"
-      ></span>
-    </div>
-  </section>
+      <div class="carousel-controls">
+        <span
+          class="carousel-btn"
+          :class="{ active: currentSlide === 0 }"
+          @click="nextSlide"
+        ></span>
+        <span
+          class="carousel-btn"
+          :class="{ active: currentSlide === 1 }"
+          @click="nextSlide"
+        ></span>
+      </div>
+    </section>
+  </div>
 </template>
 
 <style scoped>
