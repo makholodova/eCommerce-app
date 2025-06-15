@@ -66,7 +66,7 @@ export async function addProductToCard(productId: string): Promise<Cart> {
       updatePromocodeStoreFromCart(response.data);
     }
 
-    return response.data.lineItems[0];
+    return response.data;
   } catch (error) {
     console.error(error);
     throw new Error("не удалось добавить товар в корзину");
@@ -100,6 +100,28 @@ export async function removeProduct(lineItemID: string): Promise<Cart | null> {
     cartStore.setShoppingCart(updatedCart.lineItems);
 
     return updatedCart;
+    if (cart) {
+      const cartID = cart.id;
+      const version = cart.version;
+      const response = await api.post(`/me/carts/${cartID}`, {
+        version: version,
+        actions: [
+          {
+            action: "removeLineItem",
+            lineItemId: lineItemID,
+          },
+        ],
+      });
+      cartStore.removeFromCart(lineItemID);
+      console.log(
+        "в корзине удалился продукт " +
+          lineItemID +
+          "со следующем lineItem" +
+          JSON.stringify(response.data),
+      );
+
+      return response.data;
+    }
   } catch (error) {
     console.error("не удалось удалить продукт", error);
     throw new Error("не удалось удалить продукт");
