@@ -214,6 +214,7 @@ h5 {
 .block-link a {
   font-size: 16px;
   color: var(--black);
+  text-decoration: none;
   transition: color 0.3ms ease;
 }
 
