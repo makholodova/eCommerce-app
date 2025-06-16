@@ -10,7 +10,6 @@ import {
   changeItemQuantity,
   clearCard,
   applyDiscountCode,
-  getActiveCart,
 } from "@/api/commercetools/cart/cart";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
@@ -18,6 +17,7 @@ import { useModal } from "@/composables/useModal";
 import CartPromocode from "@/components/cart/CartPromocode.vue";
 import { usePromocodeStore } from "@/store/usePromocodeStore";
 import { showError } from "@/utils/toast.ts";
+import { updatePromocodeStoreFromCart } from "@/utils/updatePromocodeStoreFromCart";
 
 interface MockLineItem {
   id: string;
@@ -42,6 +42,7 @@ const isLoaded = ref(false);
 const isClearCardConfirmation = ref(false);
 const { modalState, openModal, closeModal } = useModal();
 const promocodeStore = usePromocodeStore();
+const isPromocodeApplied = ref(false);
 
 function mapCartLineItems(lineItems: Cart["lineItems"]): MockLineItem[] {
   return lineItems.map((lineItem) => ({
@@ -64,12 +65,6 @@ function mapCartLineItems(lineItems: Cart["lineItems"]): MockLineItem[] {
   }));
 }
 
-function updatePromocodeStoreFromCart(cart: Cart): void {
-  promocodeStore.totalPrice = cart.totalPrice.centAmount;
-  promocodeStore.discountAmount =
-    cart.discountOnTotalPrice?.discountedAmount.centAmount ?? null;
-}
-
 onMounted(async () => {
   try {
     const cart = await getMyCart();
@@ -87,15 +82,14 @@ async function updateLocalQuantity(
   lineItemId: string,
   newQuantity: number,
 ): Promise<void> {
-  const updatedItem = await changeItemQuantity(lineItemId, newQuantity);
+  const updatedCart = await changeItemQuantity(lineItemId, newQuantity);
   const item = items.value?.find((item) => item.id === lineItemId);
+  const updatedItem = updatedCart.lineItems.find((i) => i.id === lineItemId);
   if (item && typeof updatedItem?.quantity === "number") {
     item.quantity = updatedItem.quantity;
   }
-  const updatedCart = await getActiveCart();
-  if (updatedCart) {
-    updatePromocodeStoreFromCart(updatedCart);
-  }
+
+  updatePromocodeStoreFromCart(updatedCart);
 }
 
 async function increaseQuantity(
@@ -164,17 +158,14 @@ async function handleClearCart(): Promise<void> {
 }
 
 async function handleApplyPromocode(code: string): Promise<void> {
-  console.log("Пытаемся применить промокод:", code);
-
   try {
-    const result = await applyDiscountCode(code);
-    console.log("Промокод успешно применён. Обновлённая корзина:", result);
+    await applyDiscountCode(code);
+    isPromocodeApplied.value = true;
   } catch (error) {
+    isPromocodeApplied.value = false;
     if (error instanceof Error) {
       const message = "Промокод не действителен";
       showError(message);
-    } else {
-      showError("Произошла неизвестная ошибка. Попробуйте позже.");
     }
   }
 }
@@ -185,7 +176,10 @@ async function handleApplyPromocode(code: string): Promise<void> {
     <BaseSpinner v-if="!isLoaded" />
     <div v-else-if="items.length" class="cart">
       <h1 class="cart-title subtitle">Корзина</h1>
-      <CartPromocode @apply="handleApplyPromocode" />
+      <CartPromocode
+        :disabled="isPromocodeApplied"
+        @apply="handleApplyPromocode"
+      />
       <div class="cart-price">
         <BaseButton
           text="Очистить корзину"
@@ -197,7 +191,7 @@ async function handleApplyPromocode(code: string): Promise<void> {
           v-if="promocodeStore.totalPrice && promocodeStore.discountAmount"
           class="card-total"
         >
-          Итого по промокоду со скидкой {{ promocodeStore.discountPercent }}% :
+          Промокод применен "{{ promocodeStore.descriptionPromocode }}":
           {{ promocodeStore.totalPrice.toFixed(2) }} ₽
           <span
             v-if="totalWithDiscount !== totalWithoutDiscount"
@@ -308,7 +302,7 @@ async function handleApplyPromocode(code: string): Promise<void> {
   justify-content: flex-end;
   width: 100%;
   gap: 8px;
-  font-size: clamp(20px, 5vw, 22px);
+  font-size: clamp(16px, 5vw, 18px);
   font-weight: 500;
   margin-right: 40px;
 }

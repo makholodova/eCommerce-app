@@ -3,6 +3,11 @@ import type { UserLoginData } from "@/types/user-login.types";
 import type { CustomerSignInResult } from "@commercetools/platform-sdk";
 import { useAnonymousTokenStore } from "@/store/useAnonymousTokenStore";
 import { getMyCart } from "./cart/cart";
+import { usePromocodeStore } from "@/store/usePromocodeStore";
+import { getActiveCart } from "./cart/cart";
+import { updatePromocodeStoreFromCart } from "@/utils/updatePromocodeStoreFromCart";
+
+const promocodeStore = usePromocodeStore();
 
 export async function login(
   loginData: UserLoginData,
@@ -46,6 +51,13 @@ export async function login(
     const apiRoot = createCustomerApiRoot(loginData.email, loginData.password);
     await apiRoot.me().get().execute();
     await getMyCart();
+
+    if (promocodeStore.code) {
+      const cart = await getActiveCart();
+      if (cart) {
+        await updatePromocodeStoreFromCart(cart, promocodeStore.code);
+      }
+    }
 
     return result;
   } catch (error) {

@@ -1,13 +1,25 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
+import { usePromocodeStore } from "@/store/usePromocodeStore";
+
+const promocodeStore = usePromocodeStore();
+
+defineProps<{
+  disabled?: boolean;
+}>();
 
 const emit = defineEmits<{
   (e: "apply", code: string): void;
 }>();
 
 const promoCode = ref("");
-const isDisabled = computed(() => promoCode.value.trim() === "");
+
+const isDisabled = computed(() => {
+  const entered = promoCode.value.trim();
+  const alreadyApplied = promocodeStore.code !== null;
+  return entered === "" || alreadyApplied;
+});
 
 function onApplyClick(): void {
   emit("apply", promoCode.value.trim());
@@ -30,7 +42,7 @@ function onApplyClick(): void {
       <BaseButton
         text="Применить"
         size="sm"
-        :disabled="isDisabled"
+        :disabled="isDisabled || disabled"
         class="promocode-button"
         @click="onApplyClick"
       />
