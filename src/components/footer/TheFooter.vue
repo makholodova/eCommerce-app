@@ -3,6 +3,10 @@ import BaseContainer from "@/components/ui/BaseContainer.vue";
 import AddressIcon from "@/assets/icons/location.svg";
 import PhoneIcon from "@/assets/icons/phone.svg";
 import EmailIcon from "@/assets/icons/mail.svg";
+import TelegramIcon from "@/assets/icons/telegram.svg";
+import WhatsAppIcon from "@/assets/icons/whatsapp.svg";
+import VkIcon from "@/assets/icons/vk.svg";
+import YouTubeIcon from "@/assets/icons/youtube.svg";
 
 const info = [
   {
@@ -30,25 +34,25 @@ const social = [
   {
     name: "vk",
     label: "VK",
-    svg: "" /*VkIcon*/,
+    svg: VkIcon,
     url: "https://vk.com",
   },
   {
     name: "tg",
     label: "Telegram",
-    svg: "" /*TelegramIcon*/,
+    svg: TelegramIcon,
     url: "https://t.me",
   },
   {
     name: "wa",
     label: "WhatsApp",
-    svg: "" /*WhatsAppIcon*/,
+    svg: WhatsAppIcon,
     url: "https://wa.me/71234567890",
   },
   {
     name: "youtube",
     label: "YouTube",
-    svg: "" /*YouTubeIcon*/,
+    svg: YouTubeIcon,
     url: "https://youtube.com",
   },
 ];
@@ -93,27 +97,27 @@ const social = [
             </li>
           </ul>
         </div>
-
-        <div class="footer__social">
-          <h5>Социальные сети</h5>
-          <div class="social-icons">
-            <a
-              v-for="item in social"
-              :key="item.name"
-              :href="item.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="social-icon"
-            >
-              <component :is="item.svg" class="icon" />
-              <span class="sr-only">{{ item.label }}</span>
-            </a>
+        <div>
+          <div class="footer__social">
+            <h5>Социальные сети</h5>
+            <div class="social-icons">
+              <a
+                v-for="item in social"
+                :key="item.name"
+                :href="item.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-icon"
+              >
+                <component :is="item.svg" class="icon" />
+              </a>
+            </div>
           </div>
-        </div>
 
-        <div class="footer__payment">
-          <h5>Мы принимаем</h5>
-          <!-- вставить логотипы платёжных систем -->
+          <div class="footer__payment">
+            <h5>Мы принимаем</h5>
+            <!-- вставить логотипы платёжных систем -->
+          </div>
         </div>
       </div>
 
@@ -128,6 +132,7 @@ const social = [
 
 <style scoped>
 .footer {
+  margin-top: 60px;
   padding: 2rem 0;
   background: #f8f8f8;
   display: flex;
@@ -144,6 +149,10 @@ const social = [
   display: flex;
   justify-content: space-between;
   padding: 0;
+}
+.footer__links {
+  display: flex;
+  justify-content: space-between;
 }
 .footer__info-item {
   display: flex;
