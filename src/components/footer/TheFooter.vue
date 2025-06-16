@@ -183,6 +183,7 @@ h5 {
 .footer__info {
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
   padding: 0;
 }
 .footer__links {
@@ -228,6 +229,7 @@ h5 {
 .social-icons {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .social-icon {
@@ -248,6 +250,25 @@ h5 {
 .payment-icons {
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 850px) {
+  .footer__info {
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+    gap: 1rem;
+  }
+
+  .footer__links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .block-links {
+    align-items: center;
+  }
 }
 </style>
 px
