@@ -1,0 +1,69 @@
+{
+  "name": "ecommerce-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "run-s type-check dev-only",
+    "dev-only": "vite",
+    "type-check": "vue-tsc --noEmit",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.ts,.vue",
+    "lint:fix": "eslint . --ext .js,.ts,.vue --fix",
+    "lint:check": "eslint . --ext .js,.ts,.vue --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky install",
+    "test:coverage": "vitest run --coverage",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:e2e": "cypress open",
+    "test:e2e:run": "cypress run"
+  },
+  "lint-staged": {
+    "*.{ts,js,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "@commercetools/platform-sdk": "^8.9.0",
+    "@commercetools/sdk-client-v2": "^3.0.0",
+    "@vuelidate/core": "^2.0.3",
+    "@vuelidate/validators": "^2.0.4",
+    "@vueuse/core": "^13.1.0",
+    "axios": "^1.9.0",
+    "pinia": "^3.0.2",
+    "pinia-plugin-persistedstate": "^4.3.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.1",
+    "vue3-toastify": "^0.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@vitejs/plugin-vue": "^5.2.2",
+    "@vitest/coverage-v8": "^3.1.2",
+    "@vitest/ui": "^3.1.2",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.7.0",
+    "c8": "^10.1.3",
+    "cypress": "^14.3.2",
+    "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-vue": "^10.1.0",
+    "globals": "^16.0.0",
+    "husky": "^9.1.7",
+    "jsdom": "^26.1.0",
+    "lint-staged": "^15.5.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.5.3",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.31.1",
+    "vite": "^6.3.1",
+    "vite-svg-loader": "^5.1.0",
+    "vitest": "^3.1.2",
+    "vue-tsc": "^2.2.8"
+  }
+}
