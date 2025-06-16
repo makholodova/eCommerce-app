@@ -1,3 +1,5 @@
+import type { LineItem } from "@commercetools/platform-sdk";
+
 export interface AuthFields {
   email: string;
   password: string;
@@ -63,3 +65,37 @@ export interface ShoppingCartItem {
     discountedPercentage?: number;
   };
 }
+
+interface IncludedDiscount {
+  discountedAmount: {
+    centAmount: number;
+  };
+}
+
+export interface ExtendedLineItem extends LineItem {
+  discountedPrice?: {
+    includedDiscounts?: IncludedDiscount[];
+  };
+}
+
+export interface PromocodeData {
+  code: string;
+  discountPercent: number;
+  description: string;
+  appliesTo: "all" | "category";
+}
+
+export const promocodeDictionary: Record<string, PromocodeData> = {
+  ZHMT15OFF: {
+    code: "ZHMT15OFF",
+    discountPercent: 15,
+    description: "15% на все товары",
+    appliesTo: "all",
+  },
+  ZHMT20: {
+    code: "ZHMT20",
+    discountPercent: 20,
+    description: "20% на ноутбуки",
+    appliesTo: "category",
+  },
+};
