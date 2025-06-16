@@ -100,21 +100,6 @@ export async function removeProduct(lineItemID: string): Promise<Cart | null> {
     cartStore.setShoppingCart(updatedCart.lineItems);
 
     return updatedCart;
-    if (cart) {
-      const cartID = cart.id;
-      const version = cart.version;
-      const response = await api.post(`/me/carts/${cartID}`, {
-        version: version,
-        actions: [
-          {
-            action: "removeLineItem",
-            lineItemId: lineItemID,
-          },
-        ],
-      });
-      cartStore.removeFromCart(lineItemID);
-      return response.data;
-    }
   } catch (error) {
     console.error("не удалось удалить продукт", error);
     throw new Error("не удалось удалить продукт");

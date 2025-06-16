@@ -8,6 +8,7 @@ import { ref, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { checkValidSession } from "@/utils/validSession";
 import { useCartStore } from "@/store/useCartStore";
 import { usePromocodeStore } from "@/store/usePromocodeStore";
+import { storeToRefs } from "pinia";
 
 const route = useRoute();
 const authStore = useAuthStore();
