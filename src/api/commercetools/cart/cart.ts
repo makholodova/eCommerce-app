@@ -61,12 +61,12 @@ export async function addProductToCard(productId: string): Promise<Cart> {
         },
       ],
     });
-    cartStore.addToCart(response.data.lineItems[0]);
+    cartStore.setShoppingCart(response.data.lineItems);
     if (promocodeStore.code) {
       updatePromocodeStoreFromCart(response.data);
     }
 
-    return response.data.lineItems[0];
+    return response.data;
   } catch (error) {
     console.error(error);
     throw new Error("не удалось добавить товар в корзину");

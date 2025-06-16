@@ -19,26 +19,6 @@ export const useCartStore = defineStore(
       return shoppingCart.value;
     }
 
-    function addToCart(lineItem: LineItem): void {
-      const productInCard = shoppingCart.value.find(
-        (item) => item.productId !== lineItem.productId,
-      );
-      if (productInCard) {
-        const index = shoppingCart.value.findIndex(
-          (item) => item.productId === lineItem.productId,
-        );
-
-        if (index !== -1) {
-          shoppingCart.value[index] = {
-            ...productInCard,
-            quantity: productInCard.quantity + 1,
-          };
-        }
-      } else {
-        shoppingCart.value.push(lineItem);
-      }
-    }
-
     function removeFromCart(lineItemID: string): void {
       shoppingCart.value = shoppingCart.value.filter(
         (item) => item.id !== lineItemID,
@@ -55,7 +35,6 @@ export const useCartStore = defineStore(
       setShoppingCart,
       getShoppingCart,
       removeFromCart,
-      addToCart,
       cleanCart,
     };
   },

@@ -51,7 +51,6 @@ onMounted(async () => {
     router.push({ name: "notFoundPage" });
   }
 });
-//начало
 const btnText = computed(() => {
   return productInCard.value ? "Удалить из корзины" : "В корзину";
 });
@@ -79,21 +78,23 @@ async function processProduct(): Promise<void> {
       showSuccess("Товар успешно удален из корзины");
       productInCard.value = false;
     } else {
-      const lineItem = await addProductToCard(productID);
-      lineItemID.value = lineItem.id;
-      showSuccess("Товар успешно добавлен в корзину");
-      productInCard.value = true;
+      const cart = await addProductToCard(productID);
+      if (cart) {
+        const added = cart?.lineItems.find((li) => li.productId === productID);
+        lineItemID.value = added ? added.id : null;
+        showSuccess("Товар успешно добавлен в корзину");
+        productInCard.value = true;
+      }
     }
   } catch {
     const errorMsg =
-      "Не удалось удалить товар из корзины. Пожалуйста, попробуйте позже";
+      "Не удалось удалить или добавить товар. Пожалуйста, попробуйте позже";
     showError(errorMsg);
   } finally {
     isLoading.value = false;
   }
 }
 
-//конец
 function setCurrentIndexImage(index: number): void {
   currentImageIndex.value = index;
 }
