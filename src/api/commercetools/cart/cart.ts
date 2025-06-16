@@ -61,7 +61,7 @@ export async function addProductToCard(productId: string): Promise<Cart> {
         },
       ],
     });
-    cartStore.addToCart(response.data.lineItems[0]);
+    cartStore.setShoppingCart(response.data.lineItems);
     if (promocodeStore.code) {
       updatePromocodeStoreFromCart(response.data);
     }
