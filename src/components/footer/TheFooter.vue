@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import BaseContainer from "@/components/ui/BaseContainer.vue";
 import AddressIcon from "@/assets/icons/location.svg";
 import PhoneIcon from "@/assets/icons/phone.svg";
 import EmailIcon from "@/assets/icons/mail.svg";
@@ -7,6 +6,10 @@ import TelegramIcon from "@/assets/icons/telegram.svg";
 import WhatsAppIcon from "@/assets/icons/whatsapp.svg";
 import VkIcon from "@/assets/icons/vk.svg";
 import YouTubeIcon from "@/assets/icons/youtube.svg";
+
+import VisaIcon from "@/assets/images/pay-visa.png";
+import MastercardIcon from "@/assets/images/pay-mst.png";
+import MirIcon from "@/assets/images/pay-mir.png";
 
 const info = [
   {
@@ -56,11 +59,13 @@ const social = [
     url: "https://youtube.com",
   },
 ];
+
+const payments = [VisaIcon, MastercardIcon, MirIcon];
 </script>
 
 <template>
-  <footer>
-    <BaseContainer class="footer">
+  <footer ref="headerRef">
+    <div class="container footer">
       <div class="footer__top">
         <ul class="footer__info">
           <li v-for="item in info" :key="item.atr" class="footer__info-item">
@@ -73,8 +78,8 @@ const social = [
       <div class="footer__links">
         <div class="footer__block">
           <h5>Компания</h5>
-          <ul>
-            <li v-for="item in pages" :key="item.name">
+          <ul class="block-links">
+            <li v-for="item in pages" :key="item.name" class="block-link">
               <router-link :to="{ name: item.name }">{{
                 item.label
               }}</router-link>
@@ -84,8 +89,8 @@ const social = [
 
         <div class="footer__block">
           <h5>Категории</h5>
-          <ul>
-            <li v-for="item in categories" :key="item.name">
+          <ul class="block-links">
+            <li v-for="item in categories" :key="item.name" class="block-link">
               <router-link
                 :to="{
                   name: 'CatalogCategory',
@@ -116,33 +121,63 @@ const social = [
 
           <div class="footer__payment">
             <h5>Мы принимаем</h5>
-            <!-- вставить логотипы платёжных систем -->
+            <div class="payment-icons">
+              <img
+                v-for="(icon, i) in payments"
+                :key="i"
+                :src="icon"
+                :alt="`payment-icon-${i}`"
+                class="payment-icon"
+              />
+            </div>
           </div>
         </div>
       </div>
-
       <div class="footer__bottom">
         <p>
           &copy; {{ new Date().getFullYear() }} ZHMTshop — Все права защищены
         </p>
       </div>
-    </BaseContainer>
+    </div>
   </footer>
 </template>
 
 <style scoped>
-.footer {
+footer {
+  width: 100%;
   margin-top: 60px;
-  padding: 2rem 0;
-  background: #f8f8f8;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  border-top: 1px solid #c1c1c1;
+  box-shadow: 0 -2px 5px rgba(193, 193, 193, 0.6);
+}
+h5 {
+  margin: 1rem 0;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--grey);
+}
+.container {
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
 }
 
+.footer {
+  display: flex;
+  flex-direction: column;
+  padding: 10px clamp(16px, 5vw, 80px);
+}
 .footer__top {
+  border-bottom: 2px solid var(--blue-light);
+}
+.footer__top,
+.footer__links,
+.footer__bottom {
+  width: 100%;
+  max-width: 1440px;
+}
+.footer__top {
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 2rem;
 }
 .footer__info {
@@ -163,11 +198,56 @@ const social = [
 .footer__bottom {
   text-align: center;
   font-size: 0.9rem;
-  color: #777;
+  color: var(--grey);
 }
+
+.block-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0;
+  padding-left: 0;
+  list-style-type: none;
+}
+
+.block-link a {
+  font-size: 16px;
+  color: var(--black);
+  transition: color 0.3ms ease;
+}
+
+.block-link a:hover {
+  color: var(--blue-hover);
+}
+
 .icon {
   width: 25px;
   height: 25px;
+}
+
+.social-icons {
+  display: flex;
+  align-items: center;
+}
+
+.social-icon {
+  font-weight: 400;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--grey-dark);
+  transition: color 0.2ms ease;
+}
+
+.social-icon:hover {
+  color: var(--blue-hover);
+}
+
+.payment-icons {
+  display: flex;
+  align-items: center;
 }
 </style>
 px
