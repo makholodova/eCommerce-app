@@ -17,11 +17,12 @@ const togglePasswordVisibility = (): void => {
     class="toggle-password"
     @click="togglePasswordVisibility"
   >
-    <img
-      :src="isPasswordVisible ? EyeIcon : EyeIconOff"
-      alt="toggle password"
-      class="icon-eye"
-    />
+    <div v-if="isPasswordVisible">
+      <EyeIcon alt="toggle password" class="icon-eye" />
+    </div>
+    <div v-else>
+      <EyeIconOff alt="toggle password" class="icon-eye" />
+    </div>
   </button>
 </template>
 

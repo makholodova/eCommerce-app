@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import TheHeader from "./components/header/TheHeader.vue";
 import BaseContainer from "@/components/ui/BaseContainer.vue";
+import TheFooter from "@/components/footer/TheFooter.vue";
 </script>
 
 <template>
@@ -13,6 +14,7 @@ import BaseContainer from "@/components/ui/BaseContainer.vue";
         </transition>
       </router-view>
     </BaseContainer>
+    <TheFooter />
   </div>
 </template>
 

@@ -4,15 +4,40 @@ import { useRouter } from "vue-router";
 import { computed } from "vue";
 import BaseContainer from "@/components/ui/BaseContainer.vue";
 import { useAuthStore } from "@/store/useAuthStore";
-import { ref, watch } from "vue";
+import { ref, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
+import { checkValidSession } from "@/utils/validSession";
+import { useCartStore } from "@/store/useCartStore";
+import { usePromocodeStore } from "@/store/usePromocodeStore";
+import { storeToRefs } from "pinia";
 
 const route = useRoute();
 const authStore = useAuthStore();
 const router = useRouter();
-
+const cartStore = useCartStore();
+const promocodeStore = usePromocodeStore();
 const isAuthenticated = computed(() => authStore.isAuthenticated);
-
 const isChecked = ref(false);
+const headerRef = ref<HTMLElement | null>(null);
+const { totalItems } = storeToRefs(cartStore);
+
+function updateHeaderHeightCSSVar(): void {
+  if (headerRef.value) {
+    const height = headerRef.value.getBoundingClientRect().height;
+    document.documentElement.style.setProperty(
+      "--dynamic-header-height",
+      `${height}px`,
+    );
+  }
+}
+
+onMounted(async () => {
+  await nextTick();
+  updateHeaderHeightCSSVar();
+  window.addEventListener("resize", updateHeaderHeightCSSVar);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateHeaderHeightCSSVar);
+});
 
 watch(
   () => route.fullPath,
@@ -21,96 +46,160 @@ watch(
   },
 );
 
-function logout(): void {
+async function logout(): Promise<void> {
   authStore.logout();
+  promocodeStore.clearPromocode();
+
+  try {
+    await checkValidSession();
+  } catch (error) {
+    console.error(error);
+  }
+
   router.push({ name: "Main" });
 }
 </script>
 
 <template>
-  <header>
+  <header ref="headerRef">
     <BaseContainer class="header">
       <router-link :to="{ name: 'Main' }" class="logo">
         <img src="@/assets/icons/header-icons/logo.png" alt="logo" />
       </router-link>
-      <nav>
-        <input
-          id="burger-checkbox"
-          v-model="isChecked"
-          type="checkbox"
-          class="burger-checkbox"
-        />
-        <label for="burger-checkbox" class="burger"></label>
-        <ul class="navigation">
-          <router-link v-if="isAuthenticated" :to="{ name: 'User' }">
-            <div class="link-wrapper">
+      <div class="menu-wrapper">
+        <router-link :to="{ name: 'Cart' }">
+          <div class="link-wrapper">
+            <div class="cart-icon-wrapper">
               <img
-                src="@/assets/icons/header-icons/profile.png"
-                alt="user profile"
+                src="@/assets/icons/header-icons/cart.png"
+                alt="cart"
                 class="icon"
               />
-              <p class="icon-description">Профиль</p>
+              <div v-if="totalItems > 0" class="cart-total-counter">
+                {{ totalItems }}
+              </div>
             </div>
-          </router-link>
-          <router-link :to="{ name: 'Catalog' }">
-            <div class="link-wrapper">
-              <img
-                src="@/assets/icons/header-icons/catalog.png"
-                alt="catalog"
-                class="icon"
-              />
-              <p class="icon-description">Каталог</p>
-            </div>
-          </router-link>
-          <router-link
-            v-if="isAuthenticated"
-            :to="{ name: 'Main' }"
-            @click="logout"
-          >
-            <div class="link-wrapper">
-              <img
-                src="@/assets/icons/header-icons/logout.png"
-                alt="login"
-                class="icon"
-              />
-              <p class="icon-description">Выход</p>
-            </div>
-          </router-link>
-          <router-link
-            v-if="!isAuthenticated && route.name !== 'Login'"
-            :to="{ name: 'Login' }"
-          >
-            <div class="link-wrapper">
-              <img
-                src="@/assets/icons/header-icons/login.png"
-                alt="login"
-                class="icon"
-              />
-              <p class="icon-description">Вход</p>
-            </div>
-          </router-link>
-          <router-link
-            v-if="!isAuthenticated && route.name !== 'Register'"
-            :to="{ name: 'Register' }"
-          >
-            <div class="link-wrapper">
-              <img
-                src="@/assets/icons/header-icons/signup.png"
-                alt="register"
-                class="icon"
-              />
-              <p class="icon-description">Регистрация</p>
-            </div>
-          </router-link>
-        </ul>
-      </nav>
+
+            <p class="icon-description">Корзина</p>
+          </div>
+        </router-link>
+        <nav>
+          <input
+            id="burger-checkbox"
+            v-model="isChecked"
+            type="checkbox"
+            class="burger-checkbox"
+          />
+          <label for="burger-checkbox" class="burger"></label>
+          <ul class="navigation">
+            <router-link v-if="isAuthenticated" :to="{ name: 'User' }">
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/profile.png"
+                  alt="user profile"
+                  class="icon"
+                />
+                <p class="icon-description">Профиль</p>
+              </div>
+            </router-link>
+            <router-link :to="{ name: 'About' }">
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/about-us.png"
+                  alt="about us"
+                  class="icon"
+                />
+                <p class="icon-description">О нас</p>
+              </div>
+            </router-link>
+            <router-link :to="{ name: 'Catalog' }">
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/catalog.png"
+                  alt="catalog"
+                  class="icon"
+                />
+                <p class="icon-description">Каталог</p>
+              </div>
+            </router-link>
+            <router-link
+              v-if="isAuthenticated"
+              :to="{ name: 'Main' }"
+              @click="logout"
+            >
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/logout.png"
+                  alt="login"
+                  class="icon"
+                />
+                <p class="icon-description">Выход</p>
+              </div>
+            </router-link>
+            <router-link
+              v-if="!isAuthenticated && route.name !== 'Login'"
+              :to="{ name: 'Login' }"
+            >
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/login.png"
+                  alt="login"
+                  class="icon"
+                />
+                <p class="icon-description">Вход</p>
+              </div>
+            </router-link>
+            <router-link
+              v-if="!isAuthenticated && route.name !== 'Register'"
+              :to="{ name: 'Register' }"
+            >
+              <div class="link-wrapper">
+                <img
+                  src="@/assets/icons/header-icons/signup.png"
+                  alt="register"
+                  class="icon"
+                />
+                <p class="icon-description">Регистрация</p>
+              </div>
+            </router-link>
+          </ul>
+        </nav>
+      </div>
     </BaseContainer>
   </header>
 </template>
 
 <style scoped>
+.menu-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+}
 .burger-checkbox {
   display: none;
+}
+.cart-icon-wrapper {
+  position: relative;
+  z-index: 100;
+}
+.cart-total-counter {
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  display: flex;
+  justify-content: center;
+  background-color: var(--blue);
+  align-items: center;
+  padding: 2px;
+  color: white;
+  min-width: 20px;
+  min-height: 20px;
+  border-radius: 50%;
+  padding: 5px;
+  z-index: 1000;
+  font-size: 8px;
+  font-weight: bold;
 }
 @media (hover: hover) and (pointer: fine) {
   a:not(.logo):hover {
@@ -129,7 +218,7 @@ header {
 }
 .header {
   position: relative;
-  padding: 0 clamp(16px, 5vw, 80px);
+  padding: 10px clamp(16px, 5vw, 80px);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -166,13 +255,15 @@ header {
 .link-wrapper img {
   width: 20px;
   height: 20px;
+  margin-bottom: 5px;
 }
 a {
   text-decoration: none;
   border-radius: 10px;
   display: block;
+  text-transform: none;
 }
-@media (max-width: 600px) {
+@media (max-width: 650px) {
   .burger-checkbox {
     position: absolute;
     visibility: hidden;
@@ -182,7 +273,6 @@ a {
     z-index: 1;
     cursor: pointer;
     display: block;
-    position: relative;
     border: none;
     background: transparent;
 
@@ -231,37 +321,36 @@ a {
       transform 0.3s 0.15s;
   }
   .navigation {
-    top: 100%;
-    right: 0;
     position: absolute;
-    display: grid;
-    gap: 12px;
-    padding: 42px 0;
-    margin: 0;
+    right: 0;
+    top: var(--dynamic-header-height);
+    height: calc(100vh - var(--dynamic-header-height));
     width: 100vw;
-    height: 100vh;
-    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     background: var(--blue-light);
-    list-style-type: none;
-    transform: translateX(100%);
-    display: none;
-    transition: 0.3s;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    transform: translateX(-100%);
+  }
+
+  .burger-checkbox:checked ~ .navigation {
+    opacity: 1;
+    transform: translateX(0);
   }
   .navigation a {
-    display: block;
     padding: 8px;
     color: white;
     font-size: 18px;
     text-align: center;
     text-decoration: none;
   }
+
   .navigation a:hover {
     background: var(--blue-lighter);
-  }
-  .burger-checkbox:checked ~ .navigation {
-    transform: translateX(0);
-    display: flex;
-    flex-direction: column;
   }
   .header {
     padding: 5px 8px;

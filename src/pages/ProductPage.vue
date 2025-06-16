@@ -10,6 +10,12 @@ import type { ProductAdapter } from "@/types/interfaces";
 import api from "@/api/commercetools/axiosInstance";
 import { useRouter } from "vue-router";
 import BaseModal from "@/components/ui/BaseModal.vue";
+import {
+  getMyCart,
+  addProductToCard,
+  removeProduct,
+} from "@/api/commercetools/cart/cart.ts";
+import { showError, showSuccess } from "@/utils/toast.ts";
 
 enum DeviceFieldRu {
   brand = "Бренд",
@@ -33,14 +39,61 @@ const category = computed(() => {
 const rawProductID = route.params.productId;
 const productID = Array.isArray(rawProductID) ? rawProductID[0] : rawProductID;
 const isOpen = ref(false);
+const isLoading = ref<boolean>(false);
+const productInCard = ref<boolean>(false);
+const lineItemID = ref<string | null>(null);
 onMounted(async () => {
   try {
     const response = await api.get(`/product-projections/${rawProductID}`);
     product.value = productAdapter(response.data);
+    await setBtnText(productID);
   } catch {
     router.push({ name: "notFoundPage" });
   }
 });
+const btnText = computed(() => {
+  return productInCard.value ? "Удалить из корзины" : "В корзину";
+});
+
+async function setBtnText(id: string): Promise<void> {
+  try {
+    const cart = await getMyCart();
+    const lineItem = cart?.lineItems.find((li) => li.productId === id);
+    if (lineItem) {
+      productInCard.value = true;
+      lineItemID.value = lineItem.id;
+    } else {
+      productInCard.value = false;
+    }
+  } catch (error) {
+    console.log("ошибка определения, в корзине ли товар" + error);
+  }
+}
+
+async function processProduct(): Promise<void> {
+  isLoading.value = true;
+  try {
+    if (productInCard.value && lineItemID.value) {
+      await removeProduct(lineItemID.value);
+      showSuccess("Товар успешно удален из корзины");
+      productInCard.value = false;
+    } else {
+      const cart = await addProductToCard(productID);
+      if (cart) {
+        const added = cart?.lineItems.find((li) => li.productId === productID);
+        lineItemID.value = added ? added.id : null;
+        showSuccess("Товар успешно добавлен в корзину");
+        productInCard.value = true;
+      }
+    }
+  } catch {
+    const errorMsg =
+      "Не удалось удалить или добавить товар. Пожалуйста, попробуйте позже";
+    showError(errorMsg);
+  } finally {
+    isLoading.value = false;
+  }
+}
 
 function setCurrentIndexImage(index: number): void {
   currentImageIndex.value = index;
@@ -256,7 +309,12 @@ function openModal(): void {
           <div v-else class="card-price">
             <div class="card-current-price">{{ product.price }} ₽</div>
           </div>
-          <base-button class="cart-btn" text="В корзину"></base-button>
+          <base-button
+            class="cart-btn"
+            :text="btnText"
+            :disabled="isLoading"
+            @click="processProduct"
+          ></base-button>
         </div>
       </div>
     </div>
@@ -346,9 +404,7 @@ svg.disabled rect {
   justify-content: center;
   border-radius: 8px;
 }
-.cart-btn {
-  padding: 15px 60px;
-}
+
 .card-current-price {
   font-weight: 500;
   text-align: left;

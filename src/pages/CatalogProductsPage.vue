@@ -25,6 +25,7 @@ import type { breadCrumbType } from "@/types/user-login.types";
 import BaseBreadcrumbs from "@/components/ui/BaseBreadcrumbs.vue";
 import ProductSort from "@/components/ui/ProductSort.vue";
 import { sortApiMap } from "@/utils/filters/filters";
+import { useInfiniteScroll } from "@vueuse/core";
 
 const props = defineProps<{ category: string }>();
 const products = ref<ProductProjection[]>([]);
@@ -85,6 +86,7 @@ async function loadProducts(query?: string): Promise<void> {
 
   products.value = productsResult?.results ?? [];
   isLoaded.value = true;
+  ///here infinite sroll
 }
 
 async function loadInitialProducts(): Promise<void> {
@@ -125,6 +127,11 @@ useEventListener("resize", () => {
 
 const normalizedProducts = computed(() => products.value.map(productAdapter));
 
+watch(normalizedProducts, () => {
+  resetList();
+  data.value = normalizedProducts.value.slice(start, end);
+});
+
 onMounted(() => {
   loadInitialProducts();
 });
@@ -147,6 +154,38 @@ if (title.value) {
       category: title.value,
     },
   });
+}
+
+let end = 4;
+let start = 0;
+const data = ref(normalizedProducts.value.slice(start, end));
+
+const { reset } = useInfiniteScroll(
+  window,
+  () => {
+    start += 4;
+    if (end > normalizedProducts.value.length) {
+      data.value.push(...normalizedProducts.value.slice(start));
+    }
+    end += 4;
+    data.value.push(...normalizedProducts.value.slice(start, end));
+  },
+  {
+    distance: 100,
+    canLoadMore: () => {
+      // if (data.value.length >= normalizedProducts.value.length) return false;
+      return true; // for demo purposes
+    },
+  },
+);
+
+console.log(reset);
+
+async function resetList(): Promise<void> {
+  start = 0;
+  end = 4;
+  data.value = [];
+  reset();
 }
 </script>
 
@@ -195,7 +234,7 @@ if (title.value) {
       <BaseSpinner v-if="!isLoaded" />
       <div v-else-if="isSearchWord" class="product-list">
         <ProductCard
-          v-for="product in normalizedProducts"
+          v-for="product in data"
           :id="product.id"
           :key="product.id"
           :category="category"
@@ -260,6 +299,7 @@ if (title.value) {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 .sort {
   padding: 0 40px 16px 0;
