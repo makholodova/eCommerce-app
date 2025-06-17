@@ -47,7 +47,7 @@ export const useAuthStore = defineStore("auth", () => {
   async function refreshAnonymusToken(): Promise<void> {
     const anonymous_id = anonymousStore.anonymousId || getAnonymousId();
     const response = await fetch(
-      `${authUrl}oauth/${projectKey}/anonymous/token`,
+      `${authUrl}/oauth/${projectKey}/anonymous/token`,
       {
         method: "POST",
         headers: {
@@ -75,7 +75,7 @@ export const useAuthStore = defineStore("auth", () => {
     if (refreshTimer !== null) clearTimeout(refreshTimer);
     if (!tokenStore.refreshToken) return logout();
     try {
-      const response = await fetch(`${authUrl}oauth/token`, {
+      const response = await fetch(`${authUrl}/oauth/token`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
