@@ -4,18 +4,40 @@ import { useRouter } from "vue-router";
 import { computed } from "vue";
 import BaseContainer from "@/components/ui/BaseContainer.vue";
 import { useAuthStore } from "@/store/useAuthStore";
-import { ref, watch } from "vue";
+import { ref, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { checkValidSession } from "@/utils/validSession";
 import { useCartStore } from "@/store/useCartStore";
+import { usePromocodeStore } from "@/store/usePromocodeStore";
+import { storeToRefs } from "pinia";
 
 const route = useRoute();
 const authStore = useAuthStore();
 const router = useRouter();
 const cartStore = useCartStore();
-
+const promocodeStore = usePromocodeStore();
 const isAuthenticated = computed(() => authStore.isAuthenticated);
-
 const isChecked = ref(false);
+const headerRef = ref<HTMLElement | null>(null);
+const { totalItems } = storeToRefs(cartStore);
+
+function updateHeaderHeightCSSVar(): void {
+  if (headerRef.value) {
+    const height = headerRef.value.getBoundingClientRect().height;
+    document.documentElement.style.setProperty(
+      "--dynamic-header-height",
+      `${height}px`,
+    );
+  }
+}
+
+onMounted(async () => {
+  await nextTick();
+  updateHeaderHeightCSSVar();
+  window.addEventListener("resize", updateHeaderHeightCSSVar);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateHeaderHeightCSSVar);
+});
 
 watch(
   () => route.fullPath,
@@ -26,6 +48,7 @@ watch(
 
 async function logout(): Promise<void> {
   authStore.logout();
+  promocodeStore.clearPromocode();
 
   try {
     await checkValidSession();
@@ -38,7 +61,7 @@ async function logout(): Promise<void> {
 </script>
 
 <template>
-  <header>
+  <header ref="headerRef">
     <BaseContainer class="header">
       <router-link :to="{ name: 'Main' }" class="logo">
         <img src="@/assets/icons/header-icons/logo.png" alt="logo" />
@@ -52,8 +75,8 @@ async function logout(): Promise<void> {
                 alt="cart"
                 class="icon"
               />
-              <div v-if="cartStore.totalItems > 0" class="cart-total-counter">
-                {{ cartStore.totalItems }}
+              <div v-if="totalItems > 0" class="cart-total-counter">
+                {{ totalItems }}
               </div>
             </div>
 
@@ -162,17 +185,20 @@ async function logout(): Promise<void> {
 }
 .cart-total-counter {
   position: absolute;
-  top: -1px;
-  right: -10px;
-  width: 15px;
-  height: 15px;
+  top: -8px;
+  right: -12px;
   display: flex;
   justify-content: center;
+  background-color: var(--blue);
   align-items: center;
-  color: red;
+  padding: 2px;
+  color: white;
+  min-width: 20px;
+  min-height: 20px;
+  border-radius: 50%;
   padding: 5px;
   z-index: 1000;
-  font-size: 18px;
+  font-size: 8px;
   font-weight: bold;
 }
 @media (hover: hover) and (pointer: fine) {
@@ -192,7 +218,7 @@ header {
 }
 .header {
   position: relative;
-  padding: 0 clamp(16px, 5vw, 80px);
+  padding: 10px clamp(16px, 5vw, 80px);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -229,13 +255,15 @@ header {
 .link-wrapper img {
   width: 20px;
   height: 20px;
+  margin-bottom: 5px;
 }
 a {
   text-decoration: none;
   border-radius: 10px;
   display: block;
+  text-transform: none;
 }
-@media (max-width: 600px) {
+@media (max-width: 650px) {
   .burger-checkbox {
     position: absolute;
     visibility: hidden;
@@ -245,7 +273,6 @@ a {
     z-index: 1;
     cursor: pointer;
     display: block;
-    position: relative;
     border: none;
     background: transparent;
 
@@ -294,37 +321,36 @@ a {
       transform 0.3s 0.15s;
   }
   .navigation {
-    top: 100%;
-    right: 0;
     position: absolute;
-    display: grid;
-    gap: 12px;
-    padding: 42px 0;
-    margin: 0;
+    right: 0;
+    top: var(--dynamic-header-height);
+    height: calc(100vh - var(--dynamic-header-height));
     width: 100vw;
-    height: 100vh;
-    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     background: var(--blue-light);
-    list-style-type: none;
-    transform: translateX(100%);
-    display: none;
-    transition: 0.3s;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    transform: translateX(-100%);
+  }
+
+  .burger-checkbox:checked ~ .navigation {
+    opacity: 1;
+    transform: translateX(0);
   }
   .navigation a {
-    display: block;
     padding: 8px;
     color: white;
     font-size: 18px;
     text-align: center;
     text-decoration: none;
   }
+
   .navigation a:hover {
     background: var(--blue-lighter);
-  }
-  .burger-checkbox:checked ~ .navigation {
-    transform: translateX(0);
-    display: flex;
-    flex-direction: column;
   }
   .header {
     padding: 5px 8px;

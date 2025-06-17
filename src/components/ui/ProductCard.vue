@@ -6,7 +6,6 @@ import {
   addProductToCard,
   isProductInCart,
 } from "@/api/commercetools/cart/cart.ts";
-import BaseSpinner from "./BaseSpinner.vue";
 
 const props = defineProps<{
   id: string;
@@ -63,9 +62,7 @@ async function addToCart(): Promise<void> {
 
 <template>
   <div class="card" @click="redirectToProductPage">
-    <BaseSpinner v-if="isLoading" class="spinner" />
     <div class="card-img-wrapper">
-      <img :src="image" alt="card-image" class="card-img" loading="lazy" />
       <img :src="image" alt="card-image" class="card-img" loading="lazy" />
       <div v-if="isDiscounted" class="card-img-discounted-icon">
         -{{ discountedPercentage }}%
@@ -89,6 +86,7 @@ async function addToCart(): Promise<void> {
       class="card-btn"
       :text="btnText"
       :disabled="isDisabled"
+      :is-loading="isLoading"
       @click.prevent.stop="addToCart"
     ></base-button>
   </div>
@@ -165,7 +163,6 @@ a {
   justify-content: center;
   overflow: hidden;
   flex: 0 0 216px;
-  flex: 0 0 216px;
 }
 .card-img {
   width: 100%;
@@ -208,16 +205,12 @@ a {
     flex-direction: row;
     padding: 24px 16px;
     flex-wrap: wrap;
-    flex-wrap: wrap;
   }
   .card-img-wrapper {
     align-self: flex-start;
-    /* flex-shrink: 1; */
     width: 101px;
     height: 139px;
-    /* flex-shrink: 1; */
-    width: 101px;
-    height: 139px;
+    flex: 0 0 150px;
   }
   .card-information {
     flex: 1;
@@ -248,6 +241,25 @@ a {
   .card-img-discounted-icon {
     width: 48px;
     height: 33px;
+  }
+}
+
+@media (max-width: 360px) {
+  .card {
+    max-width: 375px;
+    width: 100%;
+    flex-direction: column;
+    padding: 24px 16px;
+    flex-wrap: wrap;
+  }
+  .card-img-wrapper {
+    align-self: center;
+    width: 101px;
+    height: 139px;
+    flex: 0 0 150px;
+  }
+  .card-information {
+    align-items: center;
   }
 }
 </style>

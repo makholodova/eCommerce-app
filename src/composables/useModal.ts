@@ -8,6 +8,7 @@ export type ModalType =
   | "filter"
   | "addBilling"
   | "addShipping"
+  | "clearCart"
   | null;
 
 export function useModal(): {

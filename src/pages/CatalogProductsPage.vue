@@ -181,7 +181,7 @@ const { reset } = useInfiniteScroll(
 
 console.log(reset);
 
-async function resetList(): void {
+async function resetList(): Promise<void> {
   start = 0;
   end = 4;
   data.value = [];
@@ -299,6 +299,7 @@ async function resetList(): void {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 .sort {
   padding: 0 40px 16px 0;
